@@ -17,7 +17,7 @@
     <!-- Header / Navbar -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي - دودي روز</h1>
+            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي - الشبكة المركزية</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
                 <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
                 <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
@@ -31,8 +31,8 @@
         <!-- Auth Screen (Login / Register) -->
         <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div class="text-center mb-6">
-                <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام</h2>
-                <p class="text-sm text-gray-500 mt-1">أدخل بيانات حسابك للمتابعة</p>
+                <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
+                <p class="text-sm text-gray-500 mt-1">حساب مركزي واحد لكل منشآت الشبكة</p>
             </div>
 
             <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
@@ -156,7 +156,7 @@
                 </div>
             </div>
 
-            <!-- Tenant Admin Dashboard (Loyalty & CRM Focus) -->
+            <!-- Tenant Admin Dashboard (Loyalty & Sub-Wallets Focus) -->
             <div id="tenant-admin-view" class="role-view hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
                     <div>
@@ -169,7 +169,6 @@
                     </div>
                 </div>
 
-                <!-- Loyalty Rules & Settings -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">⚙️ ضوابط وقواعد منح المكافآت والنقاط</h4>
@@ -194,41 +193,48 @@
 
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between">
                         <div>
-                            <h4 class="text-base font-bold text-indigo-800 mb-3">📊 إحصائيات عملاء دودي روز</h4>
+                            <h4 class="text-base font-bold text-indigo-800 mb-3">📊 إحصائيات محفظة عملاء المنشأة</h4>
                             <div class="grid grid-cols-2 gap-4 mt-4">
                                 <div class="bg-indigo-50 p-4 rounded-xl text-center">
-                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي العملاء المسجلين</span>
+                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي العملاء المرتبطين</span>
                                     <span id="tenant-stat-customers" class="text-2xl font-bold text-indigo-700 mt-1 block">0</span>
                                 </div>
                                 <div class="bg-emerald-50 p-4 rounded-xl text-center">
-                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي النقاط الممنوحة</span>
+                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي النقاط بالمحفظة الفرعية</span>
                                     <span id="tenant-stat-points" class="text-2xl font-bold text-emerald-700 mt-1 block">0</span>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
-                            💡 نصيحة تشغيلية: مراقبة رصيد النقاط والعملاء بانتظام تساعدك على إطلاق عروض ترويجية مستهدفة لزيادة الولاء.
+                            💡 ملاحظة: رصيد النقاط يدار عبر المحفظة الفرعية الخاصة بالمنشأة لضمان الاستقلالية المالية.
                         </div>
                     </div>
                 </div>
 
-                <!-- Customer Management & Ledger -->
+                <!-- Customer Sub-Wallets Management -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h4 class="text-base font-bold text-indigo-800 mb-3">👥 إدارة عملاء المنشأة (رصيد النقاط والحركات)</h4>
-                    <div id="tenant-customers-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل العملاء...</div>
+                    <h4 class="text-base font-bold text-indigo-800 mb-3">👥 محافظ العملاء الفرعية ومراقبة رصيد النقاط</h4>
+                    <div id="tenant-customers-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل العملاء والمحافظ...</div>
                 </div>
             </div>
 
-            <!-- Customer Dashboard -->
+            <!-- Customer Dashboard (Central Account) -->
             <div id="customer-view" class="role-view hidden space-y-6">
                 <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg opacity-90">رصيد النقاط الحالي</h3>
-                        <p id="customer-points" class="text-4xl font-extrabold mt-1">0 نقطة</p>
+                        <h3 class="text-lg opacity-90">حسابك المركزي الموحد</h3>
+                        <p id="customer-welcome-name" class="text-2xl font-bold mt-1">مرحباً بك</p>
                     </div>
                     <div class="bg-white p-3 rounded-xl text-center text-gray-800">
-                        <div class="w-24 h-24 bg-gray-200 flex items-center justify-center text-xs font-bold rounded-lg mb-1">QR Code</div>
-                        <span id="customer-code-text" class="text-xs font-semibold">--</span>
+                        <div class="w-20 h-20 bg-gray-200 flex items-center justify-center text-xs font-bold rounded-lg mb-1">QR Code</div>
+                        <span class="text-xs font-semibold">كود العميل</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h4 class="text-base font-bold text-indigo-800 mb-3">💼 محافظ النقاط في منشآت الشبكة</h4>
+                    <div id="customer-wallets-list" class="space-y-3">
+                        <p class="text-gray-400 text-sm">جاري تحميل محافظك الفرعية...</p>
                     </div>
                 </div>
             </div>
@@ -237,14 +243,14 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
-        جميع الحقوق محفوظة &copy; 2026 - نظام إدارة الولاء
+        جميع الحقوق محفوظة &copy; 2026 - نظام إدارة الولاء المركزي
     </footer>
 
     <!-- Firebase SDKs & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
@@ -266,8 +272,8 @@
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب عميل جديد' : 'تسجيل الدخول للنظام';
-            document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل وحفظ' : 'دخول';
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب مركزي جديد' : 'تسجيل الدخول للنظام المركزي';
+            document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل الحساب' : 'دخول';
             document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً كعميل جديد';
         }
 
@@ -280,10 +286,17 @@
                 if (isRegisterMode) {
                     const name = document.getElementById('fullname').value;
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                    // Central customer user profile
                     await setDoc(doc(db, "users", userCred.user.uid), {
-                        name, email, role: 'customer', tenantId: 'dody_rose', points: 0, isBlocked: false, createdAt: new Date().toISOString()
+                        name, email, role: 'customer', isBlocked: false, createdAt: new Date().toISOString()
                     });
-                    alert('تم إنشاء حساب العميل بنجاح!');
+                    
+                    // Automatically initialize a sub-wallet under dody_rose for testing
+                    await setDoc(doc(db, "tenants", "dody_rose", "customers", userCred.user.uid), {
+                        name, email, points: 50, lastVisit: new Date().toISOString()
+                    });
+
+                    alert('تم إنشاء الحساب المركزي ومحفظة دودي روز بنجاح!');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -442,17 +455,16 @@
             if (snap.empty) { listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>'; return; }
 
             let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">المنشأة</th><th class="p-3">الحالة</th></tr></thead>
+                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">الحالة</th></tr></thead>
                 <tbody class="divide-y divide-gray-100">`;
             snap.forEach((d) => {
                 const u = d.data();
-                html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${u.name || '--'}</td><td class="p-3 text-xs">${u.email}</td><td class="p-3 text-xs font-mono">${u.role}</td><td class="p-3 text-xs font-mono text-indigo-600">${u.tenantId || '-'}</td><td class="p-3 text-xs">${u.isBlocked ? 'محظور' : 'نشط'}</td></tr>`;
+                html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${u.name || '--'}</td><td class="p-3 text-xs">${u.email}</td><td class="p-3 text-xs font-mono">${u.role}</td><td class="p-3 text-xs">${u.isBlocked ? 'محظور' : 'نشط'}</td></tr>`;
             });
             html += '</tbody></table>';
             listEl.innerHTML = html;
         }
 
-        // Tenant Admin: Loyalty Rules & Customers Ledger
         window.saveTenantLoyaltyRules = async function(e) {
             e.preventDefault();
             if (!currentUserTenantId) return;
@@ -469,7 +481,6 @@
         window.loadTenantAdminData = async function() {
             if (!currentUserTenantId) return;
             
-            // Load rules
             const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
             if (tDoc.exists()) {
                 const data = tDoc.data();
@@ -481,25 +492,23 @@
                 }
             }
 
-            // Load customers for this tenant
+            // Load sub-wallets from tenants/{tenantId}/customers collection
             const listEl = document.getElementById('tenant-customers-list');
             listEl.innerHTML = 'جاري التحميل...';
             try {
-                const q = query(collection(db, "users"), where("tenantId", "==", currentUserTenantId), where("role", "==", "customer"));
-                const snap = await getDocs(q);
-                
+                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "customers"));
                 let totalCustomers = 0;
                 let totalPoints = 0;
 
                 if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 py-3">لا يوجد عملاء مسجلين لهذه المنشأة حالياً.</p>';
+                    listEl.innerHTML = '<p class="text-gray-400 py-3">لا توجد محافظ فرعية مسجلة لهذه المنشأة حالياً.</p>';
                     document.getElementById('tenant-stat-customers').innerText = 0;
                     document.getElementById('tenant-stat-points').innerText = 0;
                     return;
                 }
 
                 let html = `<table class="w-full text-right border-collapse">
-                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط</th><th class="p-3">تاريخ التسجيل</th></tr></thead>
+                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط (المحفظة الفرعية)</th><th class="p-3">آخر زيارة</th></tr></thead>
                     <tbody class="divide-y divide-gray-100">`;
                 
                 snap.forEach((d) => {
@@ -507,7 +516,7 @@
                     const c = d.data();
                     const pts = c.points || 0;
                     totalPoints += pts;
-                    const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('ar-SA') : '--';
+                    const dateStr = c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('ar-SA') : '--';
 
                     html += `<tr class="hover:bg-gray-50">
                         <td class="p-3 font-semibold">${c.name || '--'}</td>
@@ -522,7 +531,62 @@
                 document.getElementById('tenant-stat-customers').innerText = totalCustomers;
                 document.getElementById('tenant-stat-points').innerText = totalPoints;
             } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل العملاء.</p>';
+                listEl.innerHTML = '<p class="text-red-500">فشل تحميل محافظ العملاء الفرعية.</p>';
+            }
+        }
+
+        // Load customer central profile & their sub-wallets across tenants
+        window.loadCustomerDashboard = async function(userId) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (!userDoc.exists()) return;
+            const userData = userDoc.data();
+            document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
+
+            const walletsEl = document.getElementById('customer-wallets-list');
+            walletsEl.innerHTML = 'جاري البحث عن محافظك في المنشآت...';
+
+            try {
+                // Check all tenants to see where this customer has sub-wallets
+                const tenantsSnap = await getDocs(collection(db, "tenants"));
+                if (tenantsSnap.empty) {
+                    walletsEl.innerHTML = '<p class="text-gray-400 text-sm">لا توجد منشآت متاحة حالياً.</p>';
+                    return;
+                }
+
+                let walletsHtml = '';
+                let foundAny = false;
+
+                for (const tDoc of tenantsSnap.docs) {
+                    const tenantId = tDoc.id;
+                    const tenantData = tDoc.data();
+                    
+                    // Check if customer has sub-wallet in this tenant
+                    const custWalletDoc = await getDoc(doc(db, "tenants", tenantId, "customers", userId));
+                    if (custWalletDoc.exists()) {
+                        foundAny = true;
+                        const wData = custWalletDoc.data();
+                        walletsHtml += `
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <div>
+                                    <h5 class="font-bold text-indigo-800">${tenantData.businessName}</h5>
+                                    <span class="text-xs text-gray-500 font-mono">معرف الفرع: ${tenantId}</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-xl font-extrabold text-emerald-600">${wData.points || 0}</span>
+                                    <span class="text-xs text-gray-500 block">نقطة في المحفظة</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (!foundAny) {
+                    walletsHtml = '<p class="text-gray-500 text-sm py-2">ليس لديك رصيد نقاط في أي منشأة مسجلة حالياً. تفضل بزيارة أحد فروعنا لكسب النقاط!</p>';
+                }
+
+                walletsEl.innerHTML = walletsHtml;
+            } catch (err) {
+                walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل المحافظ الفرعية.</p>';
             }
         }
 
@@ -541,7 +605,7 @@
                     authSection.classList.add('hidden');
                     dashboardSection.classList.remove('hidden');
                     userInfo.classList.remove('hidden');
-                    roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
+                    roleBadge.innerText = `الدور: ${data.role}`;
 
                     document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
                     
@@ -554,6 +618,10 @@
                         document.getElementById('tenant-admin-view').classList.remove('hidden');
                         document.getElementById('current-tenant-id-badge').innerText = data.tenantId;
                         loadTenantAdminData();
+                    } else {
+                        // Customer View
+                        document.getElementById('customer-view').classList.remove('hidden');
+                        loadCustomerDashboard(user.uid);
                     }
                 }
             } else {
