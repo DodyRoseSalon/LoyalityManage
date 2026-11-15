@@ -295,7 +295,6 @@
                         <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (QR ID): <span id="customer-uid-badge">--</span></p>
                     </div>
                     <div class="bg-white p-3 rounded-xl text-center text-gray-800 shadow-md">
-                        <!-- Simulated QR Code visual containing user UID -->
                         <div class="w-24 h-24 bg-gray-900 text-white flex flex-col items-center justify-center font-mono text-[9px] rounded-lg p-1 text-center leading-tight">
                             <span>[QR-CODE]</span>
                             <span id="customer-qr-text" class="text-[8px] mt-1 text-indigo-300 truncate w-full">--</span>
@@ -365,7 +364,6 @@
                         name, email, role: 'customer', isBlocked: false, createdAt: new Date().toISOString()
                     });
                     
-                    // Initialize wallet under dody_rose with welcome bonus (50 points)
                     await setDoc(doc(db, "tenants", "dody_rose", "customers", userCred.user.uid), {
                         name, email, points: 50, lastVisit: new Date().toISOString()
                     });
@@ -611,7 +609,6 @@
             if (!customerUid) return alert('الرجاء قراءة أو إدخال كود العميل (UID).');
 
             try {
-                // Find user in central users collection
                 const userDocRef = doc(db, "users", customerUid);
                 const userDoc = await getDoc(userDocRef);
 
@@ -623,17 +620,14 @@
                 const userData = userDoc.data();
                 activePosCustomerUid = customerUid;
 
-                // Check sub-wallet in this tenant
                 const walletRef = doc(db, "tenants", currentUserTenantId, "customers", customerUid);
                 const walletDoc = await getDoc(walletRef);
                 let currentPoints = walletDoc.exists() ? (walletDoc.data().points || 0) : 0;
 
-                // Populate UI
                 document.getElementById('pos-c-name').innerText = userData.name;
                 document.getElementById('pos-c-email').innerText = userData.email;
                 document.getElementById('pos-c-points').innerText = currentPoints;
 
-                // Show operational panel & hide search input session
                 document.getElementById('pos-active-session').classList.remove('hidden');
             } catch (err) {
                 alert('خطأ أثناء البحث عن العميل: ' + err.message);
@@ -684,8 +678,7 @@
             const servicePrice = Number(document.getElementById('pos-service-price-input').value);
             if (servicePrice <= 0) return alert('الرجاء إدخال قيمة الخدمة الفعلية.');
 
-            // Calculate points needed based on rule (e.g. pointValue in currency)
-            const pointValue = activeTenantRules.pointValue || 1; // e.g., 1 point = 1 Riyal discount
+            const pointValue = activeTenantRules.pointValue || 1;
             const requiredPoints = Math.ceil(servicePrice / pointValue);
 
             const walletRef = doc(db, "tenants", currentUserTenantId, "customers", activePosCustomerUid);
@@ -792,7 +785,6 @@
                         loadTenantAdminData();
                     } else if (data.role === 'cashier') {
                         currentUserTenantId = data.tenantId;
-                        document.getElementById('cash`ie`r-view').classList.remove('hidden');
                         document.getElementById('cashier-view').classList.remove('hidden');
                         loadCashierDashboard();
                     } else {
@@ -802,17 +794,12 @@
                 }
             } else {
                 authSection.classList.remove('hidden');
-                dashboardSystemReset();
+                dashboardSection.classList.add('hidden');
+                userInfo.classList.add('hidden');
+                currentUserTenantId = null;
+                activePosCustomerUid = null;
             }
         });
-
-        function systemReset() {
-            document.getElementById('dashboard-section').classList.add('hidden');
-            document.getElementById('user-info').classList.add('hidden');
-            currentUserTenantId = null;
-            activePosCustomerUid = null;
-            resetPosSession();
-        }
     </script>
 </body>
 </html>
