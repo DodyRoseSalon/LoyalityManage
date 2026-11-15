@@ -89,14 +89,12 @@
                     </div>
                 </div>
 
-                <!-- Row 1: Create Tenant & Create Tenant Admin -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Create Tenant -->
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد نوع الاشتراك</h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة بالانجليزية (مثال: dody_rose)</label>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose)</label>
                                 <input type="text" id="tenant-id-input" pattern="[a-zA-Z0-9_]+" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
@@ -119,7 +117,6 @@
                         </form>
                     </div>
 
-                    <!-- Create Tenant Admin User -->
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة حساب مدير منشأة (Tenant Admin)</h3>
                         <form onsubmit="createTenantAdmin(event)" class="space-y-3 mt-3">
@@ -148,26 +145,6 @@
                     </div>
                 </div>
 
-                <!-- Global Settings -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h3 class="text-lg font-bold text-indigo-800 mb-1">الإعدادات العامة للنظام</h3>
-                    <form onsubmit="saveGlobalSettings(event)" class="space-y-3 mt-3 max-w-xl">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لـ 1 نقطة (ريال)</label>
-                                <input type="number" id="global-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة النقطة عند الاستبدال</label>
-                                <input type="number" id="global-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                            حفظ الإعدادات العامة
-                        </button>
-                    </form>
-                </div>
-
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                     <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المنشآت والاشتراكات</h4>
                     <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
@@ -179,7 +156,7 @@
                 </div>
             </div>
 
-            <!-- Tenant Admin Dashboard -->
+            <!-- Tenant Admin Dashboard (Loyalty & CRM Focus) -->
             <div id="tenant-admin-view" class="role-view hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
                     <div>
@@ -192,39 +169,54 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 lg:col-span-1">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">إضافة خدمة جديدة</h4>
-                        <form onsubmit="addTenantService(event)" class="space-y-3">
+                <!-- Loyalty Rules & Settings -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                        <h4 class="text-base font-bold text-indigo-800 mb-3">⚙️ ضوابط وقواعد منح المكافآت والنقاط</h4>
+                        <form onsubmit="saveTenantLoyaltyRules(event)" class="space-y-3">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">اسم الخدمة</label>
-                                <input type="text" id="service-name" placeholder="مثال: قص وتصفيف شعر" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (ريال سعودي)</label>
+                                <input type="number" id="rule-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">السعر (ريال)</label>
-                                <input type="number" id="service-price" placeholder="150" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة استبدال النقطة الواحدة (ريال)</label>
+                                <input type="number" id="rule-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">النقاط المكتسبة للعميل</label>
-                                <input type="number" id="service-points" placeholder="15" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">صلاحية النقاط (بالأيام)</label>
+                                <input type="number" id="rule-expiry-days" value="365" min="30" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                حفظ وإضافة الخدمة
+                                حفظ ضوابط الولاء
                             </button>
                         </form>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 lg:col-span-2">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">قائمة الخدمات والأسعار المسجلة</h4>
-                        <div id="services-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل الخدمات...</div>
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-base font-bold text-indigo-800 mb-3">📊 إحصائيات عملاء دودي روز</h4>
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div class="bg-indigo-50 p-4 rounded-xl text-center">
+                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي العملاء المسجلين</span>
+                                    <span id="tenant-stat-customers" class="text-2xl font-bold text-indigo-700 mt-1 block">0</span>
+                                </div>
+                                <div class="bg-emerald-50 p-4 rounded-xl text-center">
+                                    <span class="text-xs text-gray-500 font-semibold block">إجمالي النقاط الممنوحة</span>
+                                    <span id="tenant-stat-points" class="text-2xl font-bold text-emerald-700 mt-1 block">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+                            💡 نصيحة تشغيلية: مراقبة رصيد النقاط والعملاء بانتظام تساعدك على إطلاق عروض ترويجية مستهدفة لزيادة الولاء.
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Cashier POS Dashboard -->
-            <div id="cashier-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
-                <h3 class="text-xl font-bold text-indigo-800 mb-4">واجهة الكاشير (POS)</h3>
-                <p class="text-sm text-gray-500">قريباً تفعيل عمليات نقاط البيع المباشرة...</p>
+                <!-- Customer Management & Ledger -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h4 class="text-base font-bold text-indigo-800 mb-3">👥 إدارة عملاء المنشأة (رصيد النقاط والحركات)</h4>
+                    <div id="tenant-customers-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل العملاء...</div>
+                </div>
             </div>
 
             <!-- Customer Dashboard -->
@@ -252,7 +244,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
@@ -270,7 +262,6 @@
 
         let isRegisterMode = false;
         let currentUserTenantId = null;
-        let globalDefaults = { currencyPerPoint: 10, pointValueInCurrency: 1 };
 
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
@@ -290,7 +281,7 @@
                     const name = document.getElementById('fullname').value;
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
                     await setDoc(doc(db, "users", userCred.user.uid), {
-                        name, email, role: 'customer', tenantId: 'default_tenant', isBlocked: false, createdAt: new Date().toISOString()
+                        name, email, role: 'customer', tenantId: 'dody_rose', points: 0, isBlocked: false, createdAt: new Date().toISOString()
                     });
                     alert('تم إنشاء حساب العميل بنجاح!');
                 } else {
@@ -302,24 +293,6 @@
         }
 
         window.logout = function() { signOut(auth); }
-
-        async function loadGlobalSettings() {
-            try {
-                const snap = await getDoc(doc(db, "system_settings", "global"));
-                if (snap.exists()) globalDefaults = snap.data();
-            } catch (err) { console.error(err); }
-        }
-
-        window.saveGlobalSettings = async function(e) {
-            e.preventDefault();
-            const settingsData = {
-                currencyPerPoint: Number(document.getElementById('global-currency-per-point').value),
-                pointValueInCurrency: Number(document.getElementById('global-point-value').value),
-                updatedAt: new Date().toISOString()
-            };
-            await setDoc(doc(db, "system_settings", "global"), settingsData);
-            alert('تم حفظ الإعدادات العامة للنظام بنجاح!');
-        }
 
         window.createTenant = async function(e) {
             e.preventDefault();
@@ -346,7 +319,7 @@
                     planType: plan,
                     expiresAt: expiresAt,
                     createdAt: new Date().toISOString(),
-                    settings: { ...globalDefaults }
+                    loyaltyRules: { currencyPerPoint: 10, pointValue: 1, expiryDays: 365 }
                 });
                 alert(`تم إنشاء المنشأة (${businessName}) بنجاح!`);
                 document.getElementById('tenant-id-input').value = '';
@@ -357,7 +330,6 @@
             }
         }
 
-        // Create Tenant Admin User from Super Admin Panel
         window.createTenantAdmin = async function(e) {
             e.preventDefault();
             const tenantId = document.getElementById('admin-tenant-select').value;
@@ -368,16 +340,11 @@
             if (!tenantId) return alert('الرجاء اختيار المنشأة أولاً.');
 
             try {
-                // Create auth user using secondary app instance or main auth (since client SDK signs in newly created user, we use a trick or direct createUser)
-                // Note: createUserWithEmailAndPassword logs in the user automatically in Firebase Client SDK.
-                // To prevent logging out the Super Admin, we can create the user document directly or notify the admin.
-                // Better approach for client-side: we use createUserWithEmailAndPassword, but wait! It signs in the new user.
-                // Let's inform the user or handle it smoothly.
                 const userCred = await createUserWithEmailAndPassword(auth, email, password);
                 await setDoc(doc(db, "users", userCred.user.uid), {
                     name, email, role: 'tenant_admin', tenantId, isBlocked: false, createdAt: new Date().toISOString()
                 });
-                alert(`تم إنشاء حساب مدير المنشأة (${name}) بنجاح! (تم تسجيل دخولك بالحساب الجديد، يجدر بك تسجيل الخروج والعودة لحساب الأدمن الرئيسي).`);
+                alert(`تم إنشاء حساب مدير المنشأة (${name}) بنجاح!`);
                 loadUsers();
             } catch (error) {
                 alert('خطأ أثناء إنشاء حساب المدير: ' + error.message);
@@ -485,50 +452,77 @@
             listEl.innerHTML = html;
         }
 
-        // Tenant Admin Services Management
-        window.addTenantService = async function(e) {
+        // Tenant Admin: Loyalty Rules & Customers Ledger
+        window.saveTenantLoyaltyRules = async function(e) {
             e.preventDefault();
-            if (!currentUserTenantId) return alert('معرف المنشأة غير متوفر.');
-            const name = document.getElementById('service-name').value.trim();
-            const price = Number(document.getElementById('service-price').value);
-            const points = Number(document.getElementById('service-points').value);
-
-            try {
-                await addDoc(collection(db, "tenants", currentUserTenantId, "services"), {
-                    name, price, points, createdAt: new Date().toISOString()
-                });
-                alert('تمت إضافة الخدمة بنجاح!');
-                document.getElementById('service-name').value = '';
-                document.getElementById('service-price').value = '';
-                document.getElementById('service-points').value = '';
-                loadTenantServices();
-            } catch (err) {
-                alert('خطأ أثناء إضافة الخدمة: ' + err.message);
-            }
+            if (!currentUserTenantId) return;
+            const loyaltyRules = {
+                currencyPerPoint: Number(document.getElementById('rule-currency-per-point').value),
+                pointValue: Number(document.getElementById('rule-point-value').value),
+                expiryDays: Number(document.getElementById('rule-expiry-days').value),
+                updatedAt: new Date().toISOString()
+            };
+            await updateDoc(doc(db, "tenants", currentUserTenantId), { loyaltyRules });
+            alert('تم حفظ ضوابط الولاء والمكافآت بنجاح!');
         }
 
-        window.loadTenantServices = async function() {
+        window.loadTenantAdminData = async function() {
             if (!currentUserTenantId) return;
-            const listEl = document.getElementById('services-list');
+            
+            // Load rules
+            const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
+            if (tDoc.exists()) {
+                const data = tDoc.data();
+                document.getElementById('current-tenant-name').innerText = data.businessName;
+                if (data.loyaltyRules) {
+                    document.getElementById('rule-currency-per-point').value = data.loyaltyRules.currencyPerPoint || 10;
+                    document.getElementById('rule-point-value').value = data.loyaltyRules.pointValue || 1;
+                    document.getElementById('rule-expiry-days').value = data.loyaltyRules.expiryDays || 365;
+                }
+            }
+
+            // Load customers for this tenant
+            const listEl = document.getElementById('tenant-customers-list');
             listEl.innerHTML = 'جاري التحميل...';
             try {
-                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "services"));
+                const q = query(collection(db, "users"), where("tenantId", "==", currentUserTenantId), where("role", "==", "customer"));
+                const snap = await getDocs(q);
+                
+                let totalCustomers = 0;
+                let totalPoints = 0;
+
                 if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 py-3">لا توجد خدمات مسجلة لهذه المنشأة حالياً.</p>';
+                    listEl.innerHTML = '<p class="text-gray-400 py-3">لا يوجد عملاء مسجلين لهذه المنشأة حالياً.</p>';
+                    document.getElementById('tenant-stat-customers').innerText = 0;
+                    document.getElementById('tenant-stat-points').innerText = 0;
                     return;
                 }
 
                 let html = `<table class="w-full text-right border-collapse">
-                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم الخدمة</th><th class="p-3">السعر</th><th class="p-3">النقاط المكتسبة</th></tr></thead>
+                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط</th><th class="p-3">تاريخ التسجيل</th></tr></thead>
                     <tbody class="divide-y divide-gray-100">`;
+                
                 snap.forEach((d) => {
-                    const s = d.data();
-                    html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${s.name}</td><td class="p-3">${s.price} ر.س</td><td class="p-3 font-bold text-indigo-600">${s.points} نقطة</td></tr>`;
+                    totalCustomers++;
+                    const c = d.data();
+                    const pts = c.points || 0;
+                    totalPoints += pts;
+                    const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('ar-SA') : '--';
+
+                    html += `<tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold">${c.name || '--'}</td>
+                        <td class="p-3 text-xs text-gray-500">${c.email}</td>
+                        <td class="p-3 font-bold text-indigo-600">${pts} نقطة</td>
+                        <td class="p-3 text-xs">${dateStr}</td>
+                    </tr>`;
                 });
                 html += '</tbody></table>';
                 listEl.innerHTML = html;
+
+                document.getElementById('tenant-stat-customers').innerText = totalCustomers;
+                document.getElementById('tenant-stat-points').innerText = totalPoints;
             } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل الخدمات.</p>';
+                listEl.innerHTML = '<p class="text-red-500">فشل تحميل العملاء.</p>';
             }
         }
 
@@ -553,19 +547,13 @@
                     
                     if (data.role === 'super_admin') {
                         document.getElementById('super-admin-view').classList.remove('hidden');
-                        loadGlobalSettings();
                         loadTenants();
                         loadUsers();
                     } else if (data.role === 'tenant_admin') {
                         currentUserTenantId = data.tenantId;
                         document.getElementById('tenant-admin-view').classList.remove('hidden');
                         document.getElementById('current-tenant-id-badge').innerText = data.tenantId;
-                        
-                        const tDoc = await getDoc(doc(db, "tenants", data.tenantId));
-                        if(tDoc.exists()) {
-                            document.getElementById('current-tenant-name').innerText = tDoc.data().businessName;
-                        }
-                        loadTenantServices();
+                        loadTenantAdminData();
                     }
                 }
             } else {
