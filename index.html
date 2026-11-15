@@ -221,65 +221,86 @@
                 </div>
             </div>
 
-            <!-- Cashier POS Dashboard -->
-            <div id="cashier-view" class="role-view hidden space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-xl font-bold text-indigo-800">🛒 واجهة الكاشير (POS) - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
-                        <p class="text-xs text-gray-500 mt-1">إدارة نقاط العملاء ومنح المكافآت مباشرة</p>
+            <!-- Cashier POS Dashboard (Optimized for QR & Conditional Sections) -->
+            <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center">
+                    <h3 class="text-xl font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
+                    <p class="text-xs text-gray-500 mt-1">مسح كود العميل للبدء بالمعاملة</p>
+                </div>
+
+                <!-- Step 1: Scan / Enter Customer QR Code ID -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+                    <h4 class="text-base font-bold text-indigo-800">1. قراءة كود العميل (QR Code / Customer ID)</h4>
+                    <div class="flex gap-2">
+                        <input type="text" id="pos-customer-uid" placeholder="امسح الكود أو أدخل معرف العميل (UID)" class="w-full px-4 py-2 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition cursor-pointer">بحث وعرض المحفظة</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Step 1: Find Customer -->
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold text-indigo-800">1. البحث عن العميل</h4>
-                        <div class="flex gap-2">
-                            <input type="email" id="pos-customer-email" placeholder="البريد الإلكتروني للعميل" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                            <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer">بحث</button>
+                <!-- Step 2: Hidden until customer is loaded -->
+                <div id="pos-active-session" class="hidden space-y-6">
+                    <!-- Customer Details Card -->
+                    <div class="p-5 bg-indigo-50 border border-indigo-200 rounded-2xl flex justify-between items-center shadow-sm">
+                        <div>
+                            <span class="text-xs text-indigo-700 font-semibold block">العميل الحالي</span>
+                            <h4 id="pos-c-name" class="text-lg font-bold text-indigo-900 mt-0.5">--</h4>
+                            <p id="pos-c-email" class="text-xs text-gray-500">--</p>
                         </div>
-
-                        <div id="pos-customer-info" class="hidden p-4 bg-indigo-50 border border-indigo-100 rounded-xl space-y-2">
-                            <p class="text-sm font-bold text-indigo-900">اسم العميل: <span id="pos-c-name" class="font-normal">--</span></p>
-                            <p class="text-sm font-bold text-indigo-900">رصيد المحفظة الفرعية الحالي: <span id="pos-c-points" class="text-emerald-700 font-extrabold text-lg">0</span> نقطة</p>
+                        <div class="text-left bg-white px-4 py-3 rounded-xl shadow-xs border border-indigo-100">
+                            <span class="text-xs text-gray-500 block">رصيد المحفظة بالفرع</span>
+                            <span id="pos-c-points" class="text-2xl font-extrabold text-emerald-600">0</span>
+                            <span class="text-xs text-gray-600">نقطة</span>
                         </div>
                     </div>
 
-                    <!-- Step 2: Transactions (Earn or Redeem) -->
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold text-indigo-800">2. تنفيذ معاملة الولاء</h4>
-                        
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (ريال سعودي) لمنح النقاط</label>
-                            <div class="flex gap-2">
-                                <input type="number" id="pos-amount-input" placeholder="مثال: 150" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                                <button onclick="posEarnPoints()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">منح نقاط</button>
+                    <!-- Transactions Panel -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Earn Points -->
+                        <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
+                            <h5 class="font-bold text-indigo-800 text-sm">➕ إضافة نقاط (منح)</h5>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (ريال)</label>
+                                <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
+                            <button onclick="posEarnPoints()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                                حساب ومنح النقاط تلقائياً
+                            </button>
                         </div>
 
-                        <hr class="border-gray-100">
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">عدد النقاط المراد خصمها (استبدال بمكافأة)</label>
-                            <div class="flex gap-2">
-                                <input type="number" id="pos-redeem-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                                <button onclick="posRedeemPoints()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">استبدال نقاط</button>
+                        <!-- Redeem Points -->
+                        <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
+                            <h5 class="font-bold text-indigo-800 text-sm">➖ استبدال نقاط (خصم خدمة)</h5>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (ريال)</label>
+                                <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
+                            <button onclick="posRedeemPoints()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                                خصم النقاط المكافئة تلقائياً
+                            </button>
                         </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="resetPosSession()" class="text-xs text-red-500 hover:underline cursor-pointer">إغلاق جلسة العميل الحالي والانتقال لعميل جديد</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Customer Dashboard (Central Account) -->
+            <!-- Customer Dashboard (Central Account with QR Code) -->
             <div id="customer-view" class="role-view hidden space-y-6">
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-lg opacity-90">حسابك المركزي الموحد</h3>
                         <p id="customer-welcome-name" class="text-2xl font-bold mt-1">مرحباً بك</p>
+                        <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (QR ID): <span id="customer-uid-badge">--</span></p>
                     </div>
-                    <div class="bg-white p-3 rounded-xl text-center text-gray-800">
-                        <div class="w-20 h-20 bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs rounded-lg mb-1">QR Code</div>
-                        <span class="text-xs font-semibold">كود العميل</span>
+                    <div class="bg-white p-3 rounded-xl text-center text-gray-800 shadow-md">
+                        <!-- Simulated QR Code visual containing user UID -->
+                        <div class="w-24 h-24 bg-gray-900 text-white flex flex-col items-center justify-center font-mono text-[9px] rounded-lg p-1 text-center leading-tight">
+                            <span>[QR-CODE]</span>
+                            <span id="customer-qr-text" class="text-[8px] mt-1 text-indigo-300 truncate w-full">--</span>
+                        </div>
+                        <span class="text-[10px] font-semibold text-gray-600 mt-1 block">اعرضه للكاشير</span>
                     </div>
                 </div>
 
@@ -555,7 +576,7 @@
                 }
 
                 let html = `<table class="w-full text-right border-collapse">
-                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط</th><th class="p-3">آخر زيارة</th></tr></thead>
+                    <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">معرف العميل (UID)</th><th class="p-3">رصيد النقاط</th><th class="p-3">آخر زيارة</th></tr></thead>
                     <tbody class="divide-y divide-gray-100">`;
                 
                 snap.forEach((d) => {
@@ -563,7 +584,7 @@
                     const c = d.data();
                     const pts = c.points || 0;
                     totalPoints += pts;
-                    html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${c.name || '--'}</td><td class="p-3 text-xs text-gray-500">${c.email}</td><td class="p-3 font-bold text-indigo-600">${pts} نقطة</td><td class="p-3 text-xs">${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('ar-SA') : '--'}</td></tr>`;
+                    html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${c.name || '--'}</td><td class="p-3 text-[10px] font-mono text-gray-400">${d.id}</td><td class="p-3 font-bold text-indigo-600">${pts} نقطة</td><td class="p-3 text-xs">${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('ar-SA') : '--'}</td></tr>`;
                 });
                 html += '</tbody></table>';
                 listEl.innerHTML = html;
@@ -586,36 +607,49 @@
         }
 
         window.posFindCustomer = async function() {
-            const email = document.getElementById('pos-customer-email').value.trim();
-            if (!email) return alert('الرجاء إدخال البريد الإلكتروني للعميل.');
+            const customerUid = document.getElementById('pos-customer-uid').value.trim();
+            if (!customerUid) return alert('الرجاء قراءة أو إدخال كود العميل (UID).');
 
-            // Find user in central users collection
-            const q = query(collection(db, "users"), where("email", "==", email), where("role", "==", "customer"));
-            const snap = await getDocs(q);
+            try {
+                // Find user in central users collection
+                const userDocRef = doc(db, "users", customerUid);
+                const userDoc = await getDoc(userDocRef);
 
-            if (snap.empty) {
-                alert('لم يتم العثور على عميل بهذا البريد الإلكتروني في النظام المركزي.');
-                return;
+                if (!userDoc.exists() || userDoc.data().role !== 'customer') {
+                    alert('لم يتم العثور على عميل بهذا الكود في النظام المركزي.');
+                    return;
+                }
+
+                const userData = userDoc.data();
+                activePosCustomerUid = customerUid;
+
+                // Check sub-wallet in this tenant
+                const walletRef = doc(db, "tenants", currentUserTenantId, "customers", customerUid);
+                const walletDoc = await getDoc(walletRef);
+                let currentPoints = walletDoc.exists() ? (walletDoc.data().points || 0) : 0;
+
+                // Populate UI
+                document.getElementById('pos-c-name').innerText = userData.name;
+                document.getElementById('pos-c-email').innerText = userData.email;
+                document.getElementById('pos-c-points').innerText = currentPoints;
+
+                // Show operational panel & hide search input session
+                document.getElementById('pos-active-session').classList.remove('hidden');
+            } catch (err) {
+                alert('خطأ أثناء البحث عن العميل: ' + err.message);
             }
+        }
 
-            const userDoc = snap.docs[0];
-            activePosCustomerUid = userDoc.id;
-            const userData = userDoc.data();
-
-            // Check sub-wallet in this tenant
-            const walletDoc = await getDoc(doc(db, "tenants", currentUserTenantId, "customers", activePosCustomerUid));
-            let currentPoints = 0;
-            if (walletDoc.exists()) {
-                currentPoints = walletDoc.data().points || 0;
-            }
-
-            document.getElementById('pos-c-name').innerText = userData.name;
-            document.getElementById('pos-c-points').innerText = currentPoints;
-            document.getElementById('pos-customer-info').classList.remove('hidden');
+        window.resetPosSession = function() {
+            activePosCustomerUid = null;
+            document.getElementById('pos-customer-uid').value = '';
+            document.getElementById('pos-active-session').classList.add('hidden');
+            document.getElementById('pos-amount-input').value = '';
+            document.getElementById('pos-service-price-input').value = '';
         }
 
         window.posEarnPoints = async function() {
-            if (!activePosCustomerUid) return alert('الرجاء البحث عن العميل وتحديده أولاً.');
+            if (!activePosCustomerUid) return;
             const amount = Number(document.getElementById('pos-amount-input').value);
             if (amount <= 0) return alert('الرجاء إدخال مبلغ فاتورة صحيح.');
 
@@ -626,29 +660,33 @@
             const walletDoc = await getDoc(walletRef);
 
             let newPoints = earnedPoints;
-            const customerEmail = document.getElementById('pos-customer-email').value;
-            const customerName = document.getElementById('pos-c-name').innerText;
+            const userDoc = await getDoc(doc(db, "users", activePosCustomerUid));
+            const userData = userDoc.data();
 
             if (walletDoc.exists()) {
                 newPoints += (walletDoc.data().points || 0);
             }
 
             await setDoc(walletRef, {
-                name: customerName,
-                email: customerEmail,
+                name: userData.name,
+                email: userData.email,
                 points: newPoints,
                 lastVisit: new Date().toISOString()
             }, { merge: true });
 
-            alert(`تم بنجاح منح العميل ${earnedPoints} نقطة جديدة بناءً على الفاتورة! الرصيد الإجمالي بالمحفظة: ${newPoints} نقطة.`);
+            alert(`تم بنجاح منح العميل ${earnedPoints} نقطة! الرصيد الإجمالي بالمحفظة: ${newPoints} نقطة.`);
             document.getElementById('pos-c-points').innerText = newPoints;
             document.getElementById('pos-amount-input').value = '';
         }
 
         window.posRedeemPoints = async function() {
-            if (!activePosCustomerUid) return alert('الرجاء البحث عن العميل وتحديده أولاً.');
-            const redeemPts = Number(document.getElementById('pos-redeem-input').value);
-            if (redeemPts <= 0) return alert('الرجاء إدخال عدد نقاط صحيح للاستبدال.');
+            if (!activePosCustomerUid) return;
+            const servicePrice = Number(document.getElementById('pos-service-price-input').value);
+            if (servicePrice <= 0) return alert('الرجاء إدخال قيمة الخدمة الفعلية.');
+
+            // Calculate points needed based on rule (e.g. pointValue in currency)
+            const pointValue = activeTenantRules.pointValue || 1; // e.g., 1 point = 1 Riyal discount
+            const requiredPoints = Math.ceil(servicePrice / pointValue);
 
             const walletRef = doc(db, "tenants", currentUserTenantId, "customers", activePosCustomerUid);
             const walletDoc = await getDoc(walletRef);
@@ -656,17 +694,19 @@
             if (!walletDoc.exists()) return alert('لا توجد محفظة لهذا العميل في الفرع.');
             const currentPts = walletDoc.data().points || 0;
 
-            if (redeemPts > currentPts) return alert(`رصيد النقاط الحالي للعميل (${currentPts} نقطة) لا يكفي لإتمام الاستبدال.`);
+            if (requiredPoints > currentPts) {
+                return alert(`رصيد النقاط الحالي (${currentPts} نقطة) لا يكفي لتغطية هذه الخدمة. النقاط المطلوبة حسب السعر (${servicePrice} ريال) هي: ${requiredPoints} نقطة.`);
+            }
 
-            const remainingPts = currentPts - redeemPts;
+            const remainingPts = currentPts - requiredPoints;
             await updateDoc(walletRef, {
                 points: remainingPts,
                 lastVisit: new Date().toISOString()
             });
 
-            alert(`تم استبدال ${redeemPts} نقطة بنجاح! الرصيد المتبقي في المحفظة: ${remainingPts} نقطة.`);
+            alert(`تم استبدال وخصم ${requiredPoints} نقطة مقابل الخدمة بقيمة ${servicePrice} ريال! الرصيد المتبقي: ${remainingPts} نقطة.`);
             document.getElementById('pos-c-points').innerText = remainingPts;
-            document.getElementById('pos-redeem-input').value = '';
+            document.getElementById('pos-service-price-input').value = '';
         }
 
         window.loadCustomerDashboard = async function(userId) {
@@ -674,6 +714,8 @@
             if (!userDoc.exists()) return;
             const userData = userDoc.data();
             document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
+            document.getElementById('customer-uid-badge').innerText = userId;
+            document.getElementById('customer-qr-text').innerText = userId.substring(0, 10) + '...';
 
             const walletsEl = document.getElementById('customer-wallets-list');
             walletsEl.innerHTML = 'جاري البحث عن محافظك في المنشآت...';
@@ -704,7 +746,7 @@
                                 </div>
                                 <div class="text-left">
                                     <span class="text-xl font-extrabold text-emerald-600">${wData.points || 0}</span>
-                                    <span class="text-xs text-gray-500 block">نقطة في المحفظة</span>
+                                    <span class="text-xs text-gray-500 block">نقطة بالمحفظة الفرعية</span>
                                 </div>
                             </div>
                         `;
@@ -750,6 +792,7 @@
                         loadTenantAdminData();
                     } else if (data.role === 'cashier') {
                         currentUserTenantId = data.tenantId;
+                        document.getElementById('cash`ie`r-view').classList.remove('hidden');
                         document.getElementById('cashier-view').classList.remove('hidden');
                         loadCashierDashboard();
                     } else {
@@ -759,12 +802,17 @@
                 }
             } else {
                 authSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
-                userInfo.classList.add('hidden');
-                currentUserTenantId = null;
-                activePosCustomerUid = null;
+                dashboardSystemReset();
             }
         });
+
+        function systemReset() {
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            currentUserTenantId = null;
+            activePosCustomerUid = null;
+            resetPosSession();
+        }
     </script>
 </body>
 </html>
