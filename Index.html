@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الولاء - Loyalty Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي</h1>
+            <div id="user-info" class="hidden flex items-center gap-4">
+                <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition">تسجيل الخروج</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        
+        <!-- Auth Screen (Login / Register) -->
+        <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            <div class="text-center mb-6">
+                <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام</h2>
+                <p class="text-sm text-gray-500 mt-1">أدخل بيانات حسابك للمتابعة</p>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                    <input type="email" id="email" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                    <input type="password" id="password" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <!-- Extra fields for Register -->
+                <div id="register-fields" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+                        <input type="text" id="fullname" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الحساب (الدور)</label>
+                        <select id="role" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="customer">عميل (Customer)</option>
+                            <option value="cashier">كاشير (POS)</option>
+                            <option value="tenant_admin">مدير منشأة (Tenant Admin)</option>
+                            <option value="super_admin">أدمن رئيسي (Super Admin)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">معرف المنشأة (Tenant ID)</label>
+                        <input type="text" id="tenantId" placeholder="مثال: dody_rose" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" id="auth-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition shadow-lg shadow-indigo-200">
+                    دخول
+                </button>
+            </form>
+
+            <div class="text-center mt-6">
+                <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-sm text-indigo-600 hover:underline">
+                    ليس لديك حساب؟ انشئ حساباً جديداً
+                </button>
+            </div>
+        </section>
+
+        <!-- Dashboards Section -->
+        <section id="dashboard-section" class="hidden space-y-6">
+            <!-- Super Admin Dashboard -->
+            <div id="super-admin-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم الأدمن الرئيسي (Super Admin)</h3>
+                <p class="text-gray-600">إدارة المنشآت، المتغيرات العامة للنظام، ومتابعة الأداء الكلي.</p>
+            </div>
+
+            <!-- Tenant Admin Dashboard -->
+            <div id="tenant-admin-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم مدير المنشأة (Tenant Admin)</h3>
+                <p class="text-gray-600">إدارة الخدمات، الأسعار، الهدايا الذكية، والحجوزات.</p>
+            </div>
+
+            <!-- Cashier POS Dashboard -->
+            <div id="cashier-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4">واجهة الكاشير (POS)</h3>
+                <div class="grid md:grid-cols-2 gap-4 mt-4">
+                    <div class="p-4 border rounded-xl bg-gray-50">
+                        <h4 class="font-semibold mb-2">إضافة نقاط للعميل</h4>
+                        <input type="text" id="pos-customer-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <input type="number" id="pos-amount" placeholder="قيمة الفاتورة بالريال" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <button onclick="posEarnPoints()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold">إضافة النقاط</button>
+                    </div>
+                    <div class="p-4 border rounded-xl bg-gray-50">
+                        <h4 class="font-semibold mb-2">استبدال النقاط بخدمة</h4>
+                        <input type="text" id="pos-redeem-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <input type="number" id="pos-points" placeholder="عدد النقاط المراد خصمها" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <button onclick="posRedeemPoints()" class="w-full bg-amber-600 text-white py-2 rounded-lg font-semibold">تنفيذ الاستبدال</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Dashboard -->
+            <div id="customer-view" class="role-view hidden space-y-6">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg opacity-90">رصيد النقاط الحالي</h3>
+                        <p id="customer-points" class="text-4xl font-extrabold mt-1">0 نقطة</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl text-center">
+                        <div id="qrcode-box" class="w-24 h-24 bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-bold rounded-lg mb-1">QR Code</div>
+                        <span id="customer-code-text" class="text-xs text-gray-700 font-semibold">--</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h4 class="font-bold text-indigo-800 mb-3">الخدمات والعروض المتاحة</h4>
+                    <p class="text-gray-500 text-sm">استعرض الخدمات وقدم طلبات الحجز المسبق بكل سهولة.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
+        جميع الحقوق محفوظة &copy; 2026 - نظام إدارة الولاء
+    </footer>
+
+    <!-- Firebase SDKs & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
+            authDomain: "loyality-management-e083e.firebaseapp.com",
+            projectId: "loyality-management-e083e",
+            storageBucket: "loyality-management-e083e.firebasestorage.app",
+            messagingSenderId: "131027720354",
+            appId: "1:131027720354:web:e4103a30a504515d6a5ffb",
+            measurementId: "G-1TMWENBSV9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let isRegisterMode = false;
+
+        window.toggleAuthMode = function() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب جديد' : 'تسجيل الدخول للنظام';
+            document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل وحفظ' : 'دخول';
+            document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً جديداً';
+        }
+
+        window.handleAuth = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                if (isRegisterMode) {
+                    const name = document.getElementById('fullname').value;
+                    const role = document.getElementById('role').value;
+                    const tenantId = document.getElementById('tenantId').value || 'default_tenant';
+
+                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                    const uid = userCred.user.uid;
+
+                    // Save user to Firestore
+                    await setDoc(doc(db, "users", uid), {
+                        name, email, role, tenantId, createdAt: new Date()
+                    });
+                    alert('تم إنشاء الحساب بنجاح!');
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                alert('خطأ: ' + error.message);
+            }
+        }
+
+        window.logout = function() {
+            signOut(auth);
+        }
+
+        // Monitor Auth State
+        onAuthStateChanged(auth, async (user) => {
+            const authSection = document.getElementById('auth-section');
+            const dashboardSection = document.getElementById('dashboard-section');
+            const userInfo = document.getElementById('user-info');
+            const roleBadge = document.getElementById('user-role-badge');
+
+            if (user) {
+                authSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+
+                // Fetch user role
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
+
+                    // Show correct view
+                    document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
+                    if (data.role === 'super_admin') document.getElementById('super-admin-view').classList.remove('hidden');
+                    else if (data.role === 'tenant_admin') document.getElementById('tenant-admin-view').classList.remove('hidden');
+                    else if (data.role === 'cashier') document.getElementById('cashier-view').classList.remove('hidden');
+                    else if (data.role === 'customer') {
+                        document.getElementById('customer-view').classList.remove('hidden');
+                        document.getElementById('customer-code-text').innerText = user.uid.substring(0, 6).toUpperCase();
+                        document.getElementById('qrcode-box').innerText = `QR: ${user.uid.substring(0, 4)}`;
+                    }
+                }
+            } else {
+                authSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+                userInfo.classList.add('hidden');
+            }
+        });
+
+        window.posEarnPoints = function() {
+            const code = document.getElementById('pos-customer-code').value;
+            const amount = document.getElementById('pos-amount').value;
+            if(!code || !amount) return alert('يرجى ملء كافة الحقول');
+            alert(`تم إضافة النقاط بنجاح للعميل (كود: ${code}) بقيمة فاتورة ${amount} ر.س`);
+        }
+
+        window.posRedeemPoints = function() {
+            const code = document.getElementById('pos-redeem-code').value;
+            const points = document.getElementById('pos-points').value;
+            if(!code || !points) return alert('يرجى ملء كافة الحقول');
+            alert(`تم خصم ${points} نقطة بنجاح من العميل (كود: ${code})`);
+        }
+    </script>
+</body>
+</html>
