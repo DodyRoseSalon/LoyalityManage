@@ -20,7 +20,7 @@
             <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
                 <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition">تسجيل الخروج</button>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
             </div>
         </div>
     </header>
@@ -56,13 +56,13 @@
                     </div>
                 </div>
 
-                <button type="submit" id="auth-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition shadow-lg shadow-indigo-200">
+                <button type="submit" id="auth-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition shadow-lg shadow-indigo-200 cursor-pointer">
                     دخول
                 </button>
             </form>
 
             <div class="text-center mt-6">
-                <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-sm text-indigo-600 hover:underline">
+                <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-sm text-indigo-600 hover:underline cursor-pointer">
                     ليس لديك حساب؟ انشئ حساباً كعميل جديد
                 </button>
             </div>
@@ -70,27 +70,119 @@
 
         <!-- Dashboards Section -->
         <section id="dashboard-section" class="hidden space-y-6">
+            
             <!-- Super Admin Dashboard -->
             <div id="super-admin-view" class="role-view hidden space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم الأدمن الرئيسي (Super Admin)</h3>
-                    <p class="text-gray-600 mb-6">إدارة المنشآت، المتغيرات العامة للنظام، ومتابعة الأداء الكلي.</p>
-                    
+                
+                <!-- Top Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-500 font-semibold">إجمالي المنشآت</p>
+                        <p id="stat-total-tenants" class="text-2xl font-bold text-indigo-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-500 font-semibold">المنشآت النشطة</p>
+                        <p id="stat-active-tenants" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-500 font-semibold">في الفترة التجريبية</p>
+                        <p id="stat-trial-tenants" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-500 font-semibold">الموقوفة / المنتهية</p>
+                        <p id="stat-inactive-tenants" class="text-2xl font-bold text-red-600 mt-1">0</p>
+                    </div>
+                </div>
+
+                <!-- Add Tenant & Global Settings Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Add Tenant Form -->
-                    <div class="bg-gray-50 p-4 border rounded-xl max-w-lg">
-                        <h4 class="font-semibold text-gray-700 mb-3">إضافة منشأة جديدة (Tenant)</h4>
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة (Tenant)</h3>
+                        <p class="text-xs text-gray-500 mb-4">إنشاء منشأة وتحديد نوع الاشتراك أو الفترة التجريبية.</p>
+                        
                         <form onsubmit="createTenant(event)" class="space-y-3">
-                            <input type="text" id="tenant-id-input" placeholder="معرف المنشأة بالانجليزية (مثال: dody_rose)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
-                            <input type="text" id="tenant-name-input" placeholder="اسم المنشأة التجريبي (مثال: صالون دودي روز)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
-                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold text-sm">حفظ المنشأة وإضافتها</button>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة بالانجليزية (بدون مسافات)</label>
+                                <input type="text" id="tenant-id-input" placeholder="مثال: dody_rose" pattern="[a-zA-Z0-9_]+" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">اسم المنشأة التجاري</label>
+                                <input type="text" id="tenant-name-input" placeholder="مثال: صالون دودي روز للتزيين النسائي" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الباقة / الفترة التجريبية</label>
+                                <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="trial_7">فترة تجريبية مجانية (7 أيام)</option>
+                                    <option value="trial_14" selected>فترة تجريبية مجانية (14 يوماً)</option>
+                                    <option value="trial_30">فترة تجريبية مجانية (30 يوماً)</option>
+                                    <option value="active_365">اشتراك سنوي مدفوع (365 يوماً)</option>
+                                    <option value="unlimited">اشتراك مفتوح (غير محدد المدة)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
+                                حفظ المنشأة وإضافتها للنظام
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Global System Settings -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">الإعدادات العامة للنظام (Global Settings)</h3>
+                        <p class="text-xs text-gray-500 mb-4">القيم الافتراضية لاحتساب النقاط عند تسجيل أي منشأة جديدة.</p>
+                        
+                        <form onsubmit="saveGlobalSettings(event)" class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (ريال)</label>
+                                    <input type="number" id="global-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة النقطة عند الاستبدال (ريال)</label>
+                                    <input type="number" id="global-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">الحد الأدنى للاستبدال (نقطة)</label>
+                                    <input type="number" id="global-min-redeem" value="50" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">صلاحية النقاط الافتراضية (يوم)</label>
+                                    <input type="number" id="global-expiry-days" value="365" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
+                                حفظ الإعدادات العامة
+                            </button>
                         </form>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <h4 class="font-bold text-indigo-800 mb-3">المنشآت المسجلة في النظام</h4>
-                    <div id="tenants-list" class="space-y-2 text-sm text-gray-600">جاري تحميل المنشآت...</div>
+                <!-- Tenants Management Table -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-indigo-800">إدارة المنشآت المسجلة والاشتراكات</h4>
+                            <p class="text-xs text-gray-500">تحكم في تنشيط وإيقاف المنشآت، وتمديد الفترات التجريبية.</p>
+                        </div>
+                        <button onclick="loadTenants()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 cursor-pointer">تحديث القائمة</button>
+                    </div>
+                    <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل المنشآت...</div>
                 </div>
+
+                <!-- Users Management Table -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-indigo-800">إدارة حسابات المستخدمين والصلاحيات</h4>
+                            <p class="text-xs text-gray-500">مراقبة الحسابات المسجلة، وتفعيل أو حظر أي مستخدم.</p>
+                        </div>
+                        <button onclick="loadUsers()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 cursor-pointer">تحديث المستخدمين</button>
+                    </div>
+                    <div id="users-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل المستخدمين...</div>
+                </div>
+
             </div>
 
             <!-- Tenant Admin Dashboard -->
@@ -107,13 +199,13 @@
                         <h4 class="font-semibold mb-2">إضافة نقاط للعميل</h4>
                         <input type="text" id="pos-customer-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
                         <input type="number" id="pos-amount" placeholder="قيمة الفاتورة بالريال" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <button onclick="posEarnPoints()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold">إضافة النقاط</button>
+                        <button onclick="posEarnPoints()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold cursor-pointer">إضافة النقاط</button>
                     </div>
                     <div class="p-4 border rounded-xl bg-gray-50">
                         <h4 class="font-semibold mb-2">استبدال النقاط بخدمة</h4>
                         <input type="text" id="pos-redeem-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
                         <input type="number" id="pos-points" placeholder="عدد النقاط المراد خصمها" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <button onclick="posRedeemPoints()" class="w-full bg-amber-600 text-white py-2 rounded-lg font-semibold">تنفيذ الاستبدال</button>
+                        <button onclick="posRedeemPoints()" class="w-full bg-amber-600 text-white py-2 rounded-lg font-semibold cursor-pointer">تنفيذ الاستبدال</button>
                     </div>
                 </div>
             </div>
@@ -147,7 +239,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
@@ -164,6 +256,12 @@
         const db = getFirestore(app);
 
         let isRegisterMode = false;
+        let globalDefaults = {
+            currencyPerPoint: 10,
+            pointValueInCurrency: 1,
+            minRedeemPoints: 50,
+            pointsExpiryDays: 365
+        };
 
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
@@ -181,14 +279,14 @@
             try {
                 if (isRegisterMode) {
                     const name = document.getElementById('fullname').value;
-                    const role = 'customer'; // Fixed securely to customer for self-registration
+                    const role = 'customer';
                     const tenantId = 'default_tenant';
 
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
                     const uid = userCred.user.uid;
 
                     await setDoc(doc(db, "users", uid), {
-                        name, email, role, tenantId, createdAt: new Date()
+                        name, email, role, tenantId, isBlocked: false, createdAt: new Date().toISOString()
                     });
                     alert('تم إنشاء حساب العميل بنجاح!');
                 } else {
@@ -203,22 +301,74 @@
             signOut(auth);
         }
 
+        // Load Global Settings
+        async function loadGlobalSettings() {
+            try {
+                const snap = await getDoc(doc(db, "system_settings", "global"));
+                if (snap.exists()) {
+                    globalDefaults = snap.data();
+                    document.getElementById('global-currency-per-point').value = globalDefaults.currencyPerPoint;
+                    document.getElementById('global-point-value').value = globalDefaults.pointValueInCurrency;
+                    document.getElementById('global-min-redeem').value = globalDefaults.minRedeemPoints;
+                    document.getElementById('global-expiry-days').value = globalDefaults.pointsExpiryDays;
+                }
+            } catch (err) {
+                console.error("Error loading global settings:", err);
+            }
+        }
+
+        window.saveGlobalSettings = async function(e) {
+            e.preventDefault();
+            const settingsData = {
+                currencyPerPoint: Number(document.getElementById('global-currency-per-point').value),
+                pointValueInCurrency: Number(document.getElementById('global-point-value').value),
+                minRedeemPoints: Number(document.getElementById('global-min-redeem').value),
+                pointsExpiryDays: Number(document.getElementById('global-expiry-days').value),
+                updatedAt: new Date().toISOString()
+            };
+            try {
+                await setDoc(doc(db, "system_settings", "global"), settingsData);
+                globalDefaults = settingsData;
+                alert('تم حفظ الإعدادات العامة للنظام بنجاح!');
+            } catch (err) {
+                alert('خطأ أثناء حفظ الإعدادات: ' + err.message);
+            }
+        }
+
+        // Create Tenant with Trial/Subscription Plan
         window.createTenant = async function(e) {
             e.preventDefault();
             const tenantId = document.getElementById('tenant-id-input').value.trim();
             const businessName = document.getElementById('tenant-name-input').value.trim();
+            const plan = document.getElementById('tenant-plan-input').value;
+
+            let isTrial = plan.startsWith('trial_');
+            let expiresAt = null;
+            const now = new Date();
+
+            if (plan === 'trial_7') {
+                now.setDate(now.getDate() + 7);
+                expiresAt = now.toISOString();
+            } else if (plan === 'trial_14') {
+                now.setDate(now.getDate() + 14);
+                expiresAt = now.toISOString();
+            } else if (plan === 'trial_30') {
+                now.setDate(now.getDate() + 30);
+                expiresAt = now.toISOString();
+            } else if (plan === 'active_365') {
+                now.setDate(now.getDate() + 365);
+                expiresAt = now.toISOString();
+            }
 
             try {
                 await setDoc(doc(db, "tenants", tenantId), {
                     businessName,
                     isActive: true,
-                    createdAt: new Date(),
-                    settings: {
-                        currencyPerPoint: 10,
-                        pointValueInCurrency: 1,
-                        pointsExpiryDays: 365,
-                        minRedeemPoints: 50
-                    }
+                    isTrial: isTrial,
+                    planType: plan,
+                    expiresAt: expiresAt,
+                    createdAt: new Date().toISOString(),
+                    settings: { ...globalDefaults }
                 });
                 alert(`تم إنشاء المنشأة (${businessName}) بنجاح!`);
                 document.getElementById('tenant-id-input').value = '';
@@ -229,31 +379,199 @@
             }
         }
 
-        async function loadTenants() {
+        // Toggle Tenant Active Status
+        window.toggleTenantStatus = async function(tenantId, currentStatus) {
+            try {
+                await updateDoc(doc(db, "tenants", tenantId), {
+                    isActive: !currentStatus
+                });
+                loadTenants();
+            } catch (error) {
+                alert('خطأ أثناء تحديث الحالة: ' + error.message);
+            }
+        }
+
+        // Extend Tenant Trial / Subscription
+        window.extendTenantDays = async function(tenantId, currentExpiry, daysToAdd) {
+            try {
+                let baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
+                baseDate.setDate(baseDate.getDate() + daysToAdd);
+                await updateDoc(doc(db, "tenants", tenantId), {
+                    expiresAt: baseDate.toISOString(),
+                    isActive: true
+                });
+                alert(`تم تمديد صلاحية المنشأة لمدة ${daysToAdd} يوماً إضافية.`);
+                loadTenants();
+            } catch (error) {
+                alert('خطأ أثناء التمديد: ' + error.message);
+            }
+        }
+
+        // Delete Tenant
+        window.deleteTenant = async function(tenantId, businessName) {
+            if (!confirm(`هل أنت متأكد من حذف المنشأة "${businessName}" (${tenantId}) نهائياً؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
+            try {
+                await deleteDoc(doc(db, "tenants", tenantId));
+                loadTenants();
+            } catch (error) {
+                alert('خطأ أثناء الحذف: ' + error.message);
+            }
+        }
+
+        // Load Tenants Table
+        window.loadTenants = async function() {
             const listEl = document.getElementById('tenants-list');
             listEl.innerHTML = 'جاري التحميل...';
             try {
                 const querySnapshot = await getDocs(collection(db, "tenants"));
+                let total = 0, activeCount = 0, trialCount = 0, inactiveCount = 0;
+
                 if (querySnapshot.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400">لا توجد منشآت مسجلة حالياً.</p>';
+                    listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
+                    updateStats(0, 0, 0, 0);
                     return;
                 }
-                let html = '<ul class="divide-y divide-gray-100">';
+
+                let html = `<table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="border-b bg-gray-50 text-xs text-gray-600">
+                            <th class="p-3">اسم المنشأة</th>
+                            <th class="p-3">المعرف</th>
+                            <th class="p-3">نوع الباقة</th>
+                            <th class="p-3">تاريخ الانتهاء</th>
+                            <th class="p-3">الحالة</th>
+                            <th class="p-3">إجراءات التحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">`;
+
+                const now = new Date();
+
                 querySnapshot.forEach((docSnap) => {
+                    total++;
                     const data = docSnap.data();
-                    html += `<li class="py-2 flex justify-between items-center">
-                        <span class="font-semibold text-gray-800">${data.businessName}</span>
-                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">معرف: ${docSnap.id}</span>
-                    </li>`;
+                    const isExpired = data.expiresAt ? new Date(data.expiresAt) < now : false;
+                    const effectivelyActive = data.isActive && !isExpired;
+
+                    if (effectivelyActive) {
+                        activeCount++;
+                        if (data.isTrial) trialCount++;
+                    } else {
+                        inactiveCount++;
+                    }
+
+                    let planBadge = data.isTrial 
+                        ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">فترة تجريبية</span>'
+                        : '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">اشتراك رسمي</span>';
+
+                    let expiryText = data.expiresAt 
+                        ? new Date(data.expiresAt).toLocaleDateString('ar-SA') + (isExpired ? ' (منتهية)' : '')
+                        : 'مفتوح';
+
+                    let statusBadge = effectivelyActive
+                        ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>'
+                        : (isExpired 
+                            ? '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold">منتهية الصلاحية</span>'
+                            : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>');
+
+                    html += `<tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold text-gray-800">${data.businessName}</td>
+                        <td class="p-3 font-mono text-xs text-indigo-600">${docSnap.id}</td>
+                        <td class="p-3">${planBadge}</td>
+                        <td class="p-3 text-xs ${isExpired ? 'text-red-600 font-bold' : ''}">${expiryText}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 flex flex-wrap gap-1.5">
+                            <button onclick="toggleTenantStatus('${docSnap.id}', ${data.isActive})" class="px-2.5 py-1 rounded text-xs font-semibold text-white cursor-pointer ${data.isActive ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}">
+                                ${data.isActive ? 'إيقاف مؤقت' : 'تنشيط'}
+                            </button>
+                            <button onclick="extendTenantDays('${docSnap.id}', '${data.expiresAt || ''}', 14)" class="px-2.5 py-1 rounded text-xs font-semibold bg-indigo-100 text-indigo-700 hover:bg-indigo-200 cursor-pointer">
+                                +14 يوم
+                            </button>
+                            <button onclick="deleteTenant('${docSnap.id}', '${data.businessName}')" class="px-2.5 py-1 rounded text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 cursor-pointer">
+                                حذف
+                            </button>
+                        </td>
+                    </tr>`;
                 });
-                html += '</ul>';
+
+                html += '</tbody></table>';
                 listEl.innerHTML = html;
+                updateStats(total, activeCount, trialCount, inactiveCount);
             } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل المنشآت.</p>';
+                listEl.innerHTML = '<p class="text-red-500">فشل تحميل المنشآت: ' + err.message + '</p>';
             }
         }
 
-        // Monitor Auth State
+        function updateStats(total, active, trial, inactive) {
+            document.getElementById('stat-total-tenants').innerText = total;
+            document.getElementById('stat-active-tenants').innerText = active;
+            document.getElementById('stat-trial-tenants').innerText = trial;
+            document.getElementById('stat-inactive-tenants').innerText = inactive;
+        }
+
+        // Load Users Table
+        window.loadUsers = async function() {
+            const listEl = document.getElementById('users-list');
+            listEl.innerHTML = 'جاري التحميل...';
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                if (querySnapshot.empty) {
+                    listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>';
+                    return;
+                }
+
+                let html = `<table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="border-b bg-gray-50 text-xs text-gray-600">
+                            <th class="p-3">الاسم</th>
+                            <th class="p-3">البريد الإلكتروني</th>
+                            <th class="p-3">الدور</th>
+                            <th class="p-3">المنشأة</th>
+                            <th class="p-3">الحالة</th>
+                            <th class="p-3">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">`;
+
+                querySnapshot.forEach((docSnap) => {
+                    const u = docSnap.data();
+                    const isSuper = u.role === 'super_admin';
+                    const isBlocked = u.isBlocked === true;
+
+                    html += `<tr class="hover:bg-gray-50">
+                        <td class="p-3 font-semibold">${u.name || 'بدون اسم'}</td>
+                        <td class="p-3 text-xs">${u.email}</td>
+                        <td class="p-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">${u.role}</span></td>
+                        <td class="p-3 text-xs font-mono text-indigo-600">${u.tenantId || '-'}</td>
+                        <td class="p-3">${isBlocked ? '<span class="text-red-600 font-bold text-xs">محظور</span>' : '<span class="text-emerald-600 font-bold text-xs">نشط</span>'}</td>
+                        <td class="p-3">
+                            ${isSuper ? '<span class="text-xs text-gray-400">محمي</span>' : `
+                            <button onclick="toggleUserBlock('${docSnap.id}', ${isBlocked})" class="px-2.5 py-1 rounded text-xs font-semibold text-white cursor-pointer ${isBlocked ? 'bg-emerald-600' : 'bg-red-600'}">
+                                ${isBlocked ? 'إلغاء الحظر' : 'حظر الحساب'}
+                            </button>`}
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                listEl.innerHTML = html;
+            } catch (err) {
+                listEl.innerHTML = '<p class="text-red-500">فشل تحميل المستخدمين.</p>';
+            }
+        }
+
+        window.toggleUserBlock = async function(uid, currentBlocked) {
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    isBlocked: !currentBlocked
+                });
+                loadUsers();
+            } catch (err) {
+                alert('خطأ: ' + err.message);
+            }
+        }
+
+        // Monitor Auth State & Enforce Tenant/User Security
         onAuthStateChanged(auth, async (user) => {
             const authSection = document.getElementById('auth-section');
             const dashboardSection = document.getElementById('dashboard-section');
@@ -261,19 +579,45 @@
             const roleBadge = document.getElementById('user-role-badge');
 
             if (user) {
-                authSection.classList.add('hidden');
-                dashboardSection.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+
+                    // Check if user is blocked
+                    if (data.isBlocked === true) {
+                        alert('تم حظر هذا الحساب من قبل إدارة النظام.');
+                        await signOut(auth);
+                        return;
+                    }
+
+                    // Check if Tenant is Active & Not Expired (for tenant_admin & cashier)
+                    if (data.role === 'tenant_admin' || data.role === 'cashier') {
+                        const tenantDoc = await getDoc(doc(db, "tenants", data.tenantId));
+                        if (!tenantDoc.exists()) {
+                            alert('المنشأة المرتبطة بهذا الحساب غير موجودة.');
+                            await signOut(auth);
+                            return;
+                        }
+                        const tData = tenantDoc.data();
+                        const isExpired = tData.expiresAt ? new Date(tData.expiresAt) < new Date() : false;
+                        if (!tData.isActive || isExpired) {
+                            alert('عذراً، اشتراك أو الفترة التجريبية لهذه المنشأة متوقفة أو منتهية الصلاحية. يرجى التواصل مع إدارة النظام.');
+                            await signOut(auth);
+                            return;
+                        }
+                    }
+
+                    authSection.classList.add('hidden');
+                    dashboardSection.classList.remove('hidden');
+                    userInfo.classList.remove('hidden');
                     roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
 
                     document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
                     if (data.role === 'super_admin') {
                         document.getElementById('super-admin-view').classList.remove('hidden');
+                        loadGlobalSettings();
                         loadTenants();
+                        loadUsers();
                     }
                     else if (data.role === 'tenant_admin') document.getElementById('tenant-admin-view').classList.remove('hidden');
                     else if (data.role === 'cashier') document.getElementById('cashier-view').classList.remove('hidden');
