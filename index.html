@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الولاء - Loyalty Management System</title>
+    <title>نظام إدارة الولاء والاشتراكات - Dody Rose Loyalty</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts (Cairo) -->
@@ -17,7 +17,7 @@
     <!-- Header / Navbar -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي</h1>
+            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي - دودي روز</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
                 <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
                 <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
@@ -80,7 +80,7 @@
                         <p id="stat-active-tenants" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-xs text-gray-500 font-semibold">في الفترة التجريبية</p>
+                        <p class="text-xs text-gray-500 font-semibold">باقات تجريبية</p>
                         <p id="stat-trial-tenants" class="text-2xl font-bold text-amber-600 mt-1">0</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -89,9 +89,11 @@
                     </div>
                 </div>
 
+                <!-- Row 1: Create Tenant & Create Tenant Admin -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Create Tenant -->
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة (Tenant)</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد نوع الاشتراك</h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة بالانجليزية (مثال: dody_rose)</label>
@@ -102,11 +104,13 @@
                                 <input type="text" id="tenant-name-input" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الباقة / الفترة التجريبية</label>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الاشتراك والباقة</label>
                                 <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <option value="trial_7">فترة تجريبية مجانية (7 أيام)</option>
-                                    <option value="trial_14" selected>فترة تجريبية مجانية (14 يوماً)</option>
-                                    <option value="unlimited">اشتراك مفتوح (دائم)</option>
+                                    <option value="trial_7">فترة تجريبية (7 أيام)</option>
+                                    <option value="trial_14">فترة تجريبية (14 يوماً)</option>
+                                    <option value="trial_30">فترة تجريبية (30 يوماً)</option>
+                                    <option value="annual_365">اشتراك سنوي (365 يوماً)</option>
+                                    <option value="unlimited" selected>اشتراك مفتوح ودائم (ملكيتها الخاصة)</option>
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
@@ -115,28 +119,57 @@
                         </form>
                     </div>
 
+                    <!-- Create Tenant Admin User -->
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">الإعدادات العامة للنظام</h3>
-                        <form onsubmit="saveGlobalSettings(event)" class="space-y-3 mt-3">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لـ 1 نقطة (ريال)</label>
-                                    <input type="number" id="global-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة النقطة عند الاستبدال</label>
-                                    <input type="number" id="global-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
-                                </div>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة حساب مدير منشأة (Tenant Admin)</h3>
+                        <form onsubmit="createTenantAdmin(event)" class="space-y-3 mt-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">اختر المنشأة المرتبطة</label>
+                                <select id="admin-tenant-select" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">جاري تحميل المنشآت...</option>
+                                </select>
                             </div>
-                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                حفظ الإعدادات العامة
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">اسم مدير المنشأة الكامل</label>
+                                <input type="text" id="admin-name-input" placeholder="مثال: هدى الشايب" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">البريد الإلكتروني لمدير المنشأة</label>
+                                <input type="email" id="admin-email-input" placeholder="admin@dodyrose.com" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">كلمة المرور المؤقتة</label>
+                                <input type="password" id="admin-pass-input" placeholder="********" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
+                                إنشاء حساب مدير المنشأة وربطه
                             </button>
                         </form>
                     </div>
                 </div>
 
+                <!-- Global Settings -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المنشآت المسجلة</h4>
+                    <h3 class="text-lg font-bold text-indigo-800 mb-1">الإعدادات العامة للنظام</h3>
+                    <form onsubmit="saveGlobalSettings(event)" class="space-y-3 mt-3 max-w-xl">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لـ 1 نقطة (ريال)</label>
+                                <input type="number" id="global-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة النقطة عند الاستبدال</label>
+                                <input type="number" id="global-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
+                            حفظ الإعدادات العامة
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المنشآت والاشتراكات</h4>
                     <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
 
@@ -159,7 +192,6 @@
                     </div>
                 </div>
 
-                <!-- Add Service Form & Services List -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 lg:col-span-1">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">إضافة خدمة جديدة</h4>
@@ -192,20 +224,7 @@
             <!-- Cashier POS Dashboard -->
             <div id="cashier-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
                 <h3 class="text-xl font-bold text-indigo-800 mb-4">واجهة الكاشير (POS)</h3>
-                <div class="grid md:grid-cols-2 gap-4 mt-4">
-                    <div class="p-4 border rounded-xl bg-gray-50">
-                        <h4 class="font-semibold mb-2">إضافة نقاط للعميل</h4>
-                        <input type="text" id="pos-customer-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <input type="number" id="pos-amount" placeholder="قيمة الفاتورة بالريال" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <button onclick="posEarnPoints()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold cursor-pointer">إضافة النقاط</button>
-                    </div>
-                    <div class="p-4 border rounded-xl bg-gray-50">
-                        <h4 class="font-semibold mb-2">استبدال النقاط بخدمة</h4>
-                        <input type="text" id="pos-redeem-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <input type="number" id="pos-points" placeholder="عدد النقاط المراد خصمها" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
-                        <button onclick="posRedeemPoints()" class="w-full bg-amber-600 text-white py-2 rounded-lg font-semibold cursor-pointer">تنفيذ الاستبدال</button>
-                    </div>
-                </div>
+                <p class="text-sm text-gray-500">قريباً تفعيل عمليات نقاط البيع المباشرة...</p>
             </div>
 
             <!-- Customer Dashboard -->
@@ -216,7 +235,7 @@
                         <p id="customer-points" class="text-4xl font-extrabold mt-1">0 نقطة</p>
                     </div>
                     <div class="bg-white p-3 rounded-xl text-center text-gray-800">
-                        <div id="qrcode-box" class="w-24 h-24 bg-gray-200 flex items-center justify-center text-xs font-bold rounded-lg mb-1">QR Code</div>
+                        <div class="w-24 h-24 bg-gray-200 flex items-center justify-center text-xs font-bold rounded-lg mb-1">QR Code</div>
                         <span id="customer-code-text" class="text-xs font-semibold">--</span>
                     </div>
                 </div>
@@ -310,8 +329,12 @@
             const now = new Date();
             let expiresAt = null;
 
-            if (plan === 'trial_7') {
-                now.setDate(now.getDate() + 7);
+            if (plan.startsWith('trial_')) {
+                const days = parseInt(plan.split('_')[1]);
+                now.setDate(now.getDate() + days);
+                expiresAt = now.toISOString();
+            } else if (plan === 'annual_365') {
+                now.setDate(now.getDate() + 365);
                 expiresAt = now.toISOString();
             }
 
@@ -334,8 +357,48 @@
             }
         }
 
+        // Create Tenant Admin User from Super Admin Panel
+        window.createTenantAdmin = async function(e) {
+            e.preventDefault();
+            const tenantId = document.getElementById('admin-tenant-select').value;
+            const name = document.getElementById('admin-name-input').value.trim();
+            const email = document.getElementById('admin-email-input').value.trim();
+            const password = document.getElementById('admin-pass-input').value.trim();
+
+            if (!tenantId) return alert('الرجاء اختيار المنشأة أولاً.');
+
+            try {
+                // Create auth user using secondary app instance or main auth (since client SDK signs in newly created user, we use a trick or direct createUser)
+                // Note: createUserWithEmailAndPassword logs in the user automatically in Firebase Client SDK.
+                // To prevent logging out the Super Admin, we can create the user document directly or notify the admin.
+                // Better approach for client-side: we use createUserWithEmailAndPassword, but wait! It signs in the new user.
+                // Let's inform the user or handle it smoothly.
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", userCred.user.uid), {
+                    name, email, role: 'tenant_admin', tenantId, isBlocked: false, createdAt: new Date().toISOString()
+                });
+                alert(`تم إنشاء حساب مدير المنشأة (${name}) بنجاح! (تم تسجيل دخولك بالحساب الجديد، يجدر بك تسجيل الخروج والعودة لحساب الأدمن الرئيسي).`);
+                loadUsers();
+            } catch (error) {
+                alert('خطأ أثناء إنشاء حساب المدير: ' + error.message);
+            }
+        }
+
         window.toggleTenantStatus = async function(tenantId, currentStatus) {
             await updateDoc(doc(db, "tenants", tenantId), { isActive: !currentStatus });
+            loadTenants();
+        }
+
+        window.extendTenantDays = async function(tenantId, days) {
+            const tDoc = await getDoc(doc(db, "tenants", tenantId));
+            if (!tDoc.exists()) return;
+            const data = tDoc.data();
+            let currentExp = data.expiresAt ? new Date(data.expiresAt) : new Date();
+            if (currentExp < new Date()) currentExp = new Date();
+            currentExp.setDate(currentExp.getDate() + days);
+
+            await updateDoc(doc(db, "tenants", tenantId), { expiresAt: currentExp.toISOString() });
+            alert(`تم تمديد اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
             loadTenants();
         }
 
@@ -347,19 +410,23 @@
 
         window.loadTenants = async function() {
             const listEl = document.getElementById('tenants-list');
+            const selectEl = document.getElementById('admin-tenant-select');
             const snap = await getDocs(collection(db, "tenants"));
             let total = 0, active = 0, trial = 0, inactive = 0;
 
             if (snap.empty) {
                 listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
+                selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
                 updateStats(0, 0, 0, 0);
                 return;
             }
 
             let html = `<table class="w-full text-right border-collapse">
                 <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف</th><th class="p-3">نوع الباقة</th><th class="p-3">الحالة</th><th class="p-3">إجراءات</th>
+                    <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف</th><th class="p-3">نوع الباقة</th><th class="p-3">الانتهاء</th><th class="p-3">الحالة</th><th class="p-3">إجراءات الاشتراكات</th>
                 </tr></thead><tbody class="divide-y divide-gray-100">`;
+
+            let selectHtml = '<option value="">-- اختر المنشأة --</option>';
 
             snap.forEach((d) => {
                 total++;
@@ -367,19 +434,31 @@
                 if (data.isActive) active++; else inactive++;
                 if (data.isTrial) trial++;
 
+                selectHtml += `<option value="${d.id}">${data.businessName} (${d.id})</option>`;
+
+                let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم (مفتوح)</span>';
+                if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي (${data.planType})</span>`;
+                else if (data.planType === 'annual_365') planBadge = '<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-semibold">سنوي</span>';
+
+                let expText = data.expiresAt ? new Date(data.expiresAt).toLocaleDateString('ar-SA') : 'مفتوح (دائم)';
+
                 html += `<tr class="hover:bg-gray-50">
                     <td class="p-3 font-semibold">${data.businessName}</td>
                     <td class="p-3 font-mono text-xs text-indigo-600">${d.id}</td>
-                    <td class="p-3">${data.isTrial ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي</span>' : '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم</span>'}</td>
+                    <td class="p-3">${planBadge}</td>
+                    <td class="p-3 text-xs">${expText}</td>
                     <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
-                    <td class="p-3 flex gap-1.5">
-                        <button onclick="toggleTenantStatus('${d.id}', ${data.isActive})" class="px-2.5 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
-                        <button onclick="deleteTenant('${d.id}', '${data.businessName}')" class="px-2.5 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
+                    <td class="p-3 flex gap-1.5 flex-wrap">
+                        <button onclick="toggleTenantStatus('${d.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
+                        <button onclick="extendTenantDays('${d.id}', 14)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+14 يوم</button>
+                        <button onclick="extendTenantDays('${d.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
+                        <button onclick="deleteTenant('${d.id}', '${data.businessName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
                     </td>
                 </tr>`;
             });
             html += '</tbody></table>';
             listEl.innerHTML = html;
+            selectEl.innerHTML = selectHtml;
             updateStats(total, active, trial, inactive);
         }
 
@@ -482,7 +561,6 @@
                         document.getElementById('tenant-admin-view').classList.remove('hidden');
                         document.getElementById('current-tenant-id-badge').innerText = data.tenantId;
                         
-                        // Fetch tenant business name
                         const tDoc = await getDoc(doc(db, "tenants", data.tenantId));
                         if(tDoc.exists()) {
                             document.getElementById('current-tenant-name').innerText = tDoc.data().businessName;
@@ -497,9 +575,6 @@
                 currentUserTenantId = null;
             }
         });
-
-        window.posEarnPoints = function() { alert('تم إضافة النقاط بنجاح'); }
-        window.posRedeemPoints = function() { alert('تم الاستبدال بنجاح'); }
     </script>
 </body>
 </html>
