@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- QRCodeJS CDN for rendering real QR codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Html5-QRCode CDN for Camera Scanning -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -223,21 +225,29 @@
                 </div>
             </div>
 
-            <!-- Cashier POS Dashboard (Optimized for Scanner & Auto-Trigger) -->
+            <!-- Cashier POS Dashboard (Optimized with Camera QR Scanner) -->
             <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center">
                     <h3 class="text-xl font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
-                    <p class="text-xs text-gray-500 mt-1">مرر كود الـ QR الخاص بالعميل عبر الماسح الضوئي للقراءة الفورية</p>
+                    <p class="text-xs text-gray-500 mt-1">امسح كود الـ QR عبر الكاميرا أو أدخل المعرف يدوياً</p>
                 </div>
 
-                <!-- Step 1: Scanner Input Field with Auto-Trigger -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-3">
-                    <label class="block text-sm font-bold text-indigo-800">مسح كود العميل (Barcode / QR Scanner)</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="pos-customer-uid" placeholder="انقر هنا ثم مرر قارئ الباركود أو الصق الكود..." oninput="checkScannerInput(this.value)" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
-                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث</button>
+                <!-- Step 1: Scanner Input & Camera Button -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-sm font-bold text-indigo-800">1. قراءة كود العميل (UID)</label>
+                        <button onclick="toggleCameraScanner()" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+                            📷 تشغيل كاميرا المسح
+                        </button>
                     </div>
-                    <p class="text-[11px] text-gray-400">💡 النظام يتعرف على الكود آلياً بمجرد مسحه بالماسح الضوئي.</p>
+
+                    <!-- Live Camera Feed Container -->
+                    <div id="reader" class="hidden w-full max-w-sm mx-auto rounded-xl overflow-hidden border border-purple-200 bg-black"></div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="pos-customer-uid" placeholder="معرف العميل يظهر هنا تلقائياً أو أدخله يدوياً..." oninput="checkScannerInput(this.value)" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
+                    </div>
                 </div>
 
                 <!-- Step 2: Hidden until customer is loaded -->
@@ -343,6 +353,7 @@
         let currentUserTenantId = null;
         let activePosCustomerUid = null;
         let activeTenantRules = { currencyPerPoint: 10, pointValue: 1 };
+        let html5QrCode = null;
 
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
@@ -378,7 +389,10 @@
             }
         }
 
-        window.logout = function() { signOut(auth); }
+        window.logout = function() { 
+            stopCamera();
+            signOut(auth); 
+        }
 
         window.createTenant = async function(e) {
             e.preventDefault();
@@ -594,7 +608,7 @@
             }
         }
 
-        // Cashier POS Functions & Scanner Auto-Trigger
+        // Cashier POS Functions & Camera Scanner
         window.loadCashierDashboard = async function() {
             if (!currentUserTenantId) return;
             const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
@@ -603,23 +617,62 @@
                 document.getElementById('cashier-tenant-name').innerText = data.businessName;
                 if (data.loyaltyRules) activeTenantRules = data.loyaltyRules;
             }
-            // Auto focus on scanner input when cashier dashboard opens
             setTimeout(() => {
                 const input = document.getElementById('pos-customer-uid');
                 if (input) input.focus();
             }, 300);
         }
 
-        // Auto-trigger when barcode/QR scanner gun types or pastes UID
+        window.toggleCameraScanner = function() {
+            const readerDiv = document.getElementById('reader');
+            const btn = document.getElementById('cam-toggle-btn');
+            
+            if (html5QrCode && html5QrCode.isScanning) {
+                stopCamera();
+                return;
+            }
+
+            readerDiv.classList.remove('hidden');
+            btn.innerText = '⏹️ إيقاف الكاميرا';
+            
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 220, height: 220 } },
+                (decodedText, decodedResult) => {
+                    document.getElementById('pos-customer-uid').value = decodedText;
+                    stopCamera();
+                    posFindCustomer();
+                },
+                (errorMessage) => {
+                    // scanning frame error, ignore
+                }
+            ).catch(err => {
+                alert('تعذر تشغيل الكاميرا: تأكد من السماح للمتصفح بالوصول للكاميرا.');
+                readerDiv.classList.add('hidden');
+                btn.innerText = '📷 تشغيل كاميرا المسح';
+            });
+        }
+
+        function stopCamera() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    document.getElementById('reader').classList.add('hidden');
+                    document.getElementById('cam-toggle-btn').innerText = '📷 تشغيل كاميرا المسح';
+                }).catch(err => console.error(err));
+            }
+        }
+
         window.checkScannerInput = function(val) {
             val = val.trim();
-            // Typical Firebase UIDs are 20+ characters long. If scanned instantly by gun, trigger search automatically.
             if (val.length >= 20) {
                 posFindCustomer();
             }
         }
 
         window.posFindCustomer = async function() {
+            stopCamera();
             const customerUid = document.getElementById('pos-customer-uid').value.trim();
             if (!customerUid) return alert('الرجاء مسح أو إدخال كود العميل (UID).');
 
@@ -726,13 +779,13 @@
             document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
             document.getElementById('customer-uid-badge').innerText = userId;
 
-            // Generate Real High-Quality QR Code using QRCode.js
+            // Generate Real High-Quality QR Code
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
             new QRCode(qrContainer, {
                 text: userId,
-                width: 140,
-                height: 140,
+                width: 150,
+                height: 150,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
@@ -754,33 +807,35 @@
                 for (const tDoc of tenantsSnap.docs) {
                     const tenantId = tDoc.id;
                     const tenantData = tDoc.data();
-                    const custWalletDoc = await getDoc(doc(db, "tenants", tenantId, "customers", userId));
-                    
-                    if (custWalletDoc.exists()) {
-                        foundAny = true;
-                        const wData = custWalletDoc.data();
-                        walletsHtml += `
-                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                <div>
-                                    <h5 class="font-bold text-indigo-800">${tenantData.businessName}</h5>
-                                    <span class="text-xs text-gray-500 font-mono">معرف الفرع: ${tenantId}</span>
+                    try {
+                        const custWalletDoc = await getDoc(doc(db, "tenants", tenantId, "customers", userId));
+                        if (custWalletDoc.exists()) {
+                            foundAny = true;
+                            const wData = custWalletDoc.data();
+                            walletsHtml += `
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div>
+                                        <h5 class="font-bold text-indigo-800">${tenantData.businessName}</h5>
+                                        <span class="text-xs text-gray-500 font-mono">معرف الفرع: ${tenantId}</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-xl font-extrabold text-emerald-600">${wData.points || 0}</span>
+                                        <span class="text-xs text-gray-500 block">نقطة بالمحفظة الفرعية</span>
+                                    </div>
                                 </div>
-                                <div class="text-left">
-                                    <span class="text-xl font-extrabold text-emerald-600">${wData.points || 0}</span>
-                                    <span class="text-xs text-gray-500 block">نقطة بالمحفظة الفرعية</span>
-                                </div>
-                            </div>
-                        `;
+                            `;
+                        }
+                    } catch (e) {
+                        // Skip unreadable tenants silently
                     }
                 }
 
                 if (!foundAny) {
                     walletsHtml = '<p class="text-gray-500 text-sm py-2">ليس لديك رصيد نقاط في أي منشأة مسجلة حالياً.</p>';
                 }
-                walletsHtml.innerHTML = walletsHtml;
                 walletsEl.innerHTML = walletsHtml;
             } catch (err) {
-                walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل المحافظ الفرعية.</p>';
+                walletsEl.innerHTML = '<p class="text-gray-500 text-sm">ليس لديك محافظ نشطة حالياً أو جاري إنشاؤها.</p>';
             }
         }
 
@@ -822,6 +877,7 @@
                     }
                 }
             } else {
+                stopCamera();
                 authSection.classList.remove('hidden');
                 dashboardSection.classList.add('hidden');
                 userInfo.classList.add('hidden');
