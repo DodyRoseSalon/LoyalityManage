@@ -6,6 +6,8 @@
     <title>نظام إدارة الولاء والاشتراكات - Dody Rose Loyalty</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- QRCodeJS CDN for rendering real QR codes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -221,20 +223,21 @@
                 </div>
             </div>
 
-            <!-- Cashier POS Dashboard (Optimized for QR & Conditional Sections) -->
+            <!-- Cashier POS Dashboard (Optimized for Scanner & Auto-Trigger) -->
             <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center">
                     <h3 class="text-xl font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
-                    <p class="text-xs text-gray-500 mt-1">مسح كود العميل للبدء بالمعاملة</p>
+                    <p class="text-xs text-gray-500 mt-1">مرر كود الـ QR الخاص بالعميل عبر الماسح الضوئي للقراءة الفورية</p>
                 </div>
 
-                <!-- Step 1: Scan / Enter Customer QR Code ID -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                    <h4 class="text-base font-bold text-indigo-800">1. قراءة كود العميل (QR Code / Customer ID)</h4>
+                <!-- Step 1: Scanner Input Field with Auto-Trigger -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-3">
+                    <label class="block text-sm font-bold text-indigo-800">مسح كود العميل (Barcode / QR Scanner)</label>
                     <div class="flex gap-2">
-                        <input type="text" id="pos-customer-uid" placeholder="امسح الكود أو أدخل معرف العميل (UID)" class="w-full px-4 py-2 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
-                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition cursor-pointer">بحث وعرض المحفظة</button>
+                        <input type="text" id="pos-customer-uid" placeholder="انقر هنا ثم مرر قارئ الباركود أو الصق الكود..." oninput="checkScannerInput(this.value)" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث</button>
                     </div>
+                    <p class="text-[11px] text-gray-400">💡 النظام يتعرف على الكود آلياً بمجرد مسحه بالماسح الضوئي.</p>
                 </div>
 
                 <!-- Step 2: Hidden until customer is loaded -->
@@ -286,20 +289,18 @@
                 </div>
             </div>
 
-            <!-- Customer Dashboard (Central Account with QR Code) -->
+            <!-- Customer Dashboard (Central Account with Real QR Generator) -->
             <div id="customer-view" class="role-view hidden space-y-6">
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-6">
                     <div>
                         <h3 class="text-lg opacity-90">حسابك المركزي الموحد</h3>
                         <p id="customer-welcome-name" class="text-2xl font-bold mt-1">مرحباً بك</p>
-                        <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (QR ID): <span id="customer-uid-badge">--</span></p>
+                        <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (UID): <span id="customer-uid-badge">--</span></p>
                     </div>
-                    <div class="bg-white p-3 rounded-xl text-center text-gray-800 shadow-md">
-                        <div class="w-24 h-24 bg-gray-900 text-white flex flex-col items-center justify-center font-mono text-[9px] rounded-lg p-1 text-center leading-tight">
-                            <span>[QR-CODE]</span>
-                            <span id="customer-qr-text" class="text-[8px] mt-1 text-indigo-300 truncate w-full">--</span>
-                        </div>
-                        <span class="text-[10px] font-semibold text-gray-600 mt-1 block">اعرضه للكاشير</span>
+                    <!-- Real QR Code Container -->
+                    <div class="bg-white p-4 rounded-2xl text-center text-gray-800 shadow-lg flex flex-col items-center">
+                        <div id="qrcode" class="bg-white p-2 rounded-xl flex items-center justify-center"></div>
+                        <span class="text-xs font-bold text-indigo-900 mt-2">اعرض هذا الكود للكاشير</span>
                     </div>
                 </div>
 
@@ -322,7 +323,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
@@ -593,7 +594,7 @@
             }
         }
 
-        // Cashier POS Functions
+        // Cashier POS Functions & Scanner Auto-Trigger
         window.loadCashierDashboard = async function() {
             if (!currentUserTenantId) return;
             const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
@@ -602,11 +603,25 @@
                 document.getElementById('cashier-tenant-name').innerText = data.businessName;
                 if (data.loyaltyRules) activeTenantRules = data.loyaltyRules;
             }
+            // Auto focus on scanner input when cashier dashboard opens
+            setTimeout(() => {
+                const input = document.getElementById('pos-customer-uid');
+                if (input) input.focus();
+            }, 300);
+        }
+
+        // Auto-trigger when barcode/QR scanner gun types or pastes UID
+        window.checkScannerInput = function(val) {
+            val = val.trim();
+            // Typical Firebase UIDs are 20+ characters long. If scanned instantly by gun, trigger search automatically.
+            if (val.length >= 20) {
+                posFindCustomer();
+            }
         }
 
         window.posFindCustomer = async function() {
             const customerUid = document.getElementById('pos-customer-uid').value.trim();
-            if (!customerUid) return alert('الرجاء قراءة أو إدخال كود العميل (UID).');
+            if (!customerUid) return alert('الرجاء مسح أو إدخال كود العميل (UID).');
 
             try {
                 const userDocRef = doc(db, "users", customerUid);
@@ -636,10 +651,12 @@
 
         window.resetPosSession = function() {
             activePosCustomerUid = null;
-            document.getElementById('pos-customer-uid').value = '';
+            const input = document.getElementById('pos-customer-uid');
+            input.value = '';
             document.getElementById('pos-active-session').classList.add('hidden');
             document.getElementById('pos-amount-input').value = '';
             document.getElementById('pos-service-price-input').value = '';
+            input.focus();
         }
 
         window.posEarnPoints = async function() {
@@ -708,7 +725,18 @@
             const userData = userDoc.data();
             document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
             document.getElementById('customer-uid-badge').innerText = userId;
-            document.getElementById('customer-qr-text').innerText = userId.substring(0, 10) + '...';
+
+            // Generate Real High-Quality QR Code using QRCode.js
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: userId,
+                width: 140,
+                height: 140,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
 
             const walletsEl = document.getElementById('customer-wallets-list');
             walletsEl.innerHTML = 'جاري البحث عن محافظك في المنشآت...';
@@ -749,6 +777,7 @@
                 if (!foundAny) {
                     walletsHtml = '<p class="text-gray-500 text-sm py-2">ليس لديك رصيد نقاط في أي منشأة مسجلة حالياً.</p>';
                 }
+                walletsHtml.innerHTML = walletsHtml;
                 walletsEl.innerHTML = walletsHtml;
             } catch (err) {
                 walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل المحافظ الفرعية.</p>';
