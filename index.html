@@ -45,24 +45,14 @@
                     <input type="password" id="password" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
 
-                <!-- Extra fields for Register -->
+                <!-- Extra fields for Register (Restricted to Customer only for safety) -->
                 <div id="register-fields" class="hidden space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
                         <input type="text" id="fullname" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الحساب (الدور)</label>
-                        <select id="role" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <option value="customer">عميل (Customer)</option>
-                            <option value="cashier">كاشير (POS)</option>
-                            <option value="tenant_admin">مدير منشأة (Tenant Admin)</option>
-                            <option value="super_admin">أدمن رئيسي (Super Admin)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">معرف المنشأة (Tenant ID)</label>
-                        <input type="text" id="tenantId" placeholder="مثال: dody_rose" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <div class="bg-indigo-50 p-3 rounded-xl text-xs text-indigo-800">
+                        ملاحظة: التسجيل الذاتي مخصص للعملاء الجدد فقط. لإنشاء حسابات المزودين أو الكاشير يرجى مراجعة إدارة النظام.
                     </div>
                 </div>
 
@@ -73,7 +63,7 @@
 
             <div class="text-center mt-6">
                 <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-sm text-indigo-600 hover:underline">
-                    ليس لديك حساب؟ انشئ حساباً جديداً
+                    ليس لديك حساب؟ انشئ حساباً كعميل جديد
                 </button>
             </div>
         </section>
@@ -81,15 +71,32 @@
         <!-- Dashboards Section -->
         <section id="dashboard-section" class="hidden space-y-6">
             <!-- Super Admin Dashboard -->
-            <div id="super-admin-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
-                <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم الأدمن الرئيسي (Super Admin)</h3>
-                <p class="text-gray-600">إدارة المنشآت، المتغيرات العامة للنظام، ومتابعة الأداء الكلي.</p>
+            <div id="super-admin-view" class="role-view hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم الأدمن الرئيسي (Super Admin)</h3>
+                    <p class="text-gray-600 mb-6">إدارة المنشآت، المتغيرات العامة للنظام، ومتابعة الأداء الكلي.</p>
+                    
+                    <!-- Add Tenant Form -->
+                    <div class="bg-gray-50 p-4 border rounded-xl max-w-lg">
+                        <h4 class="font-semibold text-gray-700 mb-3">إضافة منشأة جديدة (Tenant)</h4>
+                        <form onsubmit="createTenant(event)" class="space-y-3">
+                            <input type="text" id="tenant-id-input" placeholder="معرف المنشأة بالانجليزية (مثال: dody_rose)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                            <input type="text" id="tenant-name-input" placeholder="اسم المنشأة التجريبي (مثال: صالون دودي روز)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold text-sm">حفظ المنشأة وإضافتها</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h4 class="font-bold text-indigo-800 mb-3">المنشآت المسجلة في النظام</h4>
+                    <div id="tenants-list" class="space-y-2 text-sm text-gray-600">جاري تحميل المنشآت...</div>
+                </div>
             </div>
 
             <!-- Tenant Admin Dashboard -->
             <div id="tenant-admin-view" class="role-view hidden bg-white p-6 rounded-2xl shadow-md">
                 <h3 class="text-xl font-bold text-indigo-800 mb-4">لوحة تحكم مدير المنشأة (Tenant Admin)</h3>
-                <p class="text-gray-600">إدارة الخدمات، الأسعار، الهدايا الذكية، والحجوزات.</p>
+                <p class="text-gray-600">إدارة الخدمات، الأسعار، الهدايا الذكية، والحجوزات الخاصة بمنشأتك.</p>
             </div>
 
             <!-- Cashier POS Dashboard -->
@@ -98,14 +105,14 @@
                 <div class="grid md:grid-cols-2 gap-4 mt-4">
                     <div class="p-4 border rounded-xl bg-gray-50">
                         <h4 class="font-semibold mb-2">إضافة نقاط للعميل</h4>
-                        <input type="text" id="pos-customer-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2">
-                        <input type="number" id="pos-amount" placeholder="قيمة الفاتورة بالريال" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <input type="text" id="pos-customer-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
+                        <input type="number" id="pos-amount" placeholder="قيمة الفاتورة بالريال" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
                         <button onclick="posEarnPoints()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold">إضافة النقاط</button>
                     </div>
                     <div class="p-4 border rounded-xl bg-gray-50">
                         <h4 class="font-semibold mb-2">استبدال النقاط بخدمة</h4>
-                        <input type="text" id="pos-redeem-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2">
-                        <input type="number" id="pos-points" placeholder="عدد النقاط المراد خصمها" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <input type="text" id="pos-redeem-code" placeholder="رقم كود العميل / QR" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
+                        <input type="number" id="pos-points" placeholder="عدد النقاط المراد خصمها" class="w-full px-3 py-2 border rounded-lg mb-2 bg-white">
                         <button onclick="posRedeemPoints()" class="w-full bg-amber-600 text-white py-2 rounded-lg font-semibold">تنفيذ الاستبدال</button>
                     </div>
                 </div>
@@ -140,7 +147,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
@@ -161,9 +168,9 @@
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب جديد' : 'تسجيل الدخول للنظام';
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب عميل جديد' : 'تسجيل الدخول للنظام';
             document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل وحفظ' : 'دخول';
-            document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً جديداً';
+            document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً كعميل جديد';
         }
 
         window.handleAuth = async function(e) {
@@ -174,17 +181,16 @@
             try {
                 if (isRegisterMode) {
                     const name = document.getElementById('fullname').value;
-                    const role = document.getElementById('role').value;
-                    const tenantId = document.getElementById('tenantId').value || 'default_tenant';
+                    const role = 'customer'; // Fixed securely to customer for self-registration
+                    const tenantId = 'default_tenant';
 
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
                     const uid = userCred.user.uid;
 
-                    // Save user to Firestore
                     await setDoc(doc(db, "users", uid), {
                         name, email, role, tenantId, createdAt: new Date()
                     });
-                    alert('تم إنشاء الحساب بنجاح!');
+                    alert('تم إنشاء حساب العميل بنجاح!');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -195,6 +201,56 @@
 
         window.logout = function() {
             signOut(auth);
+        }
+
+        window.createTenant = async function(e) {
+            e.preventDefault();
+            const tenantId = document.getElementById('tenant-id-input').value.trim();
+            const businessName = document.getElementById('tenant-name-input').value.trim();
+
+            try {
+                await setDoc(doc(db, "tenants", tenantId), {
+                    businessName,
+                    isActive: true,
+                    createdAt: new Date(),
+                    settings: {
+                        currencyPerPoint: 10,
+                        pointValueInCurrency: 1,
+                        pointsExpiryDays: 365,
+                        minRedeemPoints: 50
+                    }
+                });
+                alert(`تم إنشاء المنشأة (${businessName}) بنجاح!`);
+                document.getElementById('tenant-id-input').value = '';
+                document.getElementById('tenant-name-input').value = '';
+                loadTenants();
+            } catch (error) {
+                alert('خطأ أثناء إنشاء المنشأة: ' + error.message);
+            }
+        }
+
+        async function loadTenants() {
+            const listEl = document.getElementById('tenants-list');
+            listEl.innerHTML = 'جاري التحميل...';
+            try {
+                const querySnapshot = await getDocs(collection(db, "tenants"));
+                if (querySnapshot.empty) {
+                    listEl.innerHTML = '<p class="text-gray-400">لا توجد منشآت مسجلة حالياً.</p>';
+                    return;
+                }
+                let html = '<ul class="divide-y divide-gray-100">';
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    html += `<li class="py-2 flex justify-between items-center">
+                        <span class="font-semibold text-gray-800">${data.businessName}</span>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">معرف: ${docSnap.id}</span>
+                    </li>`;
+                });
+                html += '</ul>';
+                listEl.innerHTML = html;
+            } catch (err) {
+                listEl.innerHTML = '<p class="text-red-500">فشل تحميل المنشآت.</p>';
+            }
         }
 
         // Monitor Auth State
@@ -209,15 +265,16 @@
                 dashboardSection.classList.remove('hidden');
                 userInfo.classList.remove('hidden');
 
-                // Fetch user role
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
 
-                    // Show correct view
                     document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
-                    if (data.role === 'super_admin') document.getElementById('super-admin-view').classList.remove('hidden');
+                    if (data.role === 'super_admin') {
+                        document.getElementById('super-admin-view').classList.remove('hidden');
+                        loadTenants();
+                    }
                     else if (data.role === 'tenant_admin') document.getElementById('tenant-admin-view').classList.remove('hidden');
                     else if (data.role === 'cashier') document.getElementById('cashier-view').classList.remove('hidden');
                     else if (data.role === 'customer') {
