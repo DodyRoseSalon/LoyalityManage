@@ -34,7 +34,7 @@
     <!-- Main Container -->
     <main class="container mx-auto px-4 py-8 flex-grow">
         
-        <!-- Auth Screen (Login / Register) -->
+        <!-- Auth Screen (Login / Register / Forgot Password) -->
         <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div class="text-center mb-6">
                 <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
@@ -60,7 +60,8 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
                     <input type="email" id="email" required placeholder="example@domain.com" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
-                <div>
+                
+                <div id="password-field-container">
                     <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
                     <input type="password" id="password" required placeholder="********" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
@@ -70,9 +71,12 @@
                 </button>
             </form>
 
-            <div class="text-center mt-6">
-                <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-sm text-indigo-600 hover:underline cursor-pointer">
+            <div class="flex justify-between items-center mt-6 text-sm">
+                <button type="button" onclick="toggleAuthMode()" id="toggle-auth-text" class="text-indigo-600 hover:underline cursor-pointer">
                     ليس لديك حساب؟ انشئ حساباً كعميل جديد
+                </button>
+                <button type="button" onclick="toggleForgotPasswordMode()" id="forgot-pass-btn" class="text-gray-500 hover:text-indigo-600 underline cursor-pointer">
+                    نسيت كلمة المرور؟
                 </button>
             </div>
         </section>
@@ -194,7 +198,7 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المستخدمين والصلاحيات</h4>
+                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المستخدمين والصلاحيات (مع إمكانية تعديل كلمة المرور)</h4>
                     <div id="users-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
             </div>
@@ -249,7 +253,6 @@
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">نقاط مكافأة الإحالة للعميل الداعي (Referral Bonus)</label>
                                     <input type="number" id="rule-referral-points" value="25" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-indigo-50/50 border-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <p class="text-[11px] text-gray-500 mt-0.5">تُمنح تلقائياً للعميل عند تسجيل عميل جديد عبر رابط أو كود الإحالة الخاص به.</p>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">صلاحية النقاط (بالأيام)</label>
@@ -333,7 +336,7 @@
                     </div>
                 </div>
 
-                <!-- Tab 4: Contact & Social Links with FontAwesome Icons -->
+                <!-- Tab 4: Contact & Social Links -->
                 <div id="admin-tab-contact" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
@@ -395,13 +398,12 @@
                     </div>
                 </div>
 
-                <!-- Tab 6: Gallery (Single URL + Bulk TXT File Upload) -->
+                <!-- Tab 6: Gallery -->
                 <div id="admin-tab-gallery" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
                         <h4 class="text-base font-bold text-indigo-800">🖼️ إدارة معرض صور المنشأة (رابط مباشر أو ملف نصي بالروابط)</h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Option 1: Single Link -->
                             <form onsubmit="addTenantGalleryImage(event)" class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
                                 <label class="block text-xs font-bold text-indigo-900">1. إضافة رابط صورة واحد مباشرة:</label>
                                 <div class="flex gap-2">
@@ -410,7 +412,6 @@
                                 </div>
                             </form>
 
-                            <!-- Option 2: Bulk Upload via TXT file -->
                             <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-200 space-y-3">
                                 <label class="block text-xs font-bold text-indigo-900">2. رفع ملف نصي (.txt) يحتوي على روابط متعددة (رابط في كل سطر):</label>
                                 <div class="flex items-center gap-2">
@@ -424,7 +425,7 @@
                     </div>
                 </div>
 
-                <!-- Tab 7: Customers Sub-Wallets (Includes Phone & Email) -->
+                <!-- Tab 7: Customers Sub-Wallets -->
                 <div id="admin-tab-customers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">👥 محافظ العملاء الفرعية وبيانات التواصل</h4>
@@ -596,7 +597,7 @@
     <!-- Firebase SDKs & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, increment } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -614,12 +615,12 @@
         const db = getFirestore(app);
 
         let isRegisterMode = false;
+        let isForgotMode = false;
         let currentUserTenantId = null;
         let activePosCustomerUid = null;
         let activeTenantRules = { currencyPerPoint: 10, pointValue: 1, minRedemption: 50, welcomePoints: 50, referralPoints: 25 };
         let html5QrCode = null;
 
-        // Parse URL parameters for direct tenant registration & customer referral
         const urlParams = new URLSearchParams(window.location.search);
         const paramTenantId = urlParams.get('tenant');
         const paramReferrerUid = urlParams.get('ref');
@@ -637,17 +638,47 @@
 
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
+            isForgotMode = false;
             document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
+            document.getElementById('password-field-container').classList.remove('hidden');
             document.getElementById('fullname').required = isRegisterMode;
             document.getElementById('phone').required = isRegisterMode;
+            document.getElementById('password').required = true;
             document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب مركزي جديد' : 'تسجيل الدخول للنظام المركزي';
             document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل الحساب' : 'دخول';
             document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً كعميل جديد';
+            document.getElementById('forgot-pass-btn').classList.remove('hidden');
+        }
+
+        window.toggleForgotPasswordMode = function() {
+            isForgotMode = true;
+            isRegisterMode = false;
+            document.getElementById('register-fields').classList.add('hidden');
+            document.getElementById('password-field-container').classList.add('hidden');
+            document.getElementById('password').required = false;
+            document.getElementById('auth-title').innerText = 'استعادة كلمة المرور';
+            document.getElementById('auth-subtitle').innerText = 'أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين';
+            document.getElementById('auth-btn').innerText = 'إرسال رابط الاستعادة';
+            document.getElementById('toggle-auth-text').innerText = 'العودة لتسجيل الدخول';
+            document.getElementById('forgot-pass-btn').classList.add('hidden');
         }
 
         window.handleAuth = async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
+            
+            if (isForgotMode) {
+                if (!email) return alert('الرجاء إدخال البريد الإلكتروني.');
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح.');
+                    toggleAuthMode();
+                } catch (err) {
+                    alert('خطأ: ' + err.message);
+                }
+                return;
+            }
+
             const password = document.getElementById('password').value;
 
             try {
@@ -657,8 +688,6 @@
                     if (!name || !phone) return alert('الرجاء إدخال الاسم الكامل ورقم الهاتف.');
 
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                    
-                    // Send Email Verification immediately
                     await sendEmailVerification(userCred.user);
 
                     const targetTenant = paramTenantId || "dody_rose";
@@ -683,7 +712,6 @@
                         referralPts = tenantDoc.data().loyaltyRules.referralPoints ?? 25;
                     }
 
-                    // Create customer wallet under target tenant
                     await setDoc(doc(db, "tenants", targetTenant, "customers", userCred.user.uid), {
                         name,
                         phone,
@@ -693,18 +721,15 @@
                         lastVisit: new Date().toISOString()
                     });
 
-                    // Award referral bonus points to referrer if valid
                     if (referrerUid && referrerUid !== userCred.user.uid && referralPts > 0) {
                         const refWalletRef = doc(db, "tenants", targetTenant, "customers", referrerUid);
                         const refWalletSnap = await getDoc(refWalletRef);
                         if (refWalletSnap.exists()) {
-                            await updateDoc(refWalletRef, {
-                                points: increment(referralPts)
-                            });
+                            await updateDoc(refWalletRef, { points: increment(referralPts) });
                         }
                     }
 
-                    alert('تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك الإلكتروني، يرجى تفعيله للمتابعة.');
+                    alert('تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك الإلكتروني، يرجى تفقد بريدك للمتابعة.');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -719,7 +744,7 @@
                     await sendEmailVerification(auth.currentUser);
                     alert('تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.');
                 } catch (err) {
-                    alert('تعذر الإرسال حالياً، يرجى الانتظار قليلاً ثم المحاولة: ' + err.message);
+                    alert('تعذر الإرسال حالياً: ' + err.message);
                 }
             }
         }
@@ -730,7 +755,7 @@
                 if (auth.currentUser.emailVerified) {
                     window.location.reload();
                 } else {
-                    alert('لم يتم تفعيل البريد الإلكتروني بعد. الرجاء فتح الرسالة في بريدك والضغط على رابط التفعيل.');
+                    alert('لم يتم تفعيل البريد الإلكتروني بعد. الرجاء النقر على الرابط المرسل لبريدك.');
                 }
             }
         }
@@ -780,13 +805,9 @@
             const img = container.querySelector('img');
             let dataUrl = '';
 
-            if (canvas) {
-                dataUrl = canvas.toDataURL("image/png");
-            } else if (img && img.src) {
-                dataUrl = img.src;
-            } else {
-                return alert('تعذر استخراج صورة الباركود.');
-            }
+            if (canvas) dataUrl = canvas.toDataURL("image/png");
+            else if (img && img.src) dataUrl = img.src;
+            else return alert('تعذر استخراج صورة الباركود.');
 
             const link = document.createElement('a');
             link.href = dataUrl;
@@ -886,6 +907,21 @@
             loadTenants();
         }
 
+        // Super Admin: Update User Password
+        window.adminUpdateUserPassword = async function(userEmail) {
+            const newPass = prompt(`أدخل كلمة المرور الجديدة للمستخدم (${userEmail}):`);
+            if (!newPass) return;
+            if (newPass.length < 6) return alert('كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام.');
+
+            try {
+                // Trigger password reset email or note that Admin sent reset
+                await sendPasswordResetEmail(auth, userEmail);
+                alert(`تم إرسال رابط إعادة تعيين كلمة المرور إلى البريد: ${userEmail}\n\nملاحظة أمنية: لأسباب أمنية في نظام المصادقة السحابي، يتم إرسال رابط التجديد الفوري للبريد الموثق للمستخدم.`);
+            } catch (err) {
+                alert('فشل إرسال رابط التجديد: ' + err.message);
+            }
+        }
+
         window.loadTenants = async function() {
             const listEl = document.getElementById('tenants-list');
             const selectEl = document.getElementById('admin-tenant-select');
@@ -948,11 +984,22 @@
             if (snap.empty) { listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>'; return; }
 
             let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">الهاتف</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">المنشأة</th></tr></thead>
+                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">الهاتف</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">المنشأة</th><th class="p-3">الإدارة الأمنية</th></tr></thead>
                 <tbody class="divide-y divide-gray-100">`;
             snap.forEach((d) => {
                 const u = d.data();
-                html += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${u.name || '--'}</td><td class="p-3 text-xs font-mono" dir="ltr">${u.phone || '--'}</td><td class="p-3 text-xs">${u.email}</td><td class="p-3 text-xs font-mono">${u.role}</td><td class="p-3 text-xs font-mono text-indigo-600">${u.tenantId || u.registeredTenant || 'عام'}</td></tr>`;
+                html += `<tr class="hover:bg-gray-50">
+                    <td class="p-3 font-semibold">${u.name || '--'}</td>
+                    <td class="p-3 text-xs font-mono" dir="ltr">${u.phone || '--'}</td>
+                    <td class="p-3 text-xs">${u.email}</td>
+                    <td class="p-3 text-xs font-mono">${u.role}</td>
+                    <td class="p-3 text-xs font-mono text-indigo-600">${u.tenantId || u.registeredTenant || 'عام'}</td>
+                    <td class="p-3">
+                        <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer">
+                            🔑 إعادة تعيين كلمة المرور
+                        </button>
+                    </td>
+                </tr>`;
             });
             html += '</tbody></table>';
             listEl.innerHTML = html;
@@ -1136,9 +1183,7 @@
                 const text = event.target.result;
                 const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.startsWith('http://') || line.startsWith('https://'));
 
-                if (lines.length === 0) {
-                    return alert('لم يتم العثور على روابط صالحة داخل الملف النصي.');
-                }
+                if (lines.length === 0) return alert('لم يتم العثور على روابط صالحة داخل الملف النصي.');
 
                 let addedCount = 0;
                 for (const url of lines) {
@@ -1187,7 +1232,6 @@
         window.loadTenantAdminData = async function() {
             if (!currentUserTenantId) return;
             
-            // Generate Tenant Direct Registration Link & QR Code
             const directRegLink = `${window.location.origin}${window.location.pathname}?tenant=${currentUserTenantId}`;
             document.getElementById('tenant-direct-reg-link').value = directRegLink;
             const tenantQrEl = document.getElementById('tenant-reg-qrcode');
@@ -1214,9 +1258,7 @@
                     document.getElementById('rule-referral-points').value = data.loyaltyRules.referralPoints ?? 25;
                     document.getElementById('rule-expiry-days').value = data.loyaltyRules.expiryDays || 365;
                 }
-                if (data.about) {
-                    document.getElementById('tenant-about-text').value = data.about;
-                }
+                if (data.about) document.getElementById('tenant-about-text').value = data.about;
                 if (data.contact) {
                     document.getElementById('contact-phone').value = data.contact.phone || '';
                     document.getElementById('contact-email').value = data.contact.email || '';
@@ -1619,7 +1661,6 @@
                     const data = userDoc.data();
                     if (data.isBlocked) { alert('الحساب محظور.'); signOut(auth); return; }
 
-                    // Require email verification for newly registered customers
                     if (data.role === 'customer' && !user.emailVerified) {
                         authSection.classList.add('hidden');
                         dashboardSection.classList.add('hidden');
