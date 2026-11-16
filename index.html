@@ -228,8 +228,21 @@
                     <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
 
+                <!-- Super Admin: Users Filter & Search -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                    <h4 class="text-lg font-bold text-indigo-800">إدارة المستخدمين والبيانات الشخصية الكاملة</h4>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
+                        <h4 class="text-lg font-bold text-indigo-800">إدارة المستخدمين والصلاحيات والبيانات الشخصية</h4>
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                            <input type="text" id="search-users-input" onkeyup="filterAdminUsers()" placeholder="🔍 بحث بالاسم، الهاتف، البريد..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                            <select id="filter-users-role" onchange="filterAdminUsers()" class="px-3 py-2 border rounded-xl text-xs bg-indigo-50 font-semibold text-indigo-800 outline-none">
+                                <option value="all">جميع الأدوار</option>
+                                <option value="customer">العملاء فقط</option>
+                                <option value="tenant_admin">مديرو المنشآت</option>
+                                <option value="cashier">الكاشير</option>
+                                <option value="super_admin">السوبر أدمن</option>
+                            </select>
+                        </div>
+                    </div>
                     <div id="users-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
             </div>
@@ -730,7 +743,7 @@
     <div id="customer-details-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-indigo-800">📋 الملف الشخصي الكامل للعميل</h3>
+                <h3 class="text-lg font-bold text-indigo-800">📋 الملف الشخصي الكامل للمستخدم</h3>
                 <button onclick="closeCustomerDetailsModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
             </div>
             <div id="customer-details-content" class="space-y-3 text-sm">
@@ -1235,26 +1248,65 @@
             listEl.innerHTML = html;
         }
 
+        let allUsersCache = [];
         window.loadUsers = async function() {
             const listEl = document.getElementById('users-list');
             const snap = await getDocs(collection(db, "users"));
-            if (snap.empty) { listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>'; return; }
+            allUsersCache = [];
+
+            if (snap.empty) {
+                listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>';
+                return;
+            }
+
+            snap.forEach((d) => {
+                const u = d.data();
+                allUsersCache.push({ id: d.id, ...u });
+            });
+
+            renderAdminUsersTable(allUsersCache);
+        }
+
+        window.filterAdminUsers = function() {
+            const search = document.getElementById('search-users-input').value.toLowerCase();
+            const roleFilter = document.getElementById('filter-users-role').value;
+
+            const filtered = allUsersCache.filter(u => {
+                const matchSearch = (u.name && u.name.toLowerCase().includes(search)) || 
+                                    (u.phone && u.phone.toLowerCase().includes(search)) || 
+                                    (u.secondaryPhone && u.secondaryPhone.toLowerCase().includes(search)) || 
+                                    (u.email && u.email.toLowerCase().includes(search));
+                const matchRole = roleFilter === 'all' || u.role === roleFilter;
+                return matchSearch && matchRole;
+            });
+
+            renderAdminUsersTable(filtered);
+        }
+
+        function renderAdminUsersTable(users) {
+            const listEl = document.getElementById('users-list');
+            if (users.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث أو الفلتر.</p>';
+                return;
+            }
 
             let html = `<table class="w-full text-right border-collapse">
                 <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">الاسم</th><th class="p-3">الهواتف</th><th class="p-3">النوع والدولة والمدينة والعنوان</th><th class="p-3">الدور والمنشأة</th><th class="p-3">المناسبات والاهتمامات</th><th class="p-3">الإجراءات</th>
+                    <th class="p-3">الاسم</th><th class="p-3">الهواتف</th><th class="p-3">النوع والدولة والمدينة</th><th class="p-3">الدور والمنشأة</th><th class="p-3">المناسبات والاهتمامات</th><th class="p-3">الإجراءات والبيانات</th>
                 </tr></thead><tbody class="divide-y divide-gray-100">`;
             
-            snap.forEach((d) => {
-                const u = d.data();
+            users.forEach((u) => {
                 html += `<tr class="hover:bg-gray-50">
                     <td class="p-3 font-semibold">${u.name || '--'}</td>
                     <td class="p-3 text-xs" dir="ltr">${u.phone || '--'}<br><span class="text-gray-400">${u.secondaryPhone || ''}</span></td>
                     <td class="p-3 text-xs">${u.gender || '--'} | ${u.country || '--'} - ${u.city || '--'}<br><span class="text-gray-400">${u.address || ''}</span></td>
                     <td class="p-3 text-xs font-mono">${u.role} (${u.tenantId || u.registeredTenant || 'عام'})</td>
                     <td class="p-3 text-xs">🎂 ${u.birthdate || 'غير مسجل'}<br>💍 ${u.anniversary || 'غير مسجل'}<br>💡 ${u.hobbies || '--'}</td>
-                    <td class="p-3">
-                        <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer">
+                    <td class="p-3 flex flex-col gap-1.5">
+                        <button onclick='openCustomerDetailsModal(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
+                            👁️ عرض البيانات الشخصية
+                        </button>
+                        <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer whitespace-nowrap">
                             🔑 إعادة تعيين الباسورد
                         </button>
                     </td>
@@ -1674,12 +1726,13 @@
             const content = document.getElementById('customer-details-content');
             content.innerHTML = `
                 <div class="bg-indigo-50 p-4 rounded-xl space-y-2">
-                    <p><strong>الاسم الكامل:</strong> ${customer.name}</p>
+                    <p><strong>الاسم الكامل:</strong> ${customer.name || '--'}</p>
+                    <p><strong>الدور بالنظام:</strong> <span class="font-mono">${customer.role || 'customer'}</span></p>
                     <p><strong>النوع:</strong> ${customer.gender || 'غير مسجل'}</p>
-                    <p><strong>رقم الهاتف الأساسي:</strong> <span dir="ltr">${customer.phone}</span></p>
+                    <p><strong>رقم الهاتف الأساسي:</strong> <span dir="ltr">${customer.phone || '--'}</span></p>
                     <p><strong>رقم الهاتف الإضافي:</strong> <span dir="ltr">${customer.secondaryPhone && customer.secondaryPhone !== '--' ? customer.secondaryPhone : 'غير مسجل'}</span></p>
-                    <p><strong>البريد الإلكتروني:</strong> ${customer.email}</p>
-                    <p><strong>معرف العميل (UID):</strong> <span class="font-mono text-xs text-gray-500">${customer.id}</span></p>
+                    <p><strong>البريد الإلكتروني:</strong> ${customer.email || '--'}</p>
+                    <p><strong>معرف المستخدم (UID):</strong> <span class="font-mono text-xs text-gray-500">${customer.id || '--'}</span></p>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-xl space-y-2">
                     <p><strong>الدولة والمدينة:</strong> ${customer.country || '--'} - ${customer.city || '--'}</p>
@@ -1688,10 +1741,11 @@
                     <p><strong>تاريخ الزواج / المناسبة:</strong> ${customer.anniversary || 'غير مسجل'}</p>
                     <p><strong>الهوايات والاهتمامات:</strong> ${customer.hobbies || 'غير مسجلة'}</p>
                 </div>
+                ${customer.points !== undefined ? `
                 <div class="bg-emerald-50 p-4 rounded-xl text-center">
                     <span class="text-xs text-emerald-800 font-semibold block">رصيد النقاط الحالي بالمنشأة</span>
                     <span class="text-2xl font-extrabold text-emerald-600">${customer.points} نقطة</span>
-                </div>
+                </div>` : ''}
             `;
             document.getElementById('customer-details-modal').classList.remove('hidden');
         }
