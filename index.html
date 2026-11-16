@@ -166,7 +166,7 @@
                 </div>
             </div>
 
-            <!-- Tenant Admin Dashboard (Comprehensive Control with New Tabs & Settings) -->
+            <!-- Tenant Admin Dashboard -->
             <div id="tenant-admin-view" class="role-view hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
                     <div>
@@ -184,13 +184,13 @@
                     <button onclick="switchAdminTab('rules')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">⚙️ القواعد والنقاط</button>
                     <button onclick="switchAdminTab('about')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📖 نبذة عن النشاط</button>
                     <button onclick="switchAdminTab('services')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">💇‍♀️ الخدمات والأسعار</button>
-                    <button onclick="switchAdminTab('contact')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والمواقع</button>
+                    <button onclick="switchAdminTab('contact')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والسوشيال</button>
                     <button onclick="switchAdminTab('offers')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 العروض والخصومات</button>
                     <button onclick="switchAdminTab('gallery')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🖼️ معرض الصور</button>
                     <button onclick="switchAdminTab('customers')" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👥 العملاء والمحافظ</button>
                 </div>
 
-                <!-- Tab 1: Rules & Minimum Redemption & Welcome Bonus -->
+                <!-- Tab 1: Rules -->
                 <div id="admin-tab-rules" class="admin-tab-content space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
@@ -206,7 +206,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">الحد الأدنى للنقاط المطلوبة للاستبدال</label>
-                                    <input type="number" id="rule-min-redemption" value="50" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="مثلاً: لا يمكن الاستبدال بأقل من 50 نقطة">
+                                    <input type="number" id="rule-min-redemption" value="50" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">النقاط التشجيعية للعملاء الجدد (Welcome Bonus)</label>
@@ -265,10 +265,10 @@
                     </div>
                 </div>
 
-                <!-- Tab 4: Contact & Social Links -->
+                <!-- Tab 4: Contact & Dedicated Social Links with Icons -->
                 <div id="admin-tab-contact" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">📞 أرقام التواصل ومواقع التواصل الاجتماعي</h4>
+                        <h4 class="text-base font-bold text-indigo-800 mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
                         <form onsubmit="saveTenantContact(event)" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -280,27 +280,43 @@
                                     <input type="email" id="contact-email" placeholder="info@domain.com" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">الموقع الإلكتروني (Website)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">🌐 الموقع الإلكتروني (Website)</label>
                                     <input type="url" id="contact-web" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">رابط الموقع الجغرافي (Google Maps)</label>
-                                    <input type="url" id="contact-map" placeholder="https://maps.google.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">💬 واتساب (WhatsApp)</label>
+                                    <input type="url" id="contact-whatsapp" placeholder="https://wa.me/9665xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">رابط تطبيق سناب شات / إنستغرام</label>
-                                    <input type="url" id="contact-social" placeholder="https://instagram.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">📘 فيسبوك (Facebook)</label>
+                                    <input type="url" id="contact-facebook" placeholder="https://facebook.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">📸 انستجرام (Instagram)</label>
+                                    <input type="url" id="contact-instagram" placeholder="https://instagram.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">👻 سناب شات (Snapchat)</label>
+                                    <input type="url" id="contact-snapchat" placeholder="https://snapchat.com/add/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">🎵 تيك توك (TikTok)</label>
+                                    <input type="url" id="contact-tiktok" placeholder="https://tiktok.com/@..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">⭐ رابط تقييمات والآراء في جوجل (Google Reviews)</label>
+                                    <input type="url" id="contact-google-reviews" placeholder="https://maps.app.goo.gl/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                             </div>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ بيانات التواصل</button>
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ بيانات التواصل والسوشيال</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Tab 5: Promotional Offers with Image Support -->
+                <!-- Tab 5: Promotional Offers -->
                 <div id="admin-tab-offers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold text-indigo-800">🎁 إضافة عرض ترويجي جديد (مع دعم الصور)</h4>
+                        <h4 class="text-base font-bold text-indigo-800">🎁 إضافة عرض ترويجي جديد</h4>
                         <form onsubmit="addTenantOffer(event)" class="space-y-3">
                             <input type="text" id="offer-title" placeholder="عنوان العرض (مثال: خصم 20% على خدمات الشعر)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <textarea id="offer-desc" rows="3" placeholder="تفاصيل العرض والشروط..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none"></textarea>
@@ -311,7 +327,7 @@
                     </div>
                 </div>
 
-                <!-- Tab 6: Gallery (معرض صور المنشأة) -->
+                <!-- Tab 6: Gallery -->
                 <div id="admin-tab-gallery" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                         <h4 class="text-base font-bold text-indigo-800">🖼️ إضافة صورة إلى معرض صور المنشأة</h4>
@@ -399,7 +415,7 @@
                 </div>
             </div>
 
-            <!-- Customer Dashboard (Central Account with Tenant Information Tabs & Gallery & Image Offers) -->
+            <!-- Customer Dashboard -->
             <div id="customer-view" class="role-view hidden space-y-6">
                 <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-6">
                     <div>
@@ -420,24 +436,22 @@
                     </div>
                 </div>
 
-                <!-- Tenant Details & Info Section for Customer (Read Only with Gallery & Image Offers) -->
+                <!-- Tenant Details Portal for Customer -->
                 <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
                     <div class="flex justify-between items-center border-b pb-3">
                         <h4 id="portal-tenant-title" class="text-lg font-bold text-indigo-800">--</h4>
                         <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">بوابة المنشأة التفاعلية</span>
                     </div>
 
-                    <!-- Customer Portal Tabs -->
                     <div class="flex gap-2 border-b border-gray-100 pb-2 overflow-x-auto">
                         <button onclick="switchCustomerTab('about')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">📖 عن المنشأة</button>
                         <button onclick="switchCustomerTab('services')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">💇‍♀️ الخدمات والأسعار</button>
                         <button onclick="switchCustomerTab('offers')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 العروض والخصومات</button>
                         <button onclick="switchCustomerTab('gallery')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🖼️ معرض الصور</button>
-                        <button onclick="switchCustomerTab('contact')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والموقع</button>
+                        <button onclick="switchCustomerTab('contact')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والسوشيال</button>
                         <button onclick="switchCustomerTab('referral')" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🔗 رابط الإحالة</button>
                     </div>
 
-                    <!-- Portal Tab Contents -->
                     <div id="cust-tab-about" class="cust-tab-content text-sm text-gray-600 leading-relaxed">
                         جاري تحميل النبذة...
                     </div>
@@ -541,7 +555,6 @@
             signOut(auth); 
         }
 
-        // Tenant Admin Tabs Switching
         window.switchAdminTab = function(tabName) {
             document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
@@ -591,7 +604,7 @@
                     createdAt: new Date().toISOString(),
                     loyaltyRules: { currencyPerPoint: 10, pointValue: 1, minRedemption: 50, welcomePoints: 50, expiryDays: 365 },
                     about: '',
-                    contact: { phone: '', email: '', web: '', map: '', social: '' }
+                    contact: { phone: '', email: '', web: '', whatsapp: '', facebook: '', instagram: '', snapchat: '', tiktok: '', googleReviews: '' }
                 });
                 alert(`تم إنشاء المنشأة (${businessName}) بنجاح!`);
                 document.getElementById('tenant-id-input').value = '';
@@ -720,7 +733,6 @@
             listEl.innerHTML = html;
         }
 
-        // Tenant Admin Data & Saves
         window.saveTenantLoyaltyRules = async function(e) {
             e.preventDefault();
             if (!currentUserTenantId) return;
@@ -733,7 +745,7 @@
                 updatedAt: new Date().toISOString()
             };
             await updateDoc(doc(db, "tenants", currentUserTenantId), { loyaltyRules });
-            alert('تم حفظ ضوابط الولاء والحد الأدنى للاستبدال بنجاح!');
+            alert('تم حفظ ضوابط الولاء والاستبدال بنجاح!');
         }
 
         window.saveTenantAbout = async function(e) {
@@ -810,11 +822,15 @@
                 phone: document.getElementById('contact-phone').value.trim(),
                 email: document.getElementById('contact-email').value.trim(),
                 web: document.getElementById('contact-web').value.trim(),
-                map: document.getElementById('contact-map').value.trim(),
-                social: document.getElementById('contact-social').value.trim()
+                whatsapp: document.getElementById('contact-whatsapp').value.trim(),
+                facebook: document.getElementById('contact-facebook').value.trim(),
+                instagram: document.getElementById('contact-instagram').value.trim(),
+                snapchat: document.getElementById('contact-snapchat').value.trim(),
+                tiktok: document.getElementById('contact-tiktok').value.trim(),
+                googleReviews: document.getElementById('contact-google-reviews').value.trim()
             };
             await updateDoc(doc(db, "tenants", currentUserTenantId), { contact });
-            alert('تم حفظ بيانات التواصل والمواقع بنجاح!');
+            alert('تم حفظ بيانات التواصل وروابط السوشيال ميديا بنجاح!');
         }
 
         window.addTenantOffer = async function(e) {
@@ -869,7 +885,6 @@
             }
         }
 
-        // Gallery Functions
         window.addTenantGalleryImage = async function(e) {
             e.preventDefault();
             if (!currentUserTenantId) return;
@@ -934,8 +949,12 @@
                     document.getElementById('contact-phone').value = data.contact.phone || '';
                     document.getElementById('contact-email').value = data.contact.email || '';
                     document.getElementById('contact-web').value = data.contact.web || '';
-                    document.getElementById('contact-map').value = data.contact.map || '';
-                    document.getElementById('contact-social').value = data.contact.social || '';
+                    document.getElementById('contact-whatsapp').value = data.contact.whatsapp || '';
+                    document.getElementById('contact-facebook').value = data.contact.facebook || '';
+                    document.getElementById('contact-instagram').value = data.contact.instagram || '';
+                    document.getElementById('contact-snapchat').value = data.contact.snapchat || '';
+                    document.getElementById('contact-tiktok').value = data.contact.tiktok || '';
+                    document.getElementById('contact-google-reviews').value = data.contact.googleReviews || '';
                 }
             }
             loadTenantServicesAdmin();
@@ -969,7 +988,6 @@
             }
         }
 
-        // Cashier POS Functions & Camera Scanner
         window.loadCashierDashboard = async function() {
             if (!currentUserTenantId) return;
             const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
@@ -1129,7 +1147,6 @@
             document.getElementById('pos-service-price-input').value = '';
         }
 
-        // Customer Dashboard & Tenant Portal Viewer (Read Only with Gallery & Offers with Images)
         window.loadCustomerDashboard = async function(userId) {
             const userDoc = await getDoc(doc(db, "users", userId));
             if (!userDoc.exists()) return;
@@ -1214,15 +1231,23 @@
                 
                 const c = data.contact || {};
                 document.getElementById('cust-tab-contact').innerHTML = `
-                    <p><strong>الهاتف:</strong> ${c.phone || '--'}</p>
-                    <p><strong>البريد:</strong> ${c.email || '--'}</p>
-                    <p><strong>الموقع الإلكتروني:</strong> ${c.web ? `<a href="${c.web}" target="_blank" class="text-indigo-600 underline">زيارة الموقع</a>` : '--'}</p>
-                    <p><strong>الموقع الجغرافي:</strong> ${c.map ? `<a href="${c.map}" target="_blank" class="text-indigo-600 underline">فتح الخريطة</a>` : '--'}</p>
-                    <p><strong>وسائل التواصل:</strong> ${c.social ? `<a href="${c.social}" target="_blank" class="text-indigo-600 underline">رابط السوشيال ميديا</a>` : '--'}</p>
+                    <div class="space-y-2">
+                        <p><strong>الهاتف:</strong> ${c.phone ? `<a href="tel:${c.phone}" class="text-indigo-600 underline">${c.phone}</a>` : '--'}</p>
+                        <p><strong>البريد الإلكتروني:</strong> ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-600 underline">${c.email}</a>` : '--'}</p>
+                        <hr class="my-2 border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <p>${c.web ? `🌐 <strong>الموقع:</strong> <a href="${c.web}" target="_blank" class="text-indigo-600 underline">زيارة الموقع</a>` : '🌐 <strong>الموقع:</strong> --'}</p>
+                            <p>${c.whatsapp ? `💬 <strong>واتساب:</strong> <a href="${c.whatsapp}" target="_blank" class="text-emerald-600 underline">مراسلة واتساب</a>` : '💬 <strong>واتساب:</strong> --'}</p>
+                            <p>${c.facebook ? `📘 <strong>فيسبوك:</strong> <a href="${c.facebook}" target="_blank" class="text-blue-600 underline">رابط فيسبوك</a>` : '📘 <strong>فيسبوك:</strong> --'}</p>
+                            <p>${c.instagram ? `📸 <strong>انستجرام:</strong> <a href="${c.instagram}" target="_blank" class="text-pink-600 underline">رابط انستجرام</a>` : '📸 <strong>انستجرام:</strong> --'}</p>
+                            <p>${c.snapchat ? `👻 <strong>سناب شات:</strong> <a href="${c.snapchat}" target="_blank" class="text-yellow-600 underline">رابط سناب شات</a>` : '👻 <strong>سناب شات:</strong> --'}</p>
+                            <p>${c.tiktok ? `🎵 <strong>تيك توك:</strong> <a href="${c.tiktok}" target="_blank" class="text-gray-900 underline">رابط تيك توك</a>` : '🎵 <strong>تيك توك:</strong> --'}</p>
+                        </div>
+                        <p class="pt-2">${c.googleReviews ? `⭐ <strong>تقييمات جوجل:</strong> <a href="${c.googleReviews}" target="_blank" class="text-amber-600 font-bold underline">اضغط هنا لكتابة تقييمك في جوجل</a>` : '⭐ <strong>تقييمات جوجل:</strong> --'}</p>
+                    </div>
                 `;
             }
 
-            // Load Services (Active only)
             const srvEl = document.getElementById('cust-tab-services');
             srvEl.innerHTML = 'جاري التحميل...';
             const srvSnap = await getDocs(collection(db, "tenants", tenantId, "services"));
@@ -1245,7 +1270,6 @@
                 srvEl.innerHTML = srvHtml || '<p class="text-gray-400 text-sm">لا توجد خدمات نشطة حالياً.</p>';
             }
 
-            // Load Offers with Images
             const offerEl = document.getElementById('cust-tab-offers');
             offerEl.innerHTML = 'جاري التحميل...';
             const offerSnap = await getDocs(collection(db, "tenants", tenantId, "offers"));
@@ -1266,7 +1290,6 @@
                 offerEl.innerHTML = offerHtml;
             }
 
-            // Load Gallery Images for Customer
             const galleryEl = document.getElementById('cust-tab-gallery');
             galleryEl.innerHTML = 'جاري التحميل...';
             const gallerySnap = await getDocs(collection(db, "tenants", tenantId, "gallery"));
