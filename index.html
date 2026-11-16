@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الولاء والاشتراكات الذكي - CRM & Loyalty</title>
+    <title>نظام إدارة الولاء والاشتراكات الذكي - شركة بصمة التميز المتكاملة</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome CDN for Real Brand Icons -->
@@ -23,7 +23,7 @@
     <!-- Header / Navbar -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">✨ نظام إدارة الولاء الذكي - الشبكة المركزية</h1>
+            <h1 class="text-xl font-bold">✨ شركة بصمة التميز المتكاملة - نظام الولاء الذكي</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
                 <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
                 <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
@@ -38,7 +38,7 @@
         <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div class="text-center mb-6">
                 <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
-                <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">حساب مركزي واحد لكل منشآت الشبكة</p>
+                <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">شركة بصمة التميز المتكاملة</p>
                 <div id="referral-banner" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl font-semibold">
                     🎉 أنت تقوم بالتسجيل عبر رابط دعوة مباشر للمنشأة!
                 </div>
@@ -134,7 +134,7 @@
                         <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد الدولة والعملة</h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose_ksa أو dody_rose_egy)</label>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose أو dody_rose_egy)</label>
                                 <input type="text" id="tenant-id-input" pattern="[a-zA-Z0-9_]+" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <div>
@@ -148,7 +148,6 @@
                                         <option value="المملكة العربية السعودية">المملكة العربية السعودية</option>
                                         <option value="جمهورية مصر العربية">جمهورية مصر العربية</option>
                                         <option value="الإمارات العربية المتحدة">الإمارات العربية المتحدة</option>
-                                        <option value="أخرى">دولة أخرى</option>
                                     </select>
                                 </div>
                                 <div>
@@ -192,7 +191,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">الاسم الكامل</label>
-                                <input type="text" id="admin-name-input" placeholder="مثال: سارة أحمد" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                <input type="text" id="admin-name-input" placeholder="مثال: هدى الشايب" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">البريد الإلكتروني</label>
@@ -236,7 +235,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-indigo-800">لوحة تحكم المنشأة: <span id="current-tenant-name" class="text-indigo-600">--</span></h3>
-                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold text-indigo-600">--</span></p>
+                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold text-indigo-600">--</span> | المعرف: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button onclick="openChangePasswordModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
@@ -706,7 +705,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
-        جميع الحقوق محفوظة &copy; 2026 - نظام إدارة الولاء المركزي
+        جميع الحقوق محفوظة &copy; 2026 - شركة بصمة التميز المتكاملة
     </footer>
 
     <!-- Firebase SDKs & App Logic -->
@@ -773,7 +772,7 @@
             document.getElementById('password-field-container').classList.add('hidden');
             document.getElementById('password').required = false;
             document.getElementById('auth-title').innerText = 'استعادة كلمة المرور';
-            document.getElementById('auth-subtitle').innerText = 'أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين';
+            document.getElementById('auth-subtitle').innerText = 'شركة بصمة التميز المتكاملة';
             document.getElementById('auth-btn').innerText = 'إرسال رابط الاستعادة';
             document.getElementById('toggle-auth-text').innerText = 'العودة لتسجيل الدخول';
             document.getElementById('forgot-pass-btn').classList.add('hidden');
@@ -806,7 +805,7 @@
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
                     await sendEmailVerification(userCred.user);
 
-                    const targetTenant = paramTenantId || "dody_rose_ksa";
+                    const targetTenant = paramTenantId || "dody_rose";
                     const referrerUid = paramReferrerUid || null;
 
                     await setDoc(doc(db, "users", userCred.user.uid), {
@@ -1113,7 +1112,7 @@
                 if (data.isActive) active++; else inactive++;
                 if (data.isTrial) trial++;
                 allTenantsData.push({ id: d.id, ...data });
-                selectHtml += `<option value="${d.id}">${data.businessName} (${data.country || 'السعودية'})</option>`;
+                selectHtml += `<option value="${d.id}">${data.businessName} (${d.country || 'السعودية'})</option>`;
             });
 
             renderTenantsTable(allTenantsData);
@@ -1423,6 +1422,21 @@
         window.loadTenantAdminData = async function() {
             if (!currentUserTenantId) return;
             
+            // Fallback validation: ensure tenant ID matches correctly
+            let resolvedTenantId = currentUserTenantId;
+            let tDoc = await getDoc(doc(db, "tenants", resolvedTenantId));
+            if (!tDoc.exists()) {
+                // If direct ID not found, try finding any active tenant or default to 'dody_rose'
+                const tenantsSnap = await getDocs(collection(db, "tenants"));
+                if (!tenantsSnap.empty) {
+                    resolvedTenantId = tenantsSnap.docs[0].id;
+                    tDoc = tenantsSnap.docs[0];
+                }
+            }
+
+            currentUserTenantId = resolvedTenantId;
+            document.getElementById('current-tenant-id-badge').innerText = currentUserTenantId;
+
             const directRegLink = `${window.location.origin}${window.location.pathname}?tenant=${currentUserTenantId}`;
             document.getElementById('tenant-direct-reg-link').value = directRegLink;
             const tenantQrEl = document.getElementById('tenant-reg-qrcode');
@@ -1436,10 +1450,9 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
-            const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
-            if (tDoc.exists()) {
-                const data = tDoc.data();
-                document.getElementById('current-tenant-name').innerText = data.businessName;
+            if (tDoc && tDoc.exists()) {
+                const data = tDoc.data ? tDoc.data() : tDoc;
+                document.getElementById('current-tenant-name').innerText = data.businessName || 'صالون دودي روز للتزيين النسائي';
                 document.getElementById('tenant-country-badge').innerText = data.country || 'المملكة العربية السعودية';
                 currentTenantCurrency = data.currency || 'ريال سعودي';
                 document.getElementById('tenant-currency-badge').innerText = currentTenantCurrency;
@@ -1999,12 +2012,12 @@
                         loadTenants();
                         loadUsers();
                     } else if (data.role === 'tenant_admin') {
-                        currentUserTenantId = data.tenantId;
+                        currentUserTenantId = data.tenantId || "dody_rose";
                         document.getElementById('tenant-admin-view').classList.remove('hidden');
-                        document.getElementById('current-tenant-id-badge').innerText = data.tenantId;
+                        document.getElementById('current-tenant-id-badge').innerText = currentUserTenantId;
                         loadTenantAdminData();
                     } else if (data.role === 'cashier') {
-                        currentUserTenantId = data.tenantId;
+                        currentUserTenantId = data.tenantId || "dody_rose";
                         document.getElementById('cashier-view').classList.remove('hidden');
                         loadCashierDashboard();
                     } else {
