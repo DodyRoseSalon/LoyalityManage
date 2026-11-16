@@ -6,6 +6,8 @@
     <title>نظام إدارة الولاء والاشتراكات - Dody Rose Loyalty</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome CDN for Real Brand Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- QRCodeJS CDN for rendering real QR codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Html5-QRCode CDN for Camera Scanning -->
@@ -265,46 +267,46 @@
                     </div>
                 </div>
 
-                <!-- Tab 4: Contact & Dedicated Social Links with Icons -->
+                <!-- Tab 4: Contact & Social Links with FontAwesome Icons -->
                 <div id="admin-tab-contact" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
                         <form onsubmit="saveTenantContact(event)" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">رقم الهاتف / الجوال</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-phone text-indigo-600 ml-1"></i> رقم الهاتف / الجوال</label>
                                     <input type="text" id="contact-phone" placeholder="05xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">البريد الإلكتروني للمنشأة</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-envelope text-indigo-600 ml-1"></i> البريد الإلكتروني للمنشأة</label>
                                     <input type="email" id="contact-email" placeholder="info@domain.com" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">🌐 الموقع الإلكتروني (Website)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-globe text-indigo-600 ml-1"></i> الموقع الإلكتروني (Website)</label>
                                     <input type="url" id="contact-web" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">💬 واتساب (WhatsApp)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-whatsapp text-emerald-600 ml-1"></i> واتساب (WhatsApp)</label>
                                     <input type="url" id="contact-whatsapp" placeholder="https://wa.me/9665xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">📘 فيسبوك (Facebook)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-facebook text-blue-600 ml-1"></i> فيسبوك (Facebook)</label>
                                     <input type="url" id="contact-facebook" placeholder="https://facebook.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">📸 انستجرام (Instagram)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-instagram text-pink-600 ml-1"></i> انستجرام (Instagram)</label>
                                     <input type="url" id="contact-instagram" placeholder="https://instagram.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">👻 سناب شات (Snapchat)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-snapchat text-yellow-500 ml-1"></i> سناب شات (Snapchat)</label>
                                     <input type="url" id="contact-snapchat" placeholder="https://snapchat.com/add/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">🎵 تيك توك (TikTok)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-tiktok text-gray-900 ml-1"></i> تيك توك (TikTok)</label>
                                     <input type="url" id="contact-tiktok" placeholder="https://tiktok.com/@..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">⭐ رابط تقييمات والآراء في جوجل (Google Reviews)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-star text-amber-500 ml-1"></i> رابط تقييمات والآراء في جوجل (Google Reviews)</label>
                                     <input type="url" id="contact-google-reviews" placeholder="https://maps.app.goo.gl/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                             </div>
@@ -313,7 +315,7 @@
                     </div>
                 </div>
 
-                <!-- Tab 5: Promotional Offers -->
+                <!-- Tab 5: Offers -->
                 <div id="admin-tab-offers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                         <h4 class="text-base font-bold text-indigo-800">🎁 إضافة عرض ترويجي جديد</h4>
@@ -436,7 +438,7 @@
                     </div>
                 </div>
 
-                <!-- Tenant Details Portal for Customer -->
+                <!-- Tenant Details Portal for Customer with Real Icons -->
                 <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
                     <div class="flex justify-between items-center border-b pb-3">
                         <h4 id="portal-tenant-title" class="text-lg font-bold text-indigo-800">--</h4>
@@ -1231,19 +1233,19 @@
                 
                 const c = data.contact || {};
                 document.getElementById('cust-tab-contact').innerHTML = `
-                    <div class="space-y-2">
-                        <p><strong>الهاتف:</strong> ${c.phone ? `<a href="tel:${c.phone}" class="text-indigo-600 underline">${c.phone}</a>` : '--'}</p>
-                        <p><strong>البريد الإلكتروني:</strong> ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-600 underline">${c.email}</a>` : '--'}</p>
+                    <div class="space-y-3">
+                        <p><i class="fa-solid fa-phone text-indigo-600 ml-2 w-5"></i><strong>الهاتف:</strong> ${c.phone ? `<a href="tel:${c.phone}" class="text-indigo-600 underline">${c.phone}</a>` : '--'}</p>
+                        <p><i class="fa-solid fa-envelope text-indigo-600 ml-2 w-5"></i><strong>البريد الإلكتروني:</strong> ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-600 underline">${c.email}</a>` : '--'}</p>
                         <hr class="my-2 border-gray-100">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <p>${c.web ? `🌐 <strong>الموقع:</strong> <a href="${c.web}" target="_blank" class="text-indigo-600 underline">زيارة الموقع</a>` : '🌐 <strong>الموقع:</strong> --'}</p>
-                            <p>${c.whatsapp ? `💬 <strong>واتساب:</strong> <a href="${c.whatsapp}" target="_blank" class="text-emerald-600 underline">مراسلة واتساب</a>` : '💬 <strong>واتساب:</strong> --'}</p>
-                            <p>${c.facebook ? `📘 <strong>فيسبوك:</strong> <a href="${c.facebook}" target="_blank" class="text-blue-600 underline">رابط فيسبوك</a>` : '📘 <strong>فيسبوك:</strong> --'}</p>
-                            <p>${c.instagram ? `📸 <strong>انستجرام:</strong> <a href="${c.instagram}" target="_blank" class="text-pink-600 underline">رابط انستجرام</a>` : '📸 <strong>انستجرام:</strong> --'}</p>
-                            <p>${c.snapchat ? `👻 <strong>سناب شات:</strong> <a href="${c.snapchat}" target="_blank" class="text-yellow-600 underline">رابط سناب شات</a>` : '👻 <strong>سناب شات:</strong> --'}</p>
-                            <p>${c.tiktok ? `🎵 <strong>تيك توك:</strong> <a href="${c.tiktok}" target="_blank" class="text-gray-900 underline">رابط تيك توك</a>` : '🎵 <strong>تيك توك:</strong> --'}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <p>${c.web ? `<i class="fa-solid fa-globe text-indigo-600 ml-2 w-5"></i><strong>الموقع:</strong> <a href="${c.web}" target="_blank" class="text-indigo-600 underline">زيارة الموقع</a>` : '<i class="fa-solid fa-globe text-gray-400 ml-2 w-5"></i><strong>الموقع:</strong> --'}</p>
+                            <p>${c.whatsapp ? `<i class="fa-brands fa-whatsapp text-emerald-600 ml-2 w-5 text-base"></i><strong>واتساب:</strong> <a href="${c.whatsapp}" target="_blank" class="text-emerald-600 underline">مراسلة واتساب</a>` : '<i class="fa-brands fa-whatsapp text-gray-400 ml-2 w-5 text-base"></i><strong>واتساب:</strong> --'}</p>
+                            <p>${c.facebook ? `<i class="fa-brands fa-facebook text-blue-600 ml-2 w-5 text-base"></i><strong>فيسبوك:</strong> <a href="${c.facebook}" target="_blank" class="text-blue-600 underline">رابط فيسبوك</a>` : '<i class="fa-brands fa-facebook text-gray-400 ml-2 w-5 text-base"></i><strong>فيسبوك:</strong> --'}</p>
+                            <p>${c.instagram ? `<i class="fa-brands fa-instagram text-pink-600 ml-2 w-5 text-base"></i><strong>انستجرام:</strong> <a href="${c.instagram}" target="_blank" class="text-pink-600 underline">رابط انستجرام</a>` : '<i class="fa-brands fa-instagram text-gray-400 ml-2 w-5 text-base"></i><strong>انستجرام:</strong> --'}</p>
+                            <p>${c.snapchat ? `<i class="fa-brands fa-snapchat text-yellow-500 ml-2 w-5 text-base"></i><strong>سناب شات:</strong> <a href="${c.snapchat}" target="_blank" class="text-yellow-600 underline">رابط سناب شات</a>` : '<i class="fa-brands fa-snapchat text-gray-400 ml-2 w-5 text-base"></i><strong>سناب شات:</strong> --'}</p>
+                            <p>${c.tiktok ? `<i class="fa-brands fa-tiktok text-gray-900 ml-2 w-5 text-base"></i><strong>تيك توك:</strong> <a href="${c.tiktok}" target="_blank" class="text-gray-900 underline">رابط تيك توك</a>` : '<i class="fa-brands fa-tiktok text-gray-400 ml-2 w-5 text-base"></i><strong>تيك توك:</strong> --'}</p>
                         </div>
-                        <p class="pt-2">${c.googleReviews ? `⭐ <strong>تقييمات جوجل:</strong> <a href="${c.googleReviews}" target="_blank" class="text-amber-600 font-bold underline">اضغط هنا لكتابة تقييمك في جوجل</a>` : '⭐ <strong>تقييمات جوجل:</strong> --'}</p>
+                        <p class="pt-2">${c.googleReviews ? `<i class="fa-solid fa-star text-amber-500 ml-2 w-5 text-base"></i><strong>تقييمات جوجل:</strong> <a href="${c.googleReviews}" target="_blank" class="text-amber-600 font-bold underline">اضغط هنا لكتابة تقييمك في جوجل</a>` : '<i class="fa-solid fa-star text-gray-400 ml-2 w-5 text-base"></i><strong>تقييمات جوجل:</strong> --'}</p>
                     </div>
                 `;
             }
