@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الولاء والاشتراكات الذكي - شركة بصمة التميز المتكاملة</title>
+    <title>نظام إدارة ولاء العملاء الذكي</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome CDN for Real Brand Icons -->
@@ -23,7 +23,7 @@
     <!-- Header / Navbar -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">✨ شركة بصمة التميز المتكاملة - نظام الولاء الذكي</h1>
+            <h1 class="text-xl font-bold">✨ نظام إدارة ولاء العملاء الذكي</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
                 <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
                 <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
@@ -38,7 +38,7 @@
         <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div class="text-center mb-6">
                 <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
-                <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">شركة بصمة التميز المتكاملة</p>
+                <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">نظام إدارة ولاء العملاء الذكي</p>
                 <div id="referral-banner" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl font-semibold">
                     🎉 أنت تقوم بالتسجيل عبر رابط دعوة مباشر للمنشأة!
                 </div>
@@ -832,7 +832,7 @@
             document.getElementById('password-field-container').classList.add('hidden');
             document.getElementById('password').required = false;
             document.getElementById('auth-title').innerText = 'استعادة كلمة المرور';
-            document.getElementById('auth-subtitle').innerText = 'شركة بصمة التميز المتكاملة';
+            document.getElementById('auth-subtitle').innerText = 'نظام إدارة ولاء العملاء الذكي';
             document.getElementById('auth-btn').innerText = 'إرسال رابط الاستعادة';
             document.getElementById('toggle-auth-text').innerText = 'العودة لتسجيل الدخول';
             document.getElementById('forgot-pass-btn').classList.add('hidden');
