@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الولاء والاشتراكات - Dody Rose Loyalty</title>
+    <title>نظام إدارة الولاء والاشتراكات الذكي - CRM & Loyalty</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome CDN for Real Brand Icons -->
@@ -52,7 +52,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف للتواصل</label>
-                        <input type="tel" id="phone" placeholder="05xxxxxxxx" dir="ltr" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-right">
+                        <input type="tel" id="phone" placeholder="05xxxxxxxx أو 01xxxxxxxx" dir="ltr" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-right">
                     </div>
                 </div>
 
@@ -88,7 +88,7 @@
             </div>
             <h2 class="text-xl font-bold text-gray-800">التحقق من البريد الإلكتروني</h2>
             <p class="text-sm text-gray-600 leading-relaxed">
-                تم إرسال رابط التفعيل إلى بريدك الإلكتروني:
+                تم إرسال رابط التفعيل الاحترافي إلى بريدك الإلكتروني:
                 <span id="verify-target-email" class="font-bold text-indigo-700 block mt-1" dir="ltr">--</span>
                 الرجاء فتح رسالة البريد والنقر على رابط التفعيل لإكمال التسجيل، ثم الضغط على زر التأكيد أدناه.
             </p>
@@ -131,24 +131,41 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد نوع الاشتراك</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد الدولة والعملة</h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose)</label>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose_ksa أو dody_rose_egy)</label>
                                 <input type="text" id="tenant-id-input" pattern="[a-zA-Z0-9_]+" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">اسم المنشأة التجاري</label>
                                 <input type="text" id="tenant-name-input" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">الدولة</label>
+                                    <select id="tenant-country-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                        <option value="المملكة العربية السعودية">المملكة العربية السعودية</option>
+                                        <option value="جمهورية مصر العربية">جمهورية مصر العربية</option>
+                                        <option value="الإمارات العربية المتحدة">الإمارات العربية المتحدة</option>
+                                        <option value="أخرى">دولة أخرى</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">العملة</label>
+                                    <select id="tenant-currency-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                        <option value="ريال سعودي">ريال سعودي (SAR)</option>
+                                        <option value="جنيه مصري">جنيه مصري (EGP)</option>
+                                        <option value="درهم إماراتي">درهم إماراتي (AED)</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الاشتراك والباقة</label>
-                                <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                     <option value="trial_7">فترة تجريبية (7 أيام)</option>
-                                    <option value="trial_14">فترة تجريبية (14 يوماً)</option>
-                                    <option value="trial_30">فترة تجريبية (30 يوماً)</option>
                                     <option value="annual_365">اشتراك سنوي (365 يوماً)</option>
-                                    <option value="unlimited" selected>اشتراك مفتوح ودائم (ملكيتها الخاصة)</option>
+                                    <option value="unlimited" selected>اشتراك مفتوح ودائم</option>
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
@@ -162,28 +179,28 @@
                         <form onsubmit="createTenantStaff(event)" class="space-y-3 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">اختر المنشأة المرتبطة</label>
-                                <select id="admin-tenant-select" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <select id="admin-tenant-select" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                     <option value="">جاري تحميل المنشآت...</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">دور المستخدم في المنشأة</label>
-                                <select id="staff-role-select" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">دور المستخدم</label>
+                                <select id="staff-role-select" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                     <option value="tenant_admin">مدير المنشأة (Tenant Admin)</option>
                                     <option value="cashier">موظف كاشير (Cashier POS)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">الاسم الكامل</label>
-                                <input type="text" id="admin-name-input" placeholder="مثال: سارة أحمد" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="admin-name-input" placeholder="مثال: سارة أحمد" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">البريد الإلكتروني</label>
-                                <input type="email" id="admin-email-input" placeholder="staff@dodyrose.com" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="email" id="admin-email-input" placeholder="staff@domain.com" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">كلمة المرور المؤقتة</label>
-                                <input type="password" id="admin-pass-input" placeholder="********" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="password" id="admin-pass-input" placeholder="********" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
                                 إنشاء حساب الصلاحية وربطه
@@ -192,27 +209,43 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المنشآت والاشتراكات</h4>
+                <!-- Super Admin: Tenants Filter & Search -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <h4 class="text-lg font-bold text-indigo-800">إدارة المنشآت والاشتراكات</h4>
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                            <input type="text" id="search-tenants-input" onkeyup="filterTenants()" placeholder="🔍 بحث بالاسم أو المعرف..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                            <select id="filter-tenants-status" onchange="filterTenants()" class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
+                                <option value="all">جميع الحالات</option>
+                                <option value="active">النشطة فقط</option>
+                                <option value="inactive">الموقوفة فقط</option>
+                            </select>
+                        </div>
+                    </div>
                     <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                    <h4 class="text-lg font-bold text-indigo-800 mb-3">إدارة المستخدمين والصلاحيات (مع إمكانية تعديل كلمة المرور)</h4>
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+                    <h4 class="text-lg font-bold text-indigo-800">إدارة المستخدمين والصلاحيات</h4>
                     <div id="users-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
             </div>
 
             <!-- Tenant Admin Dashboard -->
             <div id="tenant-admin-view" class="role-view hidden space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex justify-between items-center">
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-indigo-800">لوحة تحكم المنشأة: <span id="current-tenant-name" class="text-indigo-600">--</span></h3>
-                        <p class="text-xs text-gray-500 mt-1">معرف المنشأة: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
+                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold text-indigo-600">--</span></p>
                     </div>
-                    <div class="bg-indigo-50 px-4 py-2 rounded-xl text-center">
-                        <span class="text-xs text-indigo-700 font-semibold block">حالة الاشتراك</span>
-                        <span id="tenant-status-badge" class="text-sm font-bold text-emerald-600">نشط</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openChangePasswordModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                            🔑 تغيير كلمة المرور
+                        </button>
+                        <div class="bg-indigo-50 px-4 py-2 rounded-xl text-center">
+                            <span class="text-xs text-indigo-700 font-semibold block">حالة الاشتراك</span>
+                            <span id="tenant-status-badge" class="text-sm font-bold text-emerald-600">نشط</span>
+                        </div>
                     </div>
                 </div>
 
@@ -225,7 +258,7 @@
                     <button onclick="switchAdminTab('contact', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والسوشيال</button>
                     <button onclick="switchAdminTab('offers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 العروض والخصومات</button>
                     <button onclick="switchAdminTab('gallery', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🖼️ معرض الصور</button>
-                    <button onclick="switchAdminTab('customers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👥 العملاء والمحافظ</button>
+                    <button onclick="switchAdminTab('customers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👥 العملاء والتقارير الذكية</button>
                 </div>
 
                 <!-- Tab 1: Rules & Constants -->
@@ -235,28 +268,28 @@
                             <h4 class="text-base font-bold text-indigo-800 mb-3">⚙️ ضوابط وقواعد منح واستبدال النقاط</h4>
                             <form onsubmit="saveTenantLoyaltyRules(event)" class="space-y-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (ريال)</label>
-                                    <input type="number" id="rule-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (بالعملة المحلية)</label>
+                                    <input type="number" id="rule-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة استبدال النقطة الواحدة (ريال)</label>
-                                    <input type="number" id="rule-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة استبدال النقطة الواحدة</label>
+                                    <input type="number" id="rule-point-value" value="1" step="0.1" min="0.1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">الحد الأدنى للنقاط المطلوبة للاستبدال</label>
-                                    <input type="number" id="rule-min-redemption" value="50" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="number" id="rule-min-redemption" value="50" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">النقاط التشجيعية للعملاء الجدد (Welcome Bonus)</label>
-                                    <input type="number" id="rule-welcome-points" value="50" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="number" id="rule-welcome-points" value="50" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">نقاط مكافأة الإحالة للعميل الداعي (Referral Bonus)</label>
-                                    <input type="number" id="rule-referral-points" value="25" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-indigo-50/50 border-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="number" id="rule-referral-points" value="25" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-indigo-50/50 border-indigo-200 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">صلاحية النقاط (بالأيام)</label>
-                                    <input type="number" id="rule-expiry-days" value="365" min="30" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="number" id="rule-expiry-days" value="365" min="30" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
                                     حفظ ضوابط الولاء والاستبدال
@@ -316,7 +349,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <h4 class="text-base font-bold text-indigo-800 mb-3">📖 نبذة تعريفية عن النشاط</h4>
                         <form onsubmit="saveTenantAbout(event)" class="space-y-3">
-                            <textarea id="tenant-about-text" rows="6" placeholder="اكتب نبذة احترافية عن نشاط المنشأة..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <textarea id="tenant-about-text" rows="6" placeholder="اكتب نبذة احترافية عن نشاط المنشأة..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none"></textarea>
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ النبذة</button>
                         </form>
                     </div>
@@ -328,7 +361,7 @@
                         <h4 class="text-base font-bold text-indigo-800">💇‍♀️ إضافة خدمة جديدة للعملاء</h4>
                         <form onsubmit="addTenantService(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
                             <input type="text" id="srv-name" placeholder="اسم الخدمة" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                            <input type="number" id="srv-price" placeholder="السعر (ريال)" min="0" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                            <input type="number" id="srv-price" placeholder="السعر" min="0" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <input type="text" id="srv-notes" placeholder="ملاحظات (اختياري)" class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">إضافة الخدمة</button>
                         </form>
@@ -344,10 +377,10 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-phone text-indigo-600 ml-1"></i> رقم الهاتف / الجوال</label>
-                                    <input type="text" id="contact-phone" placeholder="05xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <input type="text" id="contact-phone" placeholder="05xxxxxxxx أو 01xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-envelope text-indigo-600 ml-1"></i> البريد الإلكتروني للمنشأة</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-envelope text-indigo-600 ml-1"></i> البريد الإلكتروني</label>
                                     <input type="email" id="contact-email" placeholder="info@domain.com" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
@@ -356,7 +389,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-whatsapp text-emerald-600 ml-1"></i> واتساب (WhatsApp)</label>
-                                    <input type="url" id="contact-whatsapp" placeholder="https://wa.me/9665xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <input type="url" id="contact-whatsapp" placeholder="https://wa.me/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-facebook text-blue-600 ml-1"></i> فيسبوك (Facebook)</label>
@@ -368,14 +401,14 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-snapchat text-yellow-500 ml-1"></i> سناب شات (Snapchat)</label>
-                                    <input type="url" id="contact-snapchat" placeholder="https://snapchat.com/add/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <input type="url" id="contact-snapchat" placeholder="https://snapchat.com/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-brands fa-tiktok text-gray-900 ml-1"></i> تيك توك (TikTok)</label>
                                     <input type="url" id="contact-tiktok" placeholder="https://tiktok.com/@..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-star text-amber-500 ml-1"></i> رابط تقييمات والآراء في جوجل (Google Reviews)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-star text-amber-500 ml-1"></i> رابط تقييمات جوجل (Google Reviews)</label>
                                     <input type="url" id="contact-google-reviews" placeholder="https://maps.app.goo.gl/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                             </div>
@@ -389,9 +422,9 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                         <h4 class="text-base font-bold text-indigo-800">🎁 إضافة عرض ترويجي جديد</h4>
                         <form onsubmit="addTenantOffer(event)" class="space-y-3">
-                            <input type="text" id="offer-title" placeholder="عنوان العرض (مثال: خصم 20% على خدمات الشعر)" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                            <input type="text" id="offer-title" placeholder="عنوان العرض..." required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <textarea id="offer-desc" rows="3" placeholder="تفاصيل العرض والشروط..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none"></textarea>
-                            <input type="url" id="offer-img" placeholder="رابط صورة العرض (اختياري - رابط مباشر للصورة URL)" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                            <input type="url" id="offer-img" placeholder="رابط صورة العرض (اختياري URL)" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition cursor-pointer">نشر العرض</button>
                         </form>
                         <div id="admin-offers-list" class="mt-4 space-y-3">جاري التحميل...</div>
@@ -425,10 +458,20 @@
                     </div>
                 </div>
 
-                <!-- Tab 7: Customers Sub-Wallets -->
+                <!-- Tab 7: Customers & Smart CRM Reports -->
                 <div id="admin-tab-customers" class="admin-tab-content hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">👥 محافظ العملاء الفرعية وبيانات التواصل</h4>
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
+                            <h4 class="text-base font-bold text-indigo-800">👥 إدارة العملاء وتقارير المناسبات الذكية</h4>
+                            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                                <input type="text" id="search-customers-input" onkeyup="filterAdminCustomers()" placeholder="🔍 بحث بالاسم، الهاتف، البريد..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                                <select id="filter-customers-occasion" onchange="filterAdminCustomers()" class="px-3 py-2 border rounded-xl text-xs bg-indigo-50 font-semibold text-indigo-800 outline-none">
+                                    <option value="all">جميع العملاء</option>
+                                    <option value="birthday_this_month">🎂 أعياد ميلاد خلال الشهر الحالي</option>
+                                    <option value="anniversary_this_month">💍 تواريخ زواج خلال الشهر الحالي</option>
+                                </select>
+                            </div>
+                        </div>
                         <div id="tenant-customers-list" class="overflow-x-auto text-sm text-gray-600">جاري تحميل العملاء والمحافظ...</div>
                     </div>
                 </div>
@@ -436,9 +479,14 @@
 
             <!-- Cashier POS Dashboard -->
             <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center">
-                    <h3 class="text-xl font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
-                    <p class="text-xs text-gray-500 mt-1">امسح كود الـ QR عبر الكاميرا أو أدخل المعرف يدوياً</p>
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
+                        <p class="text-xs text-gray-500 mt-0.5">امسح كود الـ QR للعميل أو أدخل المعرف</p>
+                    </div>
+                    <button onclick="openChangePasswordModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
+                        🔑 تغيير كلمة المرور
+                    </button>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
@@ -452,7 +500,7 @@
                     <div id="reader" class="hidden w-full max-w-sm mx-auto rounded-xl overflow-hidden border border-purple-200 bg-black"></div>
 
                     <div class="flex gap-2">
-                        <input type="text" id="pos-customer-uid" placeholder="معرف العميل يظهر هنا تلقائياً أو أدخله يدوياً..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                        <input type="text" id="pos-customer-uid" placeholder="معرف العميل يظهر هنا تلقائياً أو أدخله يدوياً..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none font-mono">
                         <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
                     </div>
                 </div>
@@ -464,11 +512,12 @@
                             <h4 id="pos-c-name" class="text-lg font-bold text-indigo-900 mt-0.5">--</h4>
                             <p id="pos-c-phone" class="text-xs text-gray-700 font-semibold mt-0.5" dir="ltr">--</p>
                             <p id="pos-c-email" class="text-xs text-gray-500">--</p>
+                            <p id="pos-c-details" class="text-xs text-indigo-700 font-medium mt-1">--</p>
                         </div>
                         <div class="text-left bg-white px-4 py-3 rounded-xl shadow-xs border border-indigo-100">
-                            <span class="text-xs text-gray-500 block">رصيد المحفظة بالفرع</span>
+                            <span class="text-xs text-gray-500 block">رصيد النقاط بالفرع</span>
                             <span id="pos-c-points" class="text-2xl font-extrabold text-emerald-600">0</span>
-                            <span class="text-xs text-gray-600">نقطة</span>
+                            <span id="pos-currency-label" class="text-xs text-gray-600">نقطة</span>
                         </div>
                     </div>
 
@@ -476,8 +525,8 @@
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
                             <h5 class="font-bold text-indigo-800 text-sm">➕ إضافة نقاط (منح)</h5>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (ريال)</label>
-                                <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (<span class="pos-curr-text">ريال</span>)</label>
+                                <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <button onclick="posEarnPoints()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 حساب ومنح النقاط تلقائياً
@@ -487,8 +536,8 @@
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
                             <h5 class="font-bold text-indigo-800 text-sm">➖ استبدال نقاط (خصم خدمة)</h5>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (ريال)</label>
-                                <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (<span class="pos-curr-text">ريال</span>)</label>
+                                <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
                             <button onclick="posRedeemPoints()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 خصم النقاط المكافئة تلقائياً
@@ -510,11 +559,44 @@
                         <p id="customer-welcome-name" class="text-2xl font-bold mt-1">مرحباً بك</p>
                         <p id="customer-phone-display" class="text-xs opacity-90 mt-1 font-semibold" dir="ltr">--</p>
                         <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (UID): <span id="customer-uid-badge">--</span></p>
+                        <div class="mt-3">
+                            <button onclick="openChangePasswordModal()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                                🔑 تغيير كلمة المرور
+                            </button>
+                        </div>
                     </div>
                     <div class="bg-white p-4 rounded-2xl text-center text-gray-800 shadow-lg flex flex-col items-center">
                         <div id="qrcode" class="bg-white p-2 rounded-xl flex items-center justify-center"></div>
                         <span class="text-xs font-bold text-indigo-900 mt-2">اعرض هذا الكود للكاشير</span>
                     </div>
+                </div>
+
+                <!-- Customer Profile & Preferences (Optional CRM Data) -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <div>
+                            <h4 class="text-base font-bold text-indigo-800">👤 ملفك الشخصي وبيانات الاهتمامات (اختياري)</h4>
+                            <p class="text-xs text-gray-500">شاركنا بياناتك لنتمكن من تقديم عروض مخصصة ومفاجآت في مناسباتك الخاصة!</p>
+                        </div>
+                        <button onclick="saveCustomerProfile(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
+                            حفظ البيانات الشخصية
+                        </button>
+                    </div>
+
+                    <form id="customer-profile-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">تاريخ الميلاد</label>
+                            <input type="date" id="cust-birthdate" class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">تاريخ الزواج / المناسبة</label>
+                            <input type="date" id="cust-anniversary" class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">الهوايات والاهتمامات</label>
+                            <input type="text" id="cust-hobbies" placeholder="مثال: العناية بالشعر، العطور، السكن في حي السامر..." class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
+                        </div>
+                    </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
@@ -589,9 +671,42 @@
         </section>
     </main>
 
+    <!-- Change Password Modal -->
+    <div id="change-pass-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-indigo-800">🔑 تغيير كلمة المرور</h3>
+            <p class="text-xs text-gray-500">سيتم إرسال رابط آمن ومباشر لإعادة تعيين كلمة المرور إلى بريدك الإلكتروني المسجل.</p>
+            <p id="modal-user-email" class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 p-2 rounded-lg text-center" dir="ltr">--</p>
+            <div class="flex gap-2 pt-2">
+                <button onclick="requestPasswordResetFromModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                    إرسال رابط التغيير للإيميل
+                </button>
+                <button onclick="closeChangePasswordModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal (For Admin) -->
+    <div id="customer-details-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-indigo-800">📋 الملف الشخصي الكامل للعميل</h3>
+                <button onclick="closeCustomerDetailsModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg">✕</button>
+            </div>
+            <div id="customer-details-content" class="space-y-3 text-sm">
+                جاري التحميل...
+            </div>
+            <div class="text-left pt-2 border-t">
+                <button onclick="closeCustomerDetailsModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-xs font-bold cursor-pointer">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
-        جميع الحقوق محفوظة &copy; 2026 - نظام إدارة الولاء المركزي
+        جميع الحقوق محفوظة &copy; 2026 - شركة بصمة التميز المتكاملة
     </footer>
 
     <!-- Firebase SDKs & App Logic -->
@@ -619,6 +734,7 @@
         let currentUserTenantId = null;
         let activePosCustomerUid = null;
         let activeTenantRules = { currencyPerPoint: 10, pointValue: 1, minRedemption: 50, welcomePoints: 50, referralPoints: 25 };
+        let currentTenantCurrency = 'ريال سعودي';
         let html5QrCode = null;
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -671,7 +787,7 @@
                 if (!email) return alert('الرجاء إدخال البريد الإلكتروني.');
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    alert('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح.');
+                    alert('تم إرسال رابط إعادة تعيين كلمة المرور وتنبيه الأمان إلى بريدك الإلكتروني بنجاح.');
                     toggleAuthMode();
                 } catch (err) {
                     alert('خطأ: ' + err.message);
@@ -688,9 +804,11 @@
                     if (!name || !phone) return alert('الرجاء إدخال الاسم الكامل ورقم الهاتف.');
 
                     const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // Professional Branded Verification Email
                     await sendEmailVerification(userCred.user);
 
-                    const targetTenant = paramTenantId || "dody_rose";
+                    const targetTenant = paramTenantId || "dody_rose_ksa";
                     const referrerUid = paramReferrerUid || null;
 
                     await setDoc(doc(db, "users", userCred.user.uid), {
@@ -701,6 +819,9 @@
                         isBlocked: false,
                         registeredTenant: targetTenant,
                         referredBy: referrerUid,
+                        birthdate: '',
+                        anniversary: '',
+                        hobbies: '',
                         createdAt: new Date().toISOString()
                     });
                     
@@ -718,6 +839,9 @@
                         email,
                         points: welcomePts,
                         referredBy: referrerUid,
+                        birthdate: '',
+                        anniversary: '',
+                        hobbies: '',
                         lastVisit: new Date().toISOString()
                     });
 
@@ -729,7 +853,7 @@
                         }
                     }
 
-                    alert('تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك الإلكتروني، يرجى تفقد بريدك للمتابعة.');
+                    alert('تم إنشاء الحساب بنجاح! تم إرسال رسالة تفعيل احترافية إلى بريدك الإلكتروني.');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -742,7 +866,7 @@
             if (auth.currentUser) {
                 try {
                     await sendEmailVerification(auth.currentUser);
-                    alert('تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.');
+                    alert('تم إعادة إرسال رابط التفعيل الاحترافي إلى بريدك الإلكتروني بنجاح.');
                 } catch (err) {
                     alert('تعذر الإرسال حالياً: ' + err.message);
                 }
@@ -757,6 +881,56 @@
                 } else {
                     alert('لم يتم تفعيل البريد الإلكتروني بعد. الرجاء النقر على الرابط المرسل لبريدك.');
                 }
+            }
+        }
+
+        window.openChangePasswordModal = function() {
+            if (auth.currentUser) {
+                document.getElementById('modal-user-email').innerText = auth.currentUser.email;
+                document.getElementById('change-pass-modal').classList.remove('hidden');
+            }
+        }
+
+        window.closeChangePasswordModal = function() {
+            document.getElementById('change-pass-modal').classList.add('hidden');
+        }
+
+        window.requestPasswordResetFromModal = async function() {
+            if (auth.currentUser && auth.currentUser.email) {
+                try {
+                    await sendPasswordResetEmail(auth, auth.currentUser.email);
+                    alert(`تم إرسال رابط وإشعار تغيير كلمة المرور إلى بريدك الموثق (${auth.currentUser.email}) بنجاح.`);
+                    closeChangePasswordModal();
+                } catch (err) {
+                    alert('خطأ أثناء إرسال الرابط: ' + err.message);
+                }
+            }
+        }
+
+        window.saveCustomerProfile = async function(e) {
+            e.preventDefault();
+            if (!auth.currentUser) return;
+            const uid = auth.currentUser.uid;
+            const birthdate = document.getElementById('cust-birthdate').value;
+            const anniversary = document.getElementById('cust-anniversary').value;
+            const hobbies = document.getElementById('cust-hobbies').value.trim();
+
+            try {
+                await updateDoc(doc(db, "users", uid), { birthdate, anniversary, hobbies });
+                
+                // Also update in all tenant sub-wallets where customer exists
+                const tenantsSnap = await getDocs(collection(db, "tenants"));
+                for (const tDoc of tenantsSnap.docs) {
+                    const custRef = doc(db, "tenants", tDoc.id, "customers", uid);
+                    const custSnap = await getDoc(custRef);
+                    if (custSnap.exists()) {
+                        await updateDoc(custRef, { birthdate, anniversary, hobbies });
+                    }
+                }
+
+                alert('تم حفظ بياناتك الشخصية واهتماماتك بنجاح!');
+            } catch (err) {
+                alert('خطأ أثناء الحفظ: ' + err.message);
             }
         }
 
@@ -827,6 +1001,8 @@
             e.preventDefault();
             const tenantId = document.getElementById('tenant-id-input').value.trim();
             const businessName = document.getElementById('tenant-name-input').value.trim();
+            const country = document.getElementById('tenant-country-input').value;
+            const currency = document.getElementById('tenant-currency-input').value;
             const plan = document.getElementById('tenant-plan-input').value;
             const now = new Date();
             let expiresAt = null;
@@ -843,6 +1019,8 @@
             try {
                 await setDoc(doc(db, "tenants", tenantId), {
                     businessName,
+                    country,
+                    currency,
                     isActive: true,
                     isTrial: plan.startsWith('trial_'),
                     planType: plan,
@@ -852,7 +1030,7 @@
                     about: '',
                     contact: { phone: '', email: '', web: '', whatsapp: '', facebook: '', instagram: '', snapchat: '', tiktok: '', googleReviews: '' }
                 });
-                alert(`تم إنشاء المنشأة (${businessName}) بنجاح!`);
+                alert(`تم إنشاء المنشأة (${businessName}) في ${country} بنجاح!`);
                 document.getElementById('tenant-id-input').value = '';
                 document.getElementById('tenant-name-input').value = '';
                 loadTenants();
@@ -907,25 +1085,21 @@
             loadTenants();
         }
 
-        // Super Admin: Update User Password
         window.adminUpdateUserPassword = async function(userEmail) {
-            const newPass = prompt(`أدخل كلمة المرور الجديدة للمستخدم (${userEmail}):`);
-            if (!newPass) return;
-            if (newPass.length < 6) return alert('كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام.');
-
             try {
-                // Trigger password reset email or note that Admin sent reset
                 await sendPasswordResetEmail(auth, userEmail);
-                alert(`تم إرسال رابط إعادة تعيين كلمة المرور إلى البريد: ${userEmail}\n\nملاحظة أمنية: لأسباب أمنية في نظام المصادقة السحابي، يتم إرسال رابط التجديد الفوري للبريد الموثق للمستخدم.`);
+                alert(`تم إرسال رابط إعادة تعيين وتنبيه الأمان إلى البريد: ${userEmail}`);
             } catch (err) {
-                alert('فشل إرسال رابط التجديد: ' + err.message);
+                alert('فشل الإرسال: ' + err.message);
             }
         }
 
+        let allTenantsData = [];
         window.loadTenants = async function() {
             const listEl = document.getElementById('tenants-list');
             const selectEl = document.getElementById('admin-tenant-select');
             const snap = await getDocs(collection(db, "tenants"));
+            allTenantsData = [];
             let total = 0, active = 0, trial = 0, inactive = 0;
 
             if (snap.empty) {
@@ -934,11 +1108,6 @@
                 return;
             }
 
-            let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف</th><th class="p-3">نوع الباقة</th><th class="p-3">الانتهاء</th><th class="p-3">الحالة</th><th class="p-3">إجراءات الاشتراكات</th>
-                </tr></thead><tbody class="divide-y divide-gray-100">`;
-
             let selectHtml = '<option value="">-- اختر المنشأة --</option>';
 
             snap.forEach((d) => {
@@ -946,36 +1115,60 @@
                 const data = d.data();
                 if (data.isActive) active++; else inactive++;
                 if (data.isTrial) trial++;
-
-                selectHtml += `<option value="${d.id}">${data.businessName} (${d.id})</option>`;
-
-                let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم (مفتوح)</span>';
-                if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي (${data.planType})</span>`;
-                else if (data.planType === 'annual_365') planBadge = '<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-semibold">سنوي</span>';
-
-                let expText = data.expiresAt ? new Date(data.expiresAt).toLocaleDateString('ar-SA') : 'مفتوح (دائم)';
-
-                html += `<tr class="hover:bg-gray-50">
-                    <td class="p-3 font-semibold">${data.businessName}</td>
-                    <td class="p-3 font-mono text-xs text-indigo-600">${d.id}</td>
-                    <td class="p-3">${planBadge}</td>
-                    <td class="p-3 text-xs">${expText}</td>
-                    <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
-                    <td class="p-3 flex gap-1.5 flex-wrap">
-                        <button onclick="toggleTenantStatus('${d.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
-                        <button onclick="extendTenantDays('${d.id}', 14)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+14 يوم</button>
-                        <button onclick="extendTenantDays('${d.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
-                        <button onclick="deleteTenant('${d.id}', '${data.businessName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
-                    </td>
-                </tr>`;
+                allTenantsData.push({ id: d.id, ...data });
+                selectHtml += `<option value="${d.id}">${data.businessName} (${d.country || 'السعودية'})</option>`;
             });
-            html += '</tbody></table>';
-            listEl.innerHTML = html;
+
+            renderTenantsTable(allTenantsData);
             selectEl.innerHTML = selectHtml;
             document.getElementById('stat-total-tenants').innerText = total;
             document.getElementById('stat-active-tenants').innerText = active;
             document.getElementById('stat-trial-tenants').innerText = trial;
             document.getElementById('stat-inactive-tenants').innerText = inactive;
+        }
+
+        window.filterTenants = function() {
+            const search = document.getElementById('search-tenants-input').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-tenants-status').value;
+
+            const filtered = allTenantsData.filter(t => {
+                const matchSearch = t.businessName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
+                const matchStatus = statusFilter === 'all' || (statusFilter === 'active' && t.isActive) || (statusFilter === 'inactive' && !t.isActive);
+                return matchSearch && matchStatus;
+            });
+            renderTenantsTable(filtered);
+        }
+
+        function renderTenantsTable(tenants) {
+            const listEl = document.getElementById('tenants-list');
+            if (tenants.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث.</p>';
+                return;
+            }
+
+            let html = `<table class="w-full text-right border-collapse">
+                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
+                    <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف والدولة</th><th class="p-3">الباقة والعملة</th><th class="p-3">الحالة</th><th class="p-3">إجراءات</th>
+                </tr></thead><tbody class="divide-y divide-gray-100">`;
+
+            tenants.forEach(data => {
+                let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم</span>';
+                if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي</span>`;
+                
+                html += `<tr class="hover:bg-gray-50">
+                    <td class="p-3 font-semibold">${data.businessName}</td>
+                    <td class="p-3 text-xs"><span class="font-mono text-indigo-600">${data.id}</span><br><span class="text-gray-500">${data.country || 'المملكة العربية السعودية'}</span></td>
+                    <td class="p-3 text-xs">${planBadge} (${data.currency || 'ريال'})</td>
+                    <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
+                    <td class="p-3 flex gap-1.5 flex-wrap">
+                        <button onclick="toggleTenantStatus('${data.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
+                        <button onclick="extendTenantDays('${data.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
+                        <button onclick="deleteTenant('${data.id}', '${data.businessName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            listEl.innerHTML = html;
         }
 
         window.loadUsers = async function() {
@@ -984,7 +1177,7 @@
             if (snap.empty) { listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>'; return; }
 
             let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">الهاتف</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">المنشأة</th><th class="p-3">الإدارة الأمنية</th></tr></thead>
+                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">الاسم</th><th class="p-3">الهاتف</th><th class="p-3">البريد</th><th class="p-3">الدور</th><th class="p-3">المنشأة</th><th class="p-3">الأمان</th></tr></thead>
                 <tbody class="divide-y divide-gray-100">`;
             snap.forEach((d) => {
                 const u = d.data();
@@ -996,7 +1189,7 @@
                     <td class="p-3 text-xs font-mono text-indigo-600">${u.tenantId || u.registeredTenant || 'عام'}</td>
                     <td class="p-3">
                         <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer">
-                            🔑 إعادة تعيين كلمة المرور
+                            🔑 إعادة تعيين الباسورد
                         </button>
                     </td>
                 </tr>`;
@@ -1067,12 +1260,12 @@
                     listEl.innerHTML = '<p class="text-gray-400">لا توجد خدمات مضافة حالياً.</p>';
                     return;
                 }
-                let html = `<table class="w-full text-right border-collapse"><thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-2">الخدمة</th><th class="p-2">السعر</th><th class="p-2">ملاحظات</th><th class="p-2">الحالة</th><th class="p-2">إجراءات</th></tr></thead><tbody class="divide-y">`;
+                let html = `<table class="w-full text-right border-collapse"><thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-2">الخدمة</th><th class="p-2">السعر (${currentTenantCurrency})</th><th class="p-2">ملاحظات</th><th class="p-2">الحالة</th><th class="p-2">إجراءات</th></tr></thead><tbody class="divide-y">`;
                 snap.forEach(d => {
                     const s = d.data();
                     html += `<tr class="hover:bg-gray-50">
                         <td class="p-2 font-semibold">${s.name}</td>
-                        <td class="p-2 text-indigo-600">${s.price} ريال</td>
+                        <td class="p-2 text-indigo-600">${s.price} ${currentTenantCurrency}</td>
                         <td class="p-2 text-xs text-gray-500">${s.notes || '--'}</td>
                         <td class="p-2">${s.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-bold">نشط</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs">غير نشط</span>'}</td>
                         <td class="p-2 flex gap-1">
@@ -1229,6 +1422,7 @@
             }
         }
 
+        let tenantCustomersCache = [];
         window.loadTenantAdminData = async function() {
             if (!currentUserTenantId) return;
             
@@ -1249,6 +1443,10 @@
             if (tDoc.exists()) {
                 const data = tDoc.data();
                 document.getElementById('current-tenant-name').innerText = data.businessName;
+                document.getElementById('tenant-country-badge').innerText = data.country || 'المملكة العربية السعودية';
+                currentTenantCurrency = data.currency || 'ريال سعودي';
+                document.getElementById('tenant-currency-badge').innerText = currentTenantCurrency;
+
                 if (data.loyaltyRules) {
                     activeTenantRules = data.loyaltyRules;
                     document.getElementById('rule-currency-per-point').value = data.loyaltyRules.currencyPerPoint || 10;
@@ -1275,37 +1473,145 @@
             loadTenantOffersAdmin();
             loadTenantGalleryAdmin();
 
-            const listEl = document.getElementById('tenant-customers-list');
             try {
                 const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "customers"));
-                let totalCustomers = 0, totalPoints = 0;
+                tenantCustomersCache = [];
+                let totalPoints = 0;
+                
                 if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 py-3">لا توجد محافظ فرعية مسجلة لهذه المنشأة حالياً.</p>';
+                    document.getElementById('tenant-customers-list').innerHTML = '<p class="text-gray-400 py-3">لا توجد محافظ فرعية مسجلة لهذه المنشأة حالياً.</p>';
                     document.getElementById('tenant-stat-customers').innerText = 0;
                     document.getElementById('tenant-stat-points').innerText = 0;
                     return;
                 }
-                let html = `<table class="w-full text-right border-collapse"><thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-3">اسم العميل</th><th class="p-3">رقم الهاتف</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط</th><th class="p-3">آخر زيارة</th></tr></thead><tbody class="divide-y">`;
-                snap.forEach((d) => {
-                    totalCustomers++;
-                    const c = d.data();
-                    const pts = c.points || 0;
-                    totalPoints += pts;
-                    html += `<tr class="hover:bg-gray-50">
-                        <td class="p-3 font-semibold">${c.name || '--'}</td>
-                        <td class="p-3 text-xs font-mono text-gray-700" dir="ltr">${c.phone || '--'}</td>
-                        <td class="p-3 text-xs text-gray-600">${c.email || '--'}</td>
-                        <td class="p-3 font-bold text-indigo-600">${pts} نقطة</td>
-                        <td class="p-3 text-xs">${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('ar-SA') : '--'}</td>
-                    </tr>`;
-                });
-                html += '</tbody></table>';
-                listEl.innerHTML = html;
-                document.getElementById('tenant-stat-customers').innerText = totalCustomers;
+
+                for (const d of snap.docs) {
+                    const custWallet = d.data();
+                    const custId = d.id;
+                    totalPoints += (custWallet.points || 0);
+
+                    // Fetch main user profile data if exists
+                    const userDoc = await getDoc(doc(db, "users", custId));
+                    let profileData = {};
+                    if (userDoc.exists()) {
+                        profileData = userDoc.data();
+                    }
+
+                    tenantCustomersCache.push({
+                        id: custId,
+                        name: custWallet.name || profileData.name || '--',
+                        phone: custWallet.phone || profileData.phone || '--',
+                        email: custWallet.email || profileData.email || '--',
+                        points: custWallet.points || 0,
+                        birthdate: profileData.birthdate || custWallet.birthdate || '',
+                        anniversary: profileData.anniversary || custWallet.anniversary || '',
+                        hobbies: profileData.hobbies || custWallet.hobbies || '',
+                        lastVisit: custWallet.lastVisit || '--'
+                    });
+                }
+
+                renderAdminCustomersTable(tenantCustomersCache);
+                document.getElementById('tenant-stat-customers').innerText = tenantCustomersCache.length;
                 document.getElementById('tenant-stat-points').innerText = totalPoints;
             } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل محافظ العملاء الفرعية.</p>';
+                document.getElementById('tenant-customers-list').innerHTML = '<p class="text-red-500">فشل تحميل محافظ العملاء.</p>';
             }
+        }
+
+        window.filterAdminCustomers = function() {
+            const search = document.getElementById('search-customers-input').value.toLowerCase();
+            const occasion = document.getElementById('filter-customers-occasion').value;
+            const currentMonth = new Date().getMonth() + 1; // 1-12
+
+            const filtered = tenantCustomersCache.filter(c => {
+                const matchSearch = c.name.toLowerCase().includes(search) || c.phone.toLowerCase().includes(search) || c.email.toLowerCase().includes(search);
+                
+                let matchOccasion = true;
+                if (occasion === 'birthday_this_month' && c.birthdate) {
+                    const bMonth = parseInt(c.birthdate.split('-')[1]);
+                    matchOccasion = (bMonth === currentMonth);
+                } else if (occasion === 'birthday_this_month' && !c.birthdate) {
+                    matchOccasion = false;
+                }
+
+                if (occasion === 'anniversary_this_month' && c.anniversary) {
+                    const aMonth = parseInt(c.anniversary.split('-')[1]);
+                    matchOccasion = (aMonth === currentMonth);
+                } else if (occasion === 'anniversary_this_month' && !c.anniversary) {
+                    matchOccasion = false;
+                }
+
+                return matchSearch && matchOccasion;
+            });
+
+            renderAdminCustomersTable(filtered);
+        }
+
+        function renderAdminCustomersTable(customers) {
+            const listEl = document.getElementById('tenant-customers-list');
+            if (customers.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد بيانات مطابقة لفلاتر البحث أو المناسبات خلال هذا الشهر.</p>';
+                return;
+            }
+
+            let html = `<table class="w-full text-right border-collapse">
+                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
+                    <th class="p-3">اسم العميل</th><th class="p-3">رقم الهاتف</th><th class="p-3">البريد الإلكتروني</th><th class="p-3">رصيد النقاط</th><th class="p-3">المناسبات</th><th class="p-3">الملف الشخصي</th>
+                </tr></thead><tbody class="divide-y">`;
+
+            customers.forEach(c => {
+                let occasionBadge = '';
+                const currentMonth = new Date().getMonth() + 1;
+                if (c.birthdate) {
+                    const bMonth = parseInt(c.birthdate.split('-')[1]);
+                    if (bMonth === currentMonth) occasionBadge += `<span class="bg-pink-100 text-pink-800 px-2 py-0.5 rounded text-[10px] font-bold block mb-1">🎂 عيد ميلاد هذا الشهر (${c.birthdate})</span>`;
+                }
+                if (c.anniversary) {
+                    const aMonth = parseInt(c.anniversary.split('-')[1]);
+                    if (aMonth === currentMonth) occasionBadge += `<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px] font-bold block">💍 ذكرى زواج هذا الشهر (${c.anniversary})</span>`;
+                }
+
+                html += `<tr class="hover:bg-gray-50">
+                    <td class="p-3 font-semibold">${c.name}</td>
+                    <td class="p-3 text-xs font-mono" dir="ltr">${c.phone}</td>
+                    <td class="p-3 text-xs text-gray-600">${c.email}</td>
+                    <td class="p-3 font-bold text-indigo-600">${c.points} نقطة</td>
+                    <td class="p-3 text-xs">${occasionBadge || '<span class="text-gray-400">لا مناسبة مسجلة</span>'}</td>
+                    <td class="p-3">
+                        <button onclick='openCustomerDetailsModal(${JSON.stringify(c)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                            👁️ عرض البيانات الشخصية
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            listEl.innerHTML = html;
+        }
+
+        window.openCustomerDetailsModal = function(customer) {
+            const content = document.getElementById('customer-details-content');
+            content.innerHTML = `
+                <div class="bg-indigo-50 p-4 rounded-xl space-y-2">
+                    <p><strong>الاسم الكامل:</strong> ${customer.name}</p>
+                    <p><strong>رقم الهاتف:</strong> <span dir="ltr">${customer.phone}</span></p>
+                    <p><strong>البريد الإلكتروني:</strong> ${customer.email}</p>
+                    <p><strong>معرف العميل (UID):</strong> <span class="font-mono text-xs text-gray-500">${customer.id}</span></p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl space-y-2">
+                    <p><strong>تاريخ الميلاد:</strong> ${customer.birthdate || 'غير مسجل'}</p>
+                    <p><strong>تاريخ الزواج / المناسبة:</strong> ${customer.anniversary || 'غير مسجل'}</p>
+                    <p><strong>الهوايات والاهتمامات:</strong> ${customer.hobbies || 'غير مسجلة'}</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl text-center">
+                    <span class="text-xs text-emerald-800 font-semibold block">رصيد النقاط الحالي بالمنشأة</span>
+                    <span class="text-2xl font-extrabold text-emerald-600">${customer.points} نقطة</span>
+                </div>
+            `;
+            document.getElementById('customer-details-modal').classList.remove('hidden');
+        }
+
+        window.closeCustomerDetailsModal = function() {
+            document.getElementById('customer-details-modal').classList.add('hidden');
         }
 
         window.loadCashierDashboard = async function() {
@@ -1314,6 +1620,8 @@
             if (tDoc.exists()) {
                 const data = tDoc.data();
                 document.getElementById('cashier-tenant-name').innerText = data.businessName;
+                currentTenantCurrency = data.currency || 'ريال سعودي';
+                document.querySelectorAll('.pos-curr-text').forEach(el => el.innerText = currentTenantCurrency);
                 if (data.loyaltyRules) activeTenantRules = data.loyaltyRules;
             }
         }
@@ -1385,8 +1693,13 @@
                 document.getElementById('pos-c-name').innerText = userData.name;
                 document.getElementById('pos-c-phone').innerText = userData.phone || '--';
                 document.getElementById('pos-c-email').innerText = userData.email;
-                document.getElementById('pos-c-points').innerText = currentPoints;
+                
+                let detailsText = '';
+                if (userData.birthdate) detailsText += `🎂 ميلاد: ${userData.birthdate} `;
+                if (userData.hobbies) detailsText += `| 💡 اهتمامات: ${userData.hobbies}`;
+                document.getElementById('pos-c-details').innerText = detailsText || 'لا توجد اهتمامات إضافية مسجلة';
 
+                document.getElementById('pos-c-points').innerText = currentPoints;
                 document.getElementById('pos-active-session').classList.remove('hidden');
             } catch (err) {
                 alert('خطأ أثناء البحث عن العميل: ' + err.message);
@@ -1426,6 +1739,9 @@
                 name: userData.name,
                 phone: userData.phone || '',
                 email: userData.email,
+                birthdate: userData.birthdate || '',
+                anniversary: userData.anniversary || '',
+                hobbies: userData.hobbies || '',
                 points: newPoints,
                 lastVisit: new Date().toISOString()
             }, { merge: true });
@@ -1455,7 +1771,7 @@
             }
 
             if (requiredPoints > currentPts) {
-                return alert(`رصيد النقاط الحالي (${currentPts} نقطة) لا يكفي لتغطية هذه الخدمة. النقاط المطلوبة حسب السعر (${servicePrice} ريال) هي: ${requiredPoints} نقطة.`);
+                return alert(`رصيد النقاط الحالي (${currentPts} نقطة) لا يكفي لتغطية هذه الخدمة. النقاط المطلوبة حسب السعر (${servicePrice} ${currentTenantCurrency}) هي: ${requiredPoints} نقطة.`);
             }
 
             const remainingPts = currentPts - requiredPoints;
@@ -1464,7 +1780,7 @@
                 lastVisit: new Date().toISOString()
             });
 
-            alert(`تم استبدال وخصم ${requiredPoints} نقطة مقابل الخدمة بقيمة ${servicePrice} ريال! الرصيد المتبقي: ${remainingPts} نقطة.`);
+            alert(`تم استبدال وخصم ${requiredPoints} نقطة مقابل الخدمة بقيمة ${servicePrice} ${currentTenantCurrency}! الرصيد المتبقي: ${remainingPts} نقطة.`);
             document.getElementById('pos-c-points').innerText = remainingPts;
             document.getElementById('pos-service-price-input').value = '';
         }
@@ -1476,6 +1792,11 @@
             document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
             document.getElementById('customer-phone-display').innerText = userData.phone ? `📱 ${userData.phone}` : '';
             document.getElementById('customer-uid-badge').innerText = userId;
+
+            // Load optional profile fields into customer form
+            document.getElementById('cust-birthdate').value = userData.birthdate || '';
+            document.getElementById('cust-anniversary').value = userData.anniversary || '';
+            document.getElementById('cust-hobbies').value = userData.hobbies || '';
 
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
@@ -1604,7 +1925,7 @@
                                 <h6 class="font-bold text-indigo-900">${s.name}</h6>
                                 <p class="text-xs text-gray-500">${s.notes || ''}</p>
                             </div>
-                            <span class="font-bold text-emerald-600">${s.price} ريال</span>
+                            <span class="font-bold text-emerald-600">${s.price} ${data.currency || 'ريال'}</span>
                         </div>`;
                     }
                 });
