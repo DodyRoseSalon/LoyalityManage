@@ -604,22 +604,22 @@
                     <button onclick="switchCustomerTab('profile', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👤 الملف الشخصي والخصوصية</button>
                 </div>
 
-                <!-- Tab 1: Stacked Cards Wallets -->
+                <!-- Tab 1: Horizontal Bank Cards Wallets -->
                 <div id="cust-tab-wallets" class="cust-tab-content space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                             <div>
-                                <h4 class="text-base font-bold text-indigo-800">💳 بطاقات الولاء والمنشآت المشترك بها</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">اضغط على أي بطاقة منشأة لاستعراض خدماتها، عروضها، والباركود الخاص بك</p>
+                                <h4 class="text-base font-bold text-indigo-800">💳 بطاقات الولاء المصرفية للمنشآت</h4>
+                                <p class="text-xs text-gray-500 mt-0.5">اسحب يميناً ويساراً لتصفح بطاقات المنشآت، وانقر على أي بطاقة لعرض تفاصيلها</p>
                             </div>
                             <button onclick="openJoinTenantModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap">
                                 + انضمام لمنشأة جديدة
                             </button>
                         </div>
                         
-                        <!-- Stacked Cards Container -->
-                        <div id="customer-wallets-list" class="relative pt-2 pb-4 px-1 flex flex-col">
-                            <p class="text-gray-400 text-sm">جاري تحميل بطاقات منشآتك...</p>
+                        <!-- Horizontal Scroll Bank Cards Container -->
+                        <div id="customer-wallets-list" class="flex overflow-x-auto gap-4 py-3 px-1 scroll-smooth snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                            <p class="text-gray-400 text-sm py-4">جاري تحميل بطاقات منشآتك...</p>
                         </div>
                     </div>
 
@@ -2139,20 +2139,20 @@
             });
 
             const walletsEl = document.getElementById('customer-wallets-list');
-            walletsEl.innerHTML = '<p class="text-gray-400 text-sm">جاري تحميل بطاقات منشآتك...</p>';
+            walletsEl.innerHTML = '<p class="text-gray-400 text-sm py-4">جاري تحميل بطاقات منشآتك...</p>';
 
             const cardThemes = [
-                'from-indigo-600 via-indigo-700 to-purple-800 border-indigo-400/40',
-                'from-emerald-600 via-teal-700 to-cyan-800 border-emerald-400/40',
-                'from-slate-800 via-gray-900 to-indigo-950 border-slate-600/40',
-                'from-rose-600 via-pink-700 to-purple-800 border-rose-400/40',
-                'from-amber-600 via-orange-700 to-red-800 border-amber-400/40'
+                'from-indigo-700 via-purple-800 to-slate-900 border-indigo-400/30',
+                'from-emerald-700 via-teal-800 to-slate-900 border-emerald-400/30',
+                'from-slate-800 via-zinc-900 to-stone-900 border-slate-600/30',
+                'from-rose-700 via-pink-800 to-slate-900 border-rose-400/30',
+                'from-amber-700 via-orange-800 to-slate-900 border-amber-400/30'
             ];
 
             try {
                 const tenantsSnap = await getDocs(collection(db, "tenants"));
                 if (tenantsSnap.empty) {
-                    walletsEl.innerHTML = '<p class="text-gray-400 text-sm">لا توجد منشآت متاحة حالياً.</p>';
+                    walletsEl.innerHTML = '<p class="text-gray-400 text-sm py-4">لا توجد منشآت متاحة حالياً.</p>';
                     return;
                 }
 
@@ -2175,25 +2175,36 @@
                             if (!defaultTenant) defaultTenant = { id: tenantId, name: tenantData.businessName, points: pts };
 
                             const theme = cardThemes[cardIndex % cardThemes.length];
-                            const stackOffset = cardIndex === 0 ? '' : '-mt-3 hover:mt-1';
                             const safeName = (tenantData.businessName || '').replace(/'/g, "\\'");
 
                             walletsHtml += `
                                 <div onclick="openCustomerTenantPortal('${tenantId}', '${safeName}', ${pts})"
-                                     style="z-index: ${10 + cardIndex};"
-                                     class="relative ${stackOffset} bg-gradient-to-l ${theme} text-white p-5 rounded-2xl border shadow-lg cursor-pointer transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
-                                    <div class="flex justify-between items-center gap-4">
-                                        <div class="space-y-1">
-                                            <div class="flex items-center gap-2">
-                                                <span class="bg-white/20 text-white text-[10px] font-mono px-2 py-0.5 rounded-md">${tenantId}</span>
-                                                <span class="text-xs text-white/80">${tenantData.country || ''}</span>
+                                     class="snap-start shrink-0 w-[280px] sm:w-[320px] h-[180px] bg-gradient-to-br ${theme} text-white p-5 rounded-2xl border shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden">
+                                    
+                                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+                                    <div class="flex justify-between items-center z-10">
+                                        <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-mono px-2.5 py-1 rounded-md tracking-wider">${tenantId}</span>
+                                        <span class="text-xs text-white/80 font-medium">${tenantData.country || ''}</span>
+                                    </div>
+
+                                    <div class="z-10 space-y-1">
+                                        <div class="w-9 h-7 bg-amber-200/80 rounded-md border border-amber-400/50 flex items-center justify-center shadow-xs mb-2">
+                                            <div class="w-6 h-4 border border-amber-600/40 rounded-xs grid grid-cols-2 grid-rows-2 gap-px p-0.5">
+                                                <div class="bg-amber-500/40"></div><div class="bg-amber-500/40"></div>
+                                                <div class="bg-amber-500/40"></div><div class="bg-amber-500/40"></div>
                                             </div>
-                                            <h5 class="text-lg font-extrabold tracking-wide">${tenantData.businessName}</h5>
-                                            <p class="text-[11px] text-white/80">اضغط لفتح التفاصيل، الخدمات، والباركود الخاص بك ←</p>
                                         </div>
-                                        <div class="bg-white/15 backdrop-blur-xs px-4 py-3 rounded-xl text-center border border-white/20 min-w-[95px]">
-                                            <span class="text-2xl font-black block leading-none">${pts}</span>
-                                            <span class="text-[11px] text-white/90 mt-1 block">نقطة</span>
+                                        <h5 class="text-lg font-black tracking-wide truncate">${tenantData.businessName}</h5>
+                                    </div>
+
+                                    <div class="flex justify-between items-end z-10 pt-2 border-t border-white/15">
+                                        <div class="text-[11px] text-white/70">
+                                            <span>انقر لاستعراض الخدمات</span>
+                                        </div>
+                                        <div class="text-left">
+                                            <span class="text-2xl font-black leading-none">${pts}</span>
+                                            <span class="text-[10px] text-white/80 block">نقطة ولاء</span>
                                         </div>
                                     </div>
                                 </div>
@@ -2212,7 +2223,7 @@
 
                 if (!foundAny) {
                     walletsHtml = `
-                        <div class="text-center py-6 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-2">
+                        <div class="w-full text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-2">
                             <p class="text-gray-600 text-sm font-semibold">لست مشتركاً في أي منشأة بعد.</p>
                             <p class="text-xs text-gray-500">اضغط على زر "+ انضمام لمنشأة جديدة" وأدخل معرف المنشأة للبدء.</p>
                         </div>
@@ -2224,7 +2235,7 @@
                     openCustomerTenantPortal(defaultTenant.id, defaultTenant.name, defaultTenant.points);
                 }
             } catch (err) {
-                walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل بطاقات المنشآت.</p>';
+                walletsEl.innerHTML = '<p class="text-red-500 text-sm py-4">فشل تحميل بطاقات المنشآت.</p>';
             }
         }
 
