@@ -583,9 +583,12 @@
                         <p id="customer-welcome-name" class="text-2xl font-bold mt-1">مرحباً بك</p>
                         <p id="customer-phone-display" class="text-xs opacity-90 mt-1 font-semibold" dir="ltr">--</p>
                         <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (UID): <span id="customer-uid-badge">--</span></p>
-                        <div class="mt-3">
+                        <div class="mt-3 flex flex-wrap gap-2">
                             <button onclick="openChangePasswordModal()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
                                 🔑 تغيير كلمة المرور
+                            </button>
+                            <button onclick="openJoinTenantModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition shadow-md cursor-pointer">
+                                + انضمام لمنشأة جديدة
                             </button>
                         </div>
                     </div>
@@ -597,33 +600,50 @@
 
                 <!-- Tabs Navigation for Customer -->
                 <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
-                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">💼 محافظ النقاط</button>
+                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">💳 بطاقات المنشآت والمحافظ</button>
                     <button onclick="switchCustomerTab('profile', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👤 الملف الشخصي والخصوصية</button>
                 </div>
 
-                <!-- Tab 1: Wallets -->
+                <!-- Tab 1: Stacked Cards Wallets -->
                 <div id="cust-tab-wallets" class="cust-tab-content space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">💼 محافظ النقاط في منشآت الشبكة</h4>
-                        <div id="customer-wallets-list" class="space-y-3">
-                            <p class="text-gray-400 text-sm">جاري تحميل محافظك الفرعية...</p>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                            <div>
+                                <h4 class="text-base font-bold text-indigo-800">💳 بطاقات الولاء والمنشآت المشترك بها</h4>
+                                <p class="text-xs text-gray-500 mt-0.5">اضغط على أي بطاقة منشأة لاستعراض خدماتها، عروضها، والباركود الخاص بك</p>
+                            </div>
+                            <button onclick="openJoinTenantModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap">
+                                + انضمام لمنشأة جديدة
+                            </button>
+                        </div>
+                        
+                        <!-- Stacked Cards Container -->
+                        <div id="customer-wallets-list" class="relative pt-2 pb-4 px-1 flex flex-col">
+                            <p class="text-gray-400 text-sm">جاري تحميل بطاقات منشآتك...</p>
                         </div>
                     </div>
 
                     <!-- Tenant Details Portal for Customer -->
-                    <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h4 id="portal-tenant-title" class="text-lg font-bold text-indigo-800">--</h4>
-                            <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">بوابة المنشأة التفاعلية</span>
+                    <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border border-indigo-100 space-y-6 transition-all">
+                        <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
+                            <div>
+                                <h4 id="portal-tenant-title" class="text-lg font-bold text-indigo-800">--</h4>
+                                <p class="text-xs text-gray-500">معرف المنشأة: <span id="portal-tenant-id-label" class="font-mono font-bold text-indigo-600">--</span></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="portal-tenant-points-badge" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-extrabold">0 نقطة</span>
+                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">بوابة المنشأة التفاعلية</span>
+                            </div>
                         </div>
 
                         <div class="flex gap-2 border-b border-gray-100 pb-2 overflow-x-auto">
-                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">📖 عن المنشأة</button>
-                            <button onclick="switchPortalTab('services', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">💇‍♀️ الخدمات والأسعار</button>
-                            <button onclick="switchPortalTab('offers', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 العروض والخصومات</button>
-                            <button onclick="switchPortalTab('gallery', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🖼️ معرض الصور</button>
-                            <button onclick="switchPortalTab('contact', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والسوشيال</button>
-                            <button onclick="switchPortalTab('referral', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 اربح نقاط الإحالة</button>
+                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition whitespace-nowrap">📖 عن المنشأة</button>
+                            <button onclick="switchPortalTab('services', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">💇‍♀️ الخدمات والأسعار</button>
+                            <button onclick="switchPortalTab('offers', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🎁 العروض والخصومات</button>
+                            <button onclick="switchPortalTab('gallery', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🖼️ معرض الصور</button>
+                            <button onclick="switchPortalTab('contact', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">📞 التواصل والسوشيال</button>
+                            <button onclick="switchPortalTab('myqr', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">📲 الباركود الخاص بي</button>
+                            <button onclick="switchPortalTab('referral', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🎁 اربح نقاط الإحالة</button>
                         </div>
 
                         <div id="portal-tab-about" class="portal-tab-content text-sm text-gray-600 leading-relaxed">
@@ -640,6 +660,14 @@
                         </div>
                         <div id="portal-tab-contact" class="portal-tab-content hidden space-y-3 text-sm">
                             جاري تحميل بيانات التواصل...
+                        </div>
+                        <div id="portal-tab-myqr" class="portal-tab-content hidden text-center py-4 space-y-4">
+                            <div class="max-w-xs mx-auto bg-gradient-to-b from-indigo-50 to-white p-6 rounded-2xl border border-indigo-100 shadow-sm flex flex-col items-center">
+                                <span class="text-xs font-bold text-indigo-700 mb-3">بطاقة التعريف الرقمية لدى المنشأة</span>
+                                <div id="portal-customer-qrcode" class="bg-white p-3 rounded-xl border shadow-xs"></div>
+                                <p class="text-xs font-mono text-gray-500 mt-3" id="portal-customer-uid-text">--</p>
+                                <p class="text-[11px] text-gray-500 mt-1">قم بإبراز هذا الرمز للكاشير لإضافة أو استبدال النقاط</p>
+                            </div>
                         </div>
                         <div id="portal-tab-referral" class="portal-tab-content hidden space-y-4">
                             <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-900 text-xs space-y-1">
@@ -763,6 +791,33 @@
         </div>
     </div>
 
+    <!-- Join New Tenant Modal (For Customer) -->
+    <div id="join-tenant-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl max-w-md w-full space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-indigo-800">+ انضمام لمنشأة جديدة</h3>
+                <button onclick="closeJoinTenantModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed">
+                أدخل معرف المنشأة (<span class="font-mono font-bold text-indigo-700">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.
+            </p>
+            <form onsubmit="joinNewTenant(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">معرف المنشأة (Facility ID)</label>
+                    <input type="text" id="join-tenant-id-input" required placeholder="مثال: dody_rose" dir="ltr" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50 font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" id="join-tenant-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                        تأكيد الانضمام وإنشاء المحفظة
+                    </button>
+                    <button type="button" onclick="closeJoinTenantModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
         جميع الحقوق محفوظة &copy; 2026 - شركة بصمة التميز المتكاملة
@@ -877,6 +932,7 @@
                         role: 'customer',
                         isBlocked: false,
                         registeredTenant: targetTenant,
+                        joinedTenants: [targetTenant],
                         referredBy: referrerUid,
                         gender: '',
                         country: '',
@@ -1963,6 +2019,97 @@
             document.getElementById('pos-service-price-input').value = '';
         }
 
+        window.openJoinTenantModal = function() {
+            document.getElementById('join-tenant-id-input').value = '';
+            document.getElementById('join-tenant-modal').classList.remove('hidden');
+            document.getElementById('join-tenant-id-input').focus();
+        }
+
+        window.closeJoinTenantModal = function() {
+            document.getElementById('join-tenant-modal').classList.add('hidden');
+        }
+
+        window.joinNewTenant = async function(e) {
+            e.preventDefault();
+            if (!auth.currentUser) return;
+
+            const tenantId = document.getElementById('join-tenant-id-input').value.trim();
+            if (!tenantId) return alert('الرجاء إدخال معرف المنشأة (Facility ID).');
+
+            const btn = document.getElementById('join-tenant-submit-btn');
+            btn.disabled = true;
+            btn.innerText = 'جاري التحقق والانضمام...';
+
+            try {
+                const tenantRef = doc(db, "tenants", tenantId);
+                const tenantSnap = await getDoc(tenantRef);
+
+                if (!tenantSnap.exists()) {
+                    alert('عذراً، معرف المنشأة غير صحيح أو غير مسجل في النظام.');
+                    return;
+                }
+
+                const tenantData = tenantSnap.data();
+                if (tenantData.isActive === false) {
+                    alert('عذراً، هذه المنشأة موقوفة حالياً ولا تستقبل اشتراكات جديدة.');
+                    return;
+                }
+
+                const uid = auth.currentUser.uid;
+                const walletRef = doc(db, "tenants", tenantId, "customers", uid);
+                const walletSnap = await getDoc(walletRef);
+
+                if (walletSnap.exists()) {
+                    alert(`أنت مشترك بالفعل في (${tenantData.businessName})! سيتم فتح بطاقة المنشأة الآن.`);
+                    closeJoinTenantModal();
+                    openCustomerTenantPortal(tenantId, tenantData.businessName, walletSnap.data().points || 0);
+                    return;
+                }
+
+                const userRef = doc(db, "users", uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.exists() ? userSnap.data() : {};
+
+                const welcomePts = (tenantData.loyaltyRules && tenantData.loyaltyRules.welcomePoints !== undefined)
+                    ? Number(tenantData.loyaltyRules.welcomePoints)
+                    : 50;
+
+                await setDoc(walletRef, {
+                    name: userData.name || '',
+                    phone: userData.phone || '',
+                    secondaryPhone: userData.secondaryPhone || '',
+                    email: userData.email || auth.currentUser.email || '',
+                    points: welcomePts,
+                    gender: userData.gender || '',
+                    country: userData.country || '',
+                    city: userData.city || '',
+                    address: userData.address || '',
+                    birthdate: userData.birthdate || '',
+                    anniversary: userData.anniversary || '',
+                    hobbies: userData.hobbies || '',
+                    joinedAt: new Date().toISOString(),
+                    lastVisit: new Date().toISOString()
+                });
+
+                const existingTenants = Array.isArray(userData.joinedTenants) ? userData.joinedTenants : [];
+                if (!existingTenants.includes(tenantId)) {
+                    await updateDoc(userRef, {
+                        joinedTenants: [...existingTenants, tenantId]
+                    });
+                }
+
+                closeJoinTenantModal();
+                alert(`🎉 مبروك! تم انضمامك إلى (${tenantData.businessName}) بنجاح وحصلت على ${welcomePts} نقطة ترحيبية.`);
+                await loadCustomerDashboard(uid);
+                openCustomerTenantPortal(tenantId, tenantData.businessName, welcomePts);
+            } catch (err) {
+                alert('حدث خطأ أثناء الانضمام للمنشأة: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'تأكيد الانضمام وإنشاء المحفظة';
+            }
+        }
+
         window.loadCustomerDashboard = async function(userId) {
             const userDoc = await getDoc(doc(db, "users", userId));
             if (!userDoc.exists()) return;
@@ -1992,7 +2139,15 @@
             });
 
             const walletsEl = document.getElementById('customer-wallets-list');
-            walletsEl.innerHTML = 'جاري البحث عن محافظك في المنشآت...';
+            walletsEl.innerHTML = '<p class="text-gray-400 text-sm">جاري تحميل بطاقات منشآتك...</p>';
+
+            const cardThemes = [
+                'from-indigo-600 via-indigo-700 to-purple-800 border-indigo-400/40',
+                'from-emerald-600 via-teal-700 to-cyan-800 border-emerald-400/40',
+                'from-slate-800 via-gray-900 to-indigo-950 border-slate-600/40',
+                'from-rose-600 via-pink-700 to-purple-800 border-rose-400/40',
+                'from-amber-600 via-orange-700 to-red-800 border-amber-400/40'
+            ];
 
             try {
                 const tenantsSnap = await getDocs(collection(db, "tenants"));
@@ -2004,6 +2159,8 @@
                 let walletsHtml = '';
                 let foundAny = false;
                 let defaultTenant = null;
+                let cardIndex = 0;
+                const syncedTenantIds = [];
 
                 for (const tDoc of tenantsSnap.docs) {
                     const tenantId = tDoc.id;
@@ -2012,46 +2169,88 @@
                         const custWalletDoc = await getDoc(doc(db, "tenants", tenantId, "customers", userId));
                         if (custWalletDoc.exists()) {
                             foundAny = true;
-                            if (!defaultTenant) defaultTenant = { id: tenantId, name: tenantData.businessName };
+                            syncedTenantIds.push(tenantId);
                             const wData = custWalletDoc.data();
+                            const pts = wData.points || 0;
+                            if (!defaultTenant) defaultTenant = { id: tenantId, name: tenantData.businessName, points: pts };
+
+                            const theme = cardThemes[cardIndex % cardThemes.length];
+                            const stackOffset = cardIndex === 0 ? '' : '-mt-3 hover:mt-1';
+                            const safeName = (tenantData.businessName || '').replace(/'/g, "\\'");
+
                             walletsHtml += `
-                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-indigo-50/50 transition" onclick="openCustomerTenantPortal('${tenantId}', '${tenantData.businessName}')">
-                                    <div>
-                                        <h5 class="font-bold text-indigo-800">${tenantData.businessName}</h5>
-                                        <span class="text-xs text-gray-500">انقر للاطلاع على تفاصيل وعروض المعرض ورابط الإحالة</span>
-                                    </div>
-                                    <div class="text-left">
-                                        <span class="text-xl font-extrabold text-emerald-600">${wData.points || 0}</span>
-                                        <span class="text-xs text-gray-500 block">نقطة بالمحفظة</span>
+                                <div onclick="openCustomerTenantPortal('${tenantId}', '${safeName}', ${pts})"
+                                     style="z-index: ${10 + cardIndex};"
+                                     class="relative ${stackOffset} bg-gradient-to-l ${theme} text-white p-5 rounded-2xl border shadow-lg cursor-pointer transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
+                                    <div class="flex justify-between items-center gap-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="bg-white/20 text-white text-[10px] font-mono px-2 py-0.5 rounded-md">${tenantId}</span>
+                                                <span class="text-xs text-white/80">${tenantData.country || ''}</span>
+                                            </div>
+                                            <h5 class="text-lg font-extrabold tracking-wide">${tenantData.businessName}</h5>
+                                            <p class="text-[11px] text-white/80">اضغط لفتح التفاصيل، الخدمات، والباركود الخاص بك ←</p>
+                                        </div>
+                                        <div class="bg-white/15 backdrop-blur-xs px-4 py-3 rounded-xl text-center border border-white/20 min-w-[95px]">
+                                            <span class="text-2xl font-black block leading-none">${pts}</span>
+                                            <span class="text-[11px] text-white/90 mt-1 block">نقطة</span>
+                                        </div>
                                     </div>
                                 </div>
                             `;
+                            cardIndex++;
                         }
                     } catch (e) {}
                 }
 
+                if (syncedTenantIds.length > 0) {
+                    const currentJoined = Array.isArray(userData.joinedTenants) ? userData.joinedTenants : [];
+                    if (JSON.stringify(currentJoined.sort()) !== JSON.stringify([...syncedTenantIds].sort())) {
+                        updateDoc(doc(db, "users", userId), { joinedTenants: syncedTenantIds }).catch(() => {});
+                    }
+                }
+
                 if (!foundAny) {
-                    walletsHtml = '<p class="text-gray-500 text-sm py-2">ليس لديك رصيد نقاط في أي منشأة مسجلة حالياً.</p>';
+                    walletsHtml = `
+                        <div class="text-center py-6 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-2">
+                            <p class="text-gray-600 text-sm font-semibold">لست مشتركاً في أي منشأة بعد.</p>
+                            <p class="text-xs text-gray-500">اضغط على زر "+ انضمام لمنشأة جديدة" وأدخل معرف المنشأة للبدء.</p>
+                        </div>
+                    `;
                 }
                 walletsEl.innerHTML = walletsHtml;
 
                 if (defaultTenant) {
-                    openCustomerTenantPortal(defaultTenant.id, defaultTenant.name);
-                } else if (tenantsSnap.docs.length > 0) {
-                    const firstTenant = tenantsSnap.docs[0];
-                    openCustomerTenantPortal(firstTenant.id, firstTenant.data().businessName);
+                    openCustomerTenantPortal(defaultTenant.id, defaultTenant.name, defaultTenant.points);
                 }
             } catch (err) {
-                walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل المحافظ الفرعية.</p>';
+                walletsEl.innerHTML = '<p class="text-red-500 text-sm">فشل تحميل بطاقات المنشآت.</p>';
             }
         }
 
-        window.openCustomerTenantPortal = async function(tenantId, businessName) {
+        window.openCustomerTenantPortal = async function(tenantId, businessName, walletPoints = null) {
             const portalEl = document.getElementById('customer-tenant-portal');
             portalEl.classList.remove('hidden');
             document.getElementById('portal-tenant-title').innerText = businessName;
-            
+            document.getElementById('portal-tenant-id-label').innerText = tenantId;
+            if (walletPoints !== null) {
+                document.getElementById('portal-tenant-points-badge').innerText = `${walletPoints} نقطة`;
+            }
+
             const currentUid = auth.currentUser ? auth.currentUser.uid : '';
+            document.getElementById('portal-customer-uid-text').innerText = currentUid;
+
+            const portalQrEl = document.getElementById('portal-customer-qrcode');
+            portalQrEl.innerHTML = '';
+            new QRCode(portalQrEl, {
+                text: currentUid,
+                width: 150,
+                height: 150,
+                colorDark: "#1e1b4b",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
             const referralLink = `${window.location.origin}${window.location.pathname}?tenant=${tenantId}&ref=${currentUid}`;
             document.getElementById('cust-referral-link').value = referralLink;
 
@@ -2066,9 +2265,11 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
 
+            let tenantCurrency = 'ريال';
             const tDoc = await getDoc(doc(db, "tenants", tenantId));
             if (tDoc.exists()) {
                 const data = tDoc.data();
+                tenantCurrency = data.currency || 'ريال';
                 const refBonus = (data.loyaltyRules && data.loyaltyRules.referralPoints !== undefined) ? data.loyaltyRules.referralPoints : 25;
                 document.getElementById('cust-referral-bonus-badge').innerText = refBonus;
                 document.getElementById('portal-tab-about').innerText = data.about || 'لم تقم المنشأة بإضافة نبذة بعد.';
@@ -2107,7 +2308,7 @@
                                 <h6 class="font-bold text-indigo-900">${s.name}</h6>
                                 <p class="text-xs text-gray-500">${s.notes || ''}</p>
                             </div>
-                            <span class="font-bold text-emerald-600">${s.price} ${data.currency || 'ريال'}</span>
+                            <span class="font-bold text-emerald-600">${s.price} ${tenantCurrency}</span>
                         </div>`;
                     }
                 });
@@ -2149,6 +2350,8 @@
                 });
                 galleryEl.innerHTML = galleryHtml;
             }
+
+            portalEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         onAuthStateChanged(auth, async (user) => {
