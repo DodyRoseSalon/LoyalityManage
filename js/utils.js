@@ -12,6 +12,22 @@ export const TENANT_THEMES = {
     brown:   { name: "🟫 البني الكلاسيكي (Coffee & Chocolate)", primary: '#78350f', hover: '#451a03', light: '#fefce8', text: '#451a03', border: '#fef08a', gradient: 'linear-gradient(135deg, #92400e 0%, #451a03 100%)', cardGradient: 'from-stone-800 via-amber-950 to-neutral-900 border-amber-700/30' }
 };
 
+// فتح وإغلاق قائمة تبديل الصلاحيات المرتبطة بأيقونة الثلاث شرطات
+window.toggleRoleSwitcherMenu = function() {
+    const dropdown = document.getElementById('role-switcher-dropdown');
+    if (!dropdown) return;
+    dropdown.classList.toggle('hidden');
+};
+
+document.addEventListener('click', function(event) {
+    const container = document.getElementById('role-menu-container');
+    const dropdown = document.getElementById('role-switcher-dropdown');
+    if (!container || !dropdown || dropdown.classList.contains('hidden')) return;
+    if (!container.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
 // تطبيق السكيم والتدرج اللوني الواضح على واجهة التطبيق بالكامل
 window.applyTenantTheme = function(themeKey = 'indigo') {
     const theme = TENANT_THEMES[themeKey] || TENANT_THEMES.indigo;

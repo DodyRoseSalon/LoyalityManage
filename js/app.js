@@ -221,6 +221,8 @@ onAuthStateChanged(auth, async (user) => {
     const dashboardSection = document.getElementById('dashboard-section');
     const userInfo = document.getElementById('user-info');
     const roleBadge = document.getElementById('user-role-badge');
+    const roleMenuContainer = document.getElementById('role-menu-container');
+    const roleSwitcherDropdown = document.getElementById('role-switcher-dropdown');
 
     if (user) {
         if (user.email && window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
@@ -251,19 +253,33 @@ onAuthStateChanged(auth, async (user) => {
             dashboardSection.classList.remove('hidden');
             userInfo.classList.remove('hidden');
 
-            // إدارة عرض الصلاحيات المتعددة (قائمة منسدلة تلقائية عند تعدد الصلاحيات)
-            const userPermissions = data.permissions || [];
+            // عرض الصلاحية الحالية كشارة نصية نظيفة وإدراج الصلاحيات المتعددة تحت أيقونة الثلاث شرطات
+            const userPermissions = Array.isArray(data.permissions) ? data.permissions : [];
             if (roleBadge) {
+                roleBadge.textContent = `الدور: ${activeRole} (${activeTenant})`;
+            }
+
+            if (roleMenuContainer && roleSwitcherDropdown) {
                 if (userPermissions.length > 1) {
-                    let selectorHtml = `<select id="roleSwitcher" onchange="window.switchRoleFromDropdown(this.value)" style="padding:4px 8px; border-radius:6px; font-family:Cairo; font-size:13px; background:#fff; color:#333; border:1px solid #ccc; outline:none; cursor:pointer;">`;
-                    userPermissions.forEach(p => {
-                        const isSelected = (p.role === activeRole && p.facilityId === activeTenant) ? 'selected' : '';
-                        selectorHtml += `<option value="${p.role}|${p.facilityId}" ${isSelected}>${p.facilityName} (${p.role})</option>`;
-                    });
-                    selectorHtml += `</select>`;
-                    roleBadge.innerHTML = `الصلاحية: ${selectorHtml}`;
+                    roleMenuContainer.classList.remove('hidden');
+                    roleSwitcherDropdown.innerHTML = userPermissions.map(p => {
+                        const isCurrent = (p.role === activeRole && p.facilityId === activeTenant);
+                        const activeClasses = isCurrent
+                            ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200'
+                            : 'text-gray-700 hover:bg-gray-100 font-semibold';
+                        return `
+                            <button type="button"
+                                onclick="window.switchUserRoleOrTenant('${p.role}', '${p.facilityId}')"
+                                class="w-full text-right px-3 py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-between ${activeClasses}">
+                                <span>${p.facilityName || p.facilityId}</span>
+                                <span class="text-[11px] opacity-80">(${p.role})</span>
+                            </button>
+                        `;
+                    }).join('');
                 } else {
-                    roleBadge.innerText = `الدور: ${activeRole} (${activeTenant})`;
+                    roleMenuContainer.classList.add('hidden');
+                    roleSwitcherDropdown.classList.add('hidden');
+                    roleSwitcherDropdown.innerHTML = '';
                 }
             }
 
@@ -291,6 +307,8 @@ onAuthStateChanged(auth, async (user) => {
         authSection.classList.remove('hidden');
         dashboardSection.classList.add('hidden');
         userInfo.classList.add('hidden');
+        if (roleMenuContainer) roleMenuContainer.classList.add('hidden');
+        if (roleSwitcherDropdown) roleSwitcherDropdown.classList.add('hidden');
         currentUserTenantId = null;
     }
 });
