@@ -84,12 +84,20 @@ window.handleAuth = async function(e) {
             const targetTenant = paramTenantId || "dody_rose";
             const referrerUid = paramReferrerUid || null;
 
+            // تجهيز مصفوفة الصلاحيات الأولية للعميل الجديد
+            const initialPermissions = [{
+                facilityId: targetTenant,
+                facilityName: 'المنشأة الرئيسية',
+                role: 'customer'
+            }];
+
             await setDoc(doc(db, "users", userCred.user.uid), {
                 name,
                 phone,
                 secondaryPhone,
                 email,
                 role: 'customer',
+                permissions: initialPermissions,
                 isBlocked: false,
                 registeredTenant: targetTenant,
                 joinedTenants: [targetTenant],
@@ -139,7 +147,11 @@ window.handleAuth = async function(e) {
 
             alert('تم إنشاء الحساب بنجاح! تم إرسال رسالة تفعيل احترافية إلى بريدك الإلكتروني.');
         } else {
-            await signInWithEmailAndPassword(auth, email, password);
+            // تسجيل الدخول العادي مع استدعاء نظام الصلاحيات المتعددة الذكي
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            if (typeof window.handleUserLoginAndRoles === 'function') {
+                await window.handleUserLoginAndRoles(userCredential);
+            }
         }
     } catch (error) {
         alert('خطأ: ' + error.message);
@@ -185,6 +197,10 @@ onAuthStateChanged(auth, async (user) => {
             const data = userDoc.data();
             if (data.isBlocked) { alert('الحساب محظور.'); signOut(auth); return; }
 
+            // التحقق من الدور النشط الحالي في الجلسة أو الاعتماد على الدور الافتراضي
+            let activeRole = localStorage.getItem("active_user_role") || data.role;
+            let activeTenant = localStorage.getItem("active_facility_id") || data.tenantId || data.registeredTenant || "dody_rose";
+
             if (data.role === 'customer' && !user.emailVerified) {
                 authSection.classList.add('hidden');
                 dashboardSection.classList.add('hidden');
@@ -198,20 +214,20 @@ onAuthStateChanged(auth, async (user) => {
             authSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             userInfo.classList.remove('hidden');
-            roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
+            roleBadge.innerText = `الدور: ${activeRole} (${activeTenant})`;
 
             document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
             
-            if (data.role === 'super_admin') {
+            if (activeRole === 'super_admin') {
                 document.getElementById('super-admin-view').classList.remove('hidden');
                 window.loadTenants();
                 window.loadUsers();
-            } else if (data.role === 'tenant_admin') {
-                currentUserTenantId = data.tenantId || "dody_rose";
+            } else if (activeRole === 'tenant_admin' || activeRole === 'manager') {
+                currentUserTenantId = activeTenant;
                 document.getElementById('tenant-admin-view').classList.remove('hidden');
                 window.loadTenantAdminData(currentUserTenantId);
-            } else if (data.role === 'cashier') {
-                currentUserTenantId = data.tenantId || "dody_rose";
+            } else if (activeRole === 'cashier') {
+                currentUserTenantId = activeTenant;
                 document.getElementById('cashier-view').classList.remove('hidden');
                 window.loadCashierDashboard(currentUserTenantId);
             } else {
@@ -225,5 +241,6 @@ onAuthStateChanged(auth, async (user) => {
         dashboardSection.classList.add('hidden');
         userInfo.classList.add('hidden');
         currentUserTenantId = null;
+        localStorage.clear(); // مسح السياق عند تسجيل الخروج
     }
 });

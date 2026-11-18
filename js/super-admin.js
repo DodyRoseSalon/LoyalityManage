@@ -1,3 +1,7 @@
+/**
+ * نظام إدارة السوبر أدمن والصلاحيات المتعددة - Dody Rose Platform (النسخة الشاملة والمحدثة)
+ */
+
 import { db, auth } from "./firebase-config.js";
 import { collection, doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
@@ -5,7 +9,137 @@ import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://
 let allTenantsData = [];
 let allUsersCache = [];
 
-// تحميل المنشآت للسوبر أدمن
+// ==========================================
+// 1. نظام تسجيل الدخول ومعالجة الصلاحيات المتعددة
+// ==========================================
+window.handleUserLoginAndRoles = async function(userCredential) {
+    try {
+        const user = userCredential.user;
+        const uid = user.uid;
+
+        const userDocRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (!userSnap.exists()) {
+            alert("خطأ: حساب المستخدم غير مسجل في قاعدة البيانات.");
+            return;
+        }
+
+        const userData = userSnap.data();
+        // دعم المصفوفة الجديدة أو النظام القديم كاحتياط
+        let permissions = userData.permissions || [];
+        if (permissions.length === 0 && userData.role) {
+            permissions = [{
+                facilityId: userData.tenantId || userData.registeredTenant || 'main',
+                facilityName: userData.facilityName || 'المنشأة الرئيسية',
+                role: userData.role
+            }];
+        }
+
+        localStorage.setItem("current_user_uid", uid);
+        localStorage.setItem("current_user_email", userData.email);
+        localStorage.setItem("current_user_name", userData.name || "مستخدم");
+        localStorage.setItem("user_permissions", JSON.stringify(permissions));
+
+        if (permissions.length === 0) {
+            alert("لا توجد أي صلاحيات مرتبطة بهذا الحساب. يرجى مراجعة الإدارة.");
+            return;
+        } else if (permissions.length === 1) {
+            activateRoleAndRedirect(permissions[0]);
+        } else {
+            showRoleSelectionModal(permissions);
+        }
+
+    } catch (error) {
+        console.error("خطأ أثناء تسجيل الدخول ومعالجة الصلاحيات:", error);
+        alert("حدث خطأ غير متوقع أثناء تسجيل الدخول.");
+    }
+}
+
+function showRoleSelectionModal(permissions) {
+    let modal = document.getElementById("roleSwitcherModal");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "roleSwitcherModal";
+        modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:9999;";
+        document.body.appendChild(modal);
+    }
+
+    let optionsHtml = `
+        <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:450px; box-shadow:0 5px 15px rgba(0,0,0,0.3); font-family:Tahoma, sans-serif; direction:rtl; text-align:right;">
+            <h3 style="margin-top:0; color:#333; border-bottom:2px solid #eee; padding-bottom:10px;">اختر وضع الدخول الحالي</h3>
+            <p style="color:#666; font-size:14px;">لديك عدة صلاحيات مرتبطة بحسابك، يرجى اختيار الصفة التي تريد العمل بها اليوم:</p>
+            <div style="max-height:250px; overflow-y:auto; margin:15px 0;">
+    `;
+
+    permissions.forEach((perm, index) => {
+        let roleNameArabic = getArabicRoleName(perm.role);
+        let badgeColor = getRoleBadgeColor(perm.role);
+        
+        optionsHtml += `
+            <div onclick="selectUserRole(${index})" style="background:#f9f9f9; border:1px solid #ddd; padding:12px; margin-bottom:8px; border-radius:8px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='#f1f1f1'" onmouseout="this.style.background='#f9f9f9'">
+                <div style="font-weight:bold; color:#222; font-size:16px;">${perm.facilityName || 'منشأة تجارية'}</div>
+                <div style="margin-top:5px;">
+                    <span style="background:${badgeColor}; color:#fff; padding:3px 8px; border-radius:4px; font-size:12px;">${roleNameArabic}</span>
+                    <span style="color:#888; font-size:12px; margin-right:8px;">ID: ${perm.facilityId}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    optionsHtml += `</div></div>`;
+    modal.innerHTML = optionsHtml;
+    window.tempUserPermissions = permissions;
+}
+
+window.selectUserRole = function(index) {
+    const permissions = window.tempUserPermissions;
+    if (!permissions || !permissions[index]) return;
+    activateRoleAndRedirect(permissions[index]);
+}
+
+function activateRoleAndRedirect(perm) {
+    localStorage.setItem("active_facility_id", perm.facilityId);
+    localStorage.setItem("active_facility_name", perm.facilityName || "");
+    localStorage.setItem("active_user_role", perm.role);
+
+    const modal = document.getElementById("roleSwitcherModal");
+    if (modal) modal.remove();
+
+    if (perm.role === "super_admin" || perm.role === "manager") {
+        window.location.href = "super-admin-dashboard.html";
+    } else if (perm.role === "cashier") {
+        window.location.href = "cashier-pos.html";
+    } else if (perm.role === "customer") {
+        window.location.href = "customer-loyalty.html";
+    } else {
+        window.location.href = "index.html";
+    }
+}
+
+function getArabicRoleName(role) {
+    switch (role) {
+        case 'super_admin': return 'مشرف عام (سوبر أدمن)';
+        case 'manager': return 'مدير منشأة';
+        case 'cashier': return 'كاشير';
+        case 'customer': return 'عميل';
+        default: return role;
+    }
+}
+
+function getRoleBadgeColor(role) {
+    switch (role) {
+        case 'super_admin': return '#d9534f';
+        case 'manager': return '#0275d8';
+        case 'cashier': return '#f0ad4e';
+        case 'customer': return '#5cb85c';
+        default: return '#6c757d';
+    }
+}
+
+// ==========================================
+// 2. إدارة المنشآت (Tenants)
+// ==========================================
 window.loadTenants = async function() {
     const listEl = document.getElementById('tenants-list');
     const selectEl = document.getElementById('admin-tenant-select');
@@ -94,10 +228,8 @@ function renderTenantsTable(tenants) {
     listEl.innerHTML = html;
 }
 
-// دالة إنشاء منشأة جديدة مع حفظ السكيم المختار
 window.createTenant = async function(event) {
     event.preventDefault();
-    
     const tenantIdInput = document.getElementById('tenant-id-input');
     const tenantNameInput = document.getElementById('tenant-name-input');
     const countryInput = document.getElementById('tenant-country-input');
@@ -124,24 +256,14 @@ window.createTenant = async function(event) {
         }
 
         await setDoc(tenantRef, {
-            businessName,
-            name: businessName,
-            country,
-            currency,
-            plan,
-            theme,
-            isActive: true,
-            isTrial: plan.startsWith('trial'),
-            createdAt: new Date().toISOString()
+            businessName, name: businessName, country, currency, plan, theme,
+            isActive: true, isTrial: plan.startsWith('trial'), createdAt: new Date().toISOString()
         });
 
         alert('تم إنشاء المنشأة بنجاح وتحديد هويتها البصرية!');
         tenantIdInput.value = '';
         tenantNameInput.value = '';
-        
-        if (typeof window.loadTenants === 'function') {
-            window.loadTenants();
-        }
+        if (typeof window.loadTenants === 'function') window.loadTenants();
     } catch (err) {
         console.error("Error creating tenant:", err);
         alert('حدث خطأ أثناء إنشاء المنشأة: ' + err.message);
@@ -172,7 +294,9 @@ window.deleteTenant = async function(tenantId, businessName) {
     if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
-// إدارة المستخدمين والصلاحيات
+// ==========================================
+// 3. إدارة المستخدمين والصلاحيات
+// ==========================================
 window.loadUsers = async function() {
     const listEl = document.getElementById('users-list');
     if (!listEl) return;
@@ -281,9 +405,20 @@ window.createTenantStaff = async function(e) {
 
     try {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // تجهيز مصفوفة الصلاحيات الجديدة للموظف الجديد
+        const initialPermissions = [{
+            facilityId: tenantId,
+            facilityName: selectEl.options[selectEl.selectedIndex].text.split('(')[0].trim(),
+            role: role
+        }];
+
         await setDoc(doc(db, "users", userCred.user.uid), {
-            name, phone, secondaryPhone, email, role, tenantId, isBlocked: false, createdAt: new Date().toISOString()
+            name, phone, secondaryPhone, email, role, tenantId, 
+            permissions: initialPermissions,
+            isBlocked: false, createdAt: new Date().toISOString()
         });
+
         alert(`تم إنشاء حساب الصلاحية (${name}) بنجاح!`);
         nameEl.value = '';
         if(phoneEl) phoneEl.value = '';
@@ -296,7 +431,6 @@ window.createTenantStaff = async function(e) {
     }
 };
 
-// دالة عرض الملف الشخصي الكامل الموحدة للعملاء والمستخدمين
 window.viewCustomerFullProfile = async function(customerId) {
     const modal = document.getElementById('customer-details-modal');
     const contentEl = document.getElementById('customer-details-content');
