@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-import { doc, setDoc, getDoc, collection, getDocs, increment } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+import { doc, setDoc, getDoc, collection, getDocs, increment, updateDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 import "./super-admin.js";
 import "./tenant-admin.js";
 import "./cashier-pos.js";
@@ -145,10 +145,29 @@ window.handleAuth = async function(e) {
                 }
             }
 
+            // إرسال البريد إلى تطبيق الأندرويد لتفعيل البصمة لاحقاً
+            if (window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
+                try {
+                    window.AndroidBridge.saveUserEmail(email);
+                } catch (bridgeErr) {
+                    console.error("Bridge Error:", bridgeErr);
+                }
+            }
+
             alert('تم إنشاء الحساب بنجاح! تم إرسال رسالة تفعيل احترافية إلى بريدك الإلكتروني.');
         } else {
             // تسجيل الدخول العادي مع استدعاء نظام الصلاحيات المتعددة الذكي
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            
+            // إرسال البريد إلى تطبيق الأندرويد لتفعيل البصمة لاحقاً عند نجاح الدخول
+            if (window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
+                try {
+                    window.AndroidBridge.saveUserEmail(email);
+                } catch (bridgeErr) {
+                    console.error("Bridge Error:", bridgeErr);
+                }
+            }
+
             if (typeof window.handleUserLoginAndRoles === 'function') {
                 await window.handleUserLoginAndRoles(userCredential);
             }
@@ -192,6 +211,13 @@ onAuthStateChanged(auth, async (user) => {
     const roleBadge = document.getElementById('user-role-badge');
 
     if (user) {
+        // تحديث إرسال البريد للأندرويد احتياطياً هنا أيضاً عند رصد حالة المستخدم المسجل
+        if (user.email && window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
+            try {
+                window.AndroidBridge.saveUserEmail(user.email);
+            } catch (e) {}
+        }
+
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
             const data = userDoc.data();
