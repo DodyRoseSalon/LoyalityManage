@@ -15,6 +15,26 @@ const urlParams = new URLSearchParams(window.location.search);
 const paramTenantId = urlParams.get('tenant');
 const paramReferrerUid = urlParams.get('ref');
 
+// دوال تبديل الصلاحيات والخروج الآمن (تحافظ على البصمة ولا تمسح الذاكرة)
+window.switchUserRoleOrTenant = function(newRole, newTenantId) {
+    localStorage.setItem("active_user_role", newRole);
+    localStorage.setItem("active_facility_id", newTenantId);
+    window.location.reload();
+};
+
+window.switchRoleFromDropdown = function(val) {
+    const [role, tenantId] = val.split('|');
+    window.switchUserRoleOrTenant(role, tenantId);
+};
+
+window.exitApp = function() {
+    if (window.AndroidBridge && typeof window.AndroidBridge.closeApp === 'function') {
+        window.AndroidBridge.closeApp();
+    } else {
+        window.close();
+    }
+};
+
 if (paramTenantId || paramReferrerUid) {
     isRegisterMode = true;
     if(document.getElementById('register-fields')) document.getElementById('register-fields').classList.remove('hidden');
@@ -195,10 +215,6 @@ window.checkEmailVerificationStatus = async function() {
     }
 };
 
-window.logout = function() { 
-    signOut(auth); 
-};
-
 onAuthStateChanged(auth, async (user) => {
     const authSection = document.getElementById('auth-section');
     const verifySection = document.getElementById('verify-email-section');
@@ -234,7 +250,22 @@ onAuthStateChanged(auth, async (user) => {
             authSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             userInfo.classList.remove('hidden');
-            roleBadge.innerText = `الدور: ${activeRole} (${activeTenant})`;
+
+            // إدارة عرض الصلاحيات المتعددة (قائمة منسدلة تلقائية عند تعدد الصلاحيات)
+            const userPermissions = data.permissions || [];
+            if (roleBadge) {
+                if (userPermissions.length > 1) {
+                    let selectorHtml = `<select id="roleSwitcher" onchange="window.switchRoleFromDropdown(this.value)" style="padding:4px 8px; border-radius:6px; font-family:Cairo; font-size:13px; background:#fff; color:#333; border:1px solid #ccc; outline:none; cursor:pointer;">`;
+                    userPermissions.forEach(p => {
+                        const isSelected = (p.role === activeRole && p.facilityId === activeTenant) ? 'selected' : '';
+                        selectorHtml += `<option value="${p.role}|${p.facilityId}" ${isSelected}>${p.facilityName} (${p.role})</option>`;
+                    });
+                    selectorHtml += `</select>`;
+                    roleBadge.innerHTML = `الصلاحية: ${selectorHtml}`;
+                } else {
+                    roleBadge.innerText = `الدور: ${activeRole} (${activeTenant})`;
+                }
+            }
 
             document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
             
@@ -261,6 +292,5 @@ onAuthStateChanged(auth, async (user) => {
         dashboardSection.classList.add('hidden');
         userInfo.classList.add('hidden');
         currentUserTenantId = null;
-        localStorage.clear();
     }
 });
