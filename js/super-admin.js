@@ -29,7 +29,7 @@ window.loadTenants = async function() {
         if (data.isActive) active++; else inactive++;
         if (data.isTrial) trial++;
         allTenantsData.push({ id: d.id, ...data });
-        selectHtml += `<option value="${d.id}">${data.businessName} (${data.country || 'السعودية'})</option>`;
+        selectHtml += `<option value="${d.id}">${data.businessName || data.name} (${data.country || 'السعودية'})</option>`;
     });
 
     renderTenantsTable(allTenantsData);
@@ -42,11 +42,16 @@ window.loadTenants = async function() {
 };
 
 window.filterTenants = function() {
-    const search = document.getElementById('search-tenants-input').value.toLowerCase();
-    const statusFilter = document.getElementById('filter-tenants-status').value;
+    const searchInput = document.getElementById('search-tenants-input');
+    const statusFilterEl = document.getElementById('filter-tenants-status');
+    if (!searchInput || !statusFilterEl) return;
+
+    const search = searchInput.value.toLowerCase();
+    const statusFilter = statusFilterEl.value;
 
     const filtered = allTenantsData.filter(t => {
-        const matchSearch = t.businessName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
+        const bName = t.businessName || t.name || '';
+        const matchSearch = bName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
         const matchStatus = statusFilter === 'all' || (statusFilter === 'active' && t.isActive) || (statusFilter === 'inactive' && !t.isActive);
         return matchSearch && matchStatus;
     });
@@ -55,6 +60,8 @@ window.filterTenants = function() {
 
 function renderTenantsTable(tenants) {
     const listEl = document.getElementById('tenants-list');
+    if (!listEl) return;
+
     if (tenants.length === 0) {
         listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث.</p>';
         return;
@@ -69,15 +76,17 @@ function renderTenantsTable(tenants) {
         let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم</span>';
         if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي</span>`;
         
+        const bName = data.businessName || data.name || '--';
         html += `<tr class="hover:bg-gray-50">
-            <td class="p-3 font-semibold">${data.businessName}</td>
+            <td class="p-3 font-semibold">${bName}</td>
             <td class="p-3 text-xs"><span class="font-mono text-indigo-600">${data.id}</span><br><span class="text-gray-500">${data.country || 'المملكة العربية السعودية'}</span></td>
             <td class="p-3 text-xs">${planBadge} (${data.currency || 'ريال'})</td>
             <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
             <td class="p-3 flex gap-1.5 flex-wrap">
                 <button onclick="toggleTenantStatus('${data.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
                 <button onclick="extendTenantDays('${data.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
-                <button onclick="deleteTenant('${data.id}', '${data.businessName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
+                <button onclick="window.previewTenantTheme('${data.theme || 'indigo'}')" class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-700 cursor-pointer">معاينة السكيم</button>
+                <button onclick="deleteTenant('${data.id}', '${bName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
             </td>
         </tr>`;
     });
@@ -85,7 +94,7 @@ function renderTenantsTable(tenants) {
     listEl.innerHTML = html;
 }
 
-// دالة إنشاء منشأة جديدة (تُضاف في ملف D:\SM_Server\js\super-admin.js)
+// دالة إنشاء منشأة جديدة مع حفظ السكيم المختار
 window.createTenant = async function(event) {
     event.preventDefault();
     
@@ -94,7 +103,7 @@ window.createTenant = async function(event) {
     const countryInput = document.getElementById('tenant-country-input');
     const currencyInput = document.getElementById('tenant-currency-input');
     const planInput = document.getElementById('tenant-plan-input');
-    const themeInput = document.getElementById('tenant-theme-input'); // حقل السكيم الجديد
+    const themeInput = document.getElementById('tenant-theme-input');
 
     if (!tenantIdInput || !tenantNameInput) return;
 
@@ -103,10 +112,9 @@ window.createTenant = async function(event) {
     const country = countryInput ? countryInput.value : "المملكة العربية السعودية";
     const currency = currencyInput ? currencyInput.value : "ريال سعودي";
     const plan = planInput ? planInput.value : "unlimited";
-    const theme = themeInput ? themeInput.value : "indigo"; // قراءة قيمة السكيم المختار
+    const theme = themeInput ? themeInput.value : "indigo";
 
     try {
-        // التحقق مما إذا كانت المنشأة موجودة مسبقاً
         const tenantRef = doc(db, "tenants", tenantId);
         const tenantSnap = await getDoc(tenantRef);
 
@@ -115,13 +123,13 @@ window.createTenant = async function(event) {
             return;
         }
 
-        // حفظ بيانات المنشأة في Firestore مع السكيم المختار
         await setDoc(tenantRef, {
             businessName,
+            name: businessName,
             country,
             currency,
             plan,
-            theme, // حفظ كود السكيم البصري للمنشأة
+            theme,
             isActive: true,
             isTrial: plan.startsWith('trial'),
             createdAt: new Date().toISOString()
@@ -131,7 +139,6 @@ window.createTenant = async function(event) {
         tenantIdInput.value = '';
         tenantNameInput.value = '';
         
-        // إعادة تحميل قائمة المنشآت لتحديث الجداول والقوائم المنسدلة
         if (typeof window.loadTenants === 'function') {
             window.loadTenants();
         }
@@ -143,7 +150,7 @@ window.createTenant = async function(event) {
 
 window.toggleTenantStatus = async function(tenantId, currentStatus) {
     await updateDoc(doc(db, "tenants", tenantId), { isActive: !currentStatus });
-    loadTenants();
+    if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
 window.extendTenantDays = async function(tenantId, days) {
@@ -156,13 +163,13 @@ window.extendTenantDays = async function(tenantId, days) {
 
     await updateDoc(doc(db, "tenants", tenantId), { expiresAt: currentExp.toISOString() });
     alert(`تم تمديد اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
-    loadTenants();
+    if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
 window.deleteTenant = async function(tenantId, businessName) {
     if (!confirm(`هل أنت متأكد من حذف المنشأة "${businessName}"؟`)) return;
     await deleteDoc(doc(db, "tenants", tenantId));
-    loadTenants();
+    if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
 // إدارة المستخدمين والصلاحيات
@@ -173,7 +180,7 @@ window.loadUsers = async function() {
     allUsersCache = [];
 
     if (snap.empty) {
-        listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>';
+        listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا يوجد مستخدمون.</p>';
         return;
     }
 
@@ -186,14 +193,18 @@ window.loadUsers = async function() {
 };
 
 window.filterAdminUsers = function() {
-    const search = document.getElementById('search-users-input').value.toLowerCase();
-    const roleFilter = document.getElementById('filter-users-role').value;
+    const searchInput = document.getElementById('search-users-input');
+    const roleFilterEl = document.getElementById('filter-users-role');
+    if (!searchInput || !roleFilterEl) return;
+
+    const search = searchInput.value.toLowerCase();
+    const roleFilter = roleFilterEl.value;
 
     const filtered = allUsersCache.filter(u => {
         const matchSearch = (u.name && u.name.toLowerCase().includes(search)) || 
-                            (u.phone && u.phone.toLowerCase().includes(search)) || 
-                            (u.secondaryPhone && u.secondaryPhone.toLowerCase().includes(search)) || 
-                            (u.email && u.email.toLowerCase().includes(search));
+                          (u.phone && u.phone.toLowerCase().includes(search)) || 
+                          (u.secondaryPhone && u.secondaryPhone.toLowerCase().includes(search)) || 
+                          (u.email && u.email.toLowerCase().includes(search));
         const matchRole = roleFilter === 'all' || u.role === roleFilter;
         return matchSearch && matchRole;
     });
@@ -203,6 +214,8 @@ window.filterAdminUsers = function() {
 
 function renderAdminUsersTable(users) {
     const listEl = document.getElementById('users-list');
+    if (!listEl) return;
+
     if (users.length === 0) {
         listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث أو الفلتر.</p>';
         return;
@@ -245,13 +258,23 @@ window.adminUpdateUserPassword = async function(userEmail) {
 
 window.createTenantStaff = async function(e) {
     e.preventDefault();
-    const tenantId = document.getElementById('admin-tenant-select').value;
-    const role = document.getElementById('staff-role-select').value;
-    const name = document.getElementById('admin-name-input').value.trim();
-    const phone = document.getElementById('admin-phone-input').value.trim();
-    const secondaryPhone = document.getElementById('admin-secondary-phone-input').value.trim();
-    const email = document.getElementById('admin-email-input').value.trim();
-    const password = document.getElementById('admin-pass-input').value.trim();
+    const selectEl = document.getElementById('admin-tenant-select');
+    const roleEl = document.getElementById('staff-role-select');
+    const nameEl = document.getElementById('admin-name-input');
+    const phoneEl = document.getElementById('admin-phone-input');
+    const secPhoneEl = document.getElementById('admin-secondary-phone-input');
+    const emailEl = document.getElementById('admin-email-input');
+    const passEl = document.getElementById('admin-pass-input');
+
+    if (!selectEl || !roleEl || !nameEl || !emailEl || !passEl) return;
+
+    const tenantId = selectEl.value;
+    const role = roleEl.value;
+    const name = nameEl.value.trim();
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const secondaryPhone = secPhoneEl ? secPhoneEl.value.trim() : '';
+    const email = emailEl.value.trim();
+    const password = passEl.value.trim();
 
     if (!tenantId) return alert('الرجاء اختيار المنشأة أولاً.');
     if (!phone) return alert('الرجاء إدخال رقم الهاتف الأساسي للموظف.');
@@ -262,13 +285,43 @@ window.createTenantStaff = async function(e) {
             name, phone, secondaryPhone, email, role, tenantId, isBlocked: false, createdAt: new Date().toISOString()
         });
         alert(`تم إنشاء حساب الصلاحية (${name}) بنجاح!`);
-        document.getElementById('admin-name-input').value = '';
-        document.getElementById('admin-phone-input').value = '';
-        document.getElementById('admin-secondary-phone-input').value = '';
-        document.getElementById('admin-email-input').value = '';
-        document.getElementById('admin-pass-input').value = '';
-        loadUsers();
+        nameEl.value = '';
+        if(phoneEl) phoneEl.value = '';
+        if(secPhoneEl) secPhoneEl.value = '';
+        emailEl.value = '';
+        passEl.value = '';
+        if (typeof window.loadUsers === 'function') window.loadUsers();
     } catch (error) {
         alert('خطأ أثناء إنشاء حساب الصلاحية: ' + error.message);
     }
+};
+
+// دالة فتح النافذة المنبثقة لعرض التفاصيل الشخصية (مشتركة مع السوبر أدمن)
+window.openCustomerDetailsModal = function(userData) {
+    const modal = document.getElementById('customer-details-modal');
+    const contentEl = document.getElementById('customer-details-content');
+    if (!modal || !contentEl) return;
+
+    contentEl.innerHTML = `
+        <div class="space-y-3 bg-gray-50 p-4 rounded-xl border">
+            <p><strong>الاسم الكامل:</strong> <span class="text-indigo-900 font-bold">${userData.name || '--'}</span></p>
+            <p><strong>رقم الهاتف الأساسي:</strong> <span class="font-mono" dir="ltr">${userData.phone || '--'}</span></p>
+            <p><strong>رقم الهاتف الإضافي:</strong> <span class="font-mono" dir="ltr">${userData.secondaryPhone || '--'}</span></p>
+            <p><strong>البريد الإلكتروني:</strong> <span class="font-mono" dir="ltr">${userData.email || '--'}</span></p>
+            <p><strong>الدور والصلاحية:</strong> <span class="font-mono">${userData.role || 'عميل'}</span></p>
+            <p><strong>النوع:</strong> ${userData.gender || '--'}</p>
+            <p><strong>الدولة والمدينة:</strong> ${userData.country || '--'} / ${userData.city || '--'}</p>
+            <p><strong>العنوان بالتفصيل:</strong> ${userData.address || '--'}</p>
+            <p><strong>تاريخ الميلاد:</strong> ${userData.birthdate ? `🎂 ${userData.birthdate}` : '--'}</p>
+            <p><strong>تاريخ المناسبة / الزواج:</strong> ${userData.anniversary ? `💍 ${userData.anniversary}` : '--'}</p>
+            <p><strong>الهوايات والاهتمامات:</strong> ${userData.hobbies || '--'}</p>
+            <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${userData.id || '--'}</span></p>
+        </div>
+    `;
+    modal.classList.remove('hidden');
+};
+
+window.closeCustomerDetailsModal = function() {
+    const modal = document.getElementById('customer-details-modal');
+    if (modal) modal.classList.add('hidden');
 };
