@@ -15,17 +15,33 @@
     <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --theme-gradient: linear-gradient(135deg, #4338ca 0%, #1e1b4b 100%);
+            --theme-primary: #4338ca;
+            --theme-primary-hover: #3730a3;
+            --theme-light: #eef2ff;
+            --theme-text: #312e81;
+            --theme-border: #c7d2fe;
+        }
         body { font-family: 'Cairo', sans-serif; }
+        
+        /* تطبيق التدرج اللوني بوضوح وقوة */
+        .theme-bg-primary { background: var(--theme-gradient) !important; color: #ffffff !important; }
+        .theme-bg-primary:hover { opacity: 0.92 !important; }
+        .theme-bg-light { background-color: var(--theme-light) !important; }
+        .theme-text-primary { color: var(--theme-primary) !important; }
+        .theme-text-dark { color: var(--theme-text) !important; }
+        .theme-border { border-color: var(--theme-border) !important; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between">
 
     <!-- Header / Navbar -->
-    <header class="bg-indigo-700 text-white shadow-md">
+    <header id="main-header" class="bg-indigo-700 theme-bg-primary text-white shadow-md transition-colors duration-300">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold">✨ نظام إدارة ولاء العملاء الذكي</h1>
             <div id="user-info" class="hidden flex items-center gap-4">
-                <span id="user-role-badge" class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-semibold"></span>
+                <span id="user-role-badge" class="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold"></span>
                 <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">تسجيل الخروج</button>
             </div>
         </div>
@@ -34,7 +50,7 @@
     <!-- Main Container -->
     <main class="container mx-auto px-4 py-8 flex-grow">
         
-        <!-- Auth Screen (Login / Register / Forgot Password) -->
+        <!-- Auth Screen -->
         <section id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div class="text-center mb-6">
                 <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
@@ -163,13 +179,30 @@
                                     </select>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الاشتراك والباقة</label>
-                                <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                                    <option value="trial_7">فترة تجريبية (7 أيام)</option>
-                                    <option value="annual_365">اشتراك سنوي (365 يوماً)</option>
-                                    <option value="unlimited" selected>اشتراك مفتوح ودائم</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">نوع الاشتراك والباقة</label>
+                                    <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                        <option value="trial_7">فترة تجريبية (7 أيام)</option>
+                                        <option value="annual_365">اشتراك سنوي (365 يوماً)</option>
+                                        <option value="unlimited" selected>اشتراك مفتوح ودائم</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">مظهر المنشأة (Theme)</label>
+                                    <select id="tenant-theme-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none font-semibold">
+                                        <option value="indigo">🟦 1. الأزرق الملكي</option>
+                                        <option value="rose">🟥 2. الوردي الفاخر</option>
+                                        <option value="emerald">🟩 3. الأخضر الزمردي</option>
+                                        <option value="purple">🟪 4. البنفسجي المخملي</option>
+                                        <option value="amber">🟧 5. الذهبي الدافئ</option>
+                                        <option value="teal">🟦 6. الفيروزي العصري</option>
+                                        <option value="crimson">🟥 7. الأحمر القرمزي</option>
+                                        <option value="slate">⬛ 8. الرمادي الداكن</option>
+                                        <option value="cyan">🟦 9. الأزرق السماوي</option>
+                                        <option value="brown">🟫 10. البني الكلاسيكي</option>
+                                    </select>
+                                </div>
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
                                 حفظ المنشأة وإضافتها للنظام
@@ -220,7 +253,7 @@
                     </div>
                 </div>
 
-                <!-- Super Admin: Tenants Filter & Search -->
+                <!-- Tenants List & Search -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                         <h4 class="text-lg font-bold text-indigo-800">إدارة المنشآت والاشتراكات</h4>
@@ -236,7 +269,7 @@
                     <div id="tenants-list" class="overflow-x-auto text-sm text-gray-600">جاري التحميل...</div>
                 </div>
 
-                <!-- Super Admin: Users Filter & Search -->
+                <!-- Users List & Search -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
                         <h4 class="text-lg font-bold text-indigo-800">إدارة المستخدمين والصلاحيات والبيانات الشخصية</h4>
@@ -257,17 +290,17 @@
 
             <!-- Tenant Admin Dashboard -->
             <div id="tenant-admin-view" class="role-view hidden space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="bg-white p-6 rounded-2xl shadow-md border theme-border flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h3 class="text-xl font-bold text-indigo-800">لوحة تحكم المنشأة: <span id="current-tenant-name" class="text-indigo-600">--</span></h3>
-                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold text-indigo-600">--</span> | المعرف: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
+                        <h3 class="text-xl font-bold theme-text-dark">لوحة تحكم المنشأة: <span id="current-tenant-name" class="theme-text-primary">--</span></h3>
+                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold theme-text-primary">--</span> | المعرف: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="openChangePasswordModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                        <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
                             🔑 تغيير كلمة المرور
                         </button>
-                        <div class="bg-indigo-50 px-4 py-2 rounded-xl text-center">
-                            <span class="text-xs text-indigo-700 font-semibold block">حالة الاشتراك</span>
+                        <div class="theme-bg-light px-4 py-2 rounded-xl text-center">
+                            <span class="text-xs theme-text-dark font-semibold block">حالة الاشتراك</span>
                             <span id="tenant-status-badge" class="text-sm font-bold text-emerald-600">نشط</span>
                         </div>
                     </div>
@@ -275,7 +308,7 @@
 
                 <!-- Tabs Navigation for Tenant Admin -->
                 <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
-                    <button onclick="switchAdminTab('rules', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">⚙️ القواعد والنقاط</button>
+                    <button onclick="switchAdminTab('rules', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition">⚙️ القواعد والنقاط والمظهر</button>
                     <button onclick="switchAdminTab('qr', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📲 رابط وباركود المنشأة</button>
                     <button onclick="switchAdminTab('about', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📖 نبذة عن النشاط</button>
                     <button onclick="switchAdminTab('services', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">💇‍♀️ الخدمات والأسعار</button>
@@ -285,12 +318,12 @@
                     <button onclick="switchAdminTab('customers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👥 العملاء والتقارير الذكية</button>
                 </div>
 
-                <!-- Tab 1: Rules & Constants -->
+                <!-- Tab 1: Rules & Constants & Theme -->
                 <div id="admin-tab-rules" class="admin-tab-content space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                            <h4 class="text-base font-bold text-indigo-800 mb-3">⚙️ ضوابط وقواعد منح واستبدال النقاط</h4>
-                            <form onsubmit="saveTenantLoyaltyRules(event)" class="space-y-3">
+                            <h4 class="text-base font-bold theme-text-dark mb-3">⚙️ ضوابط وقواعد منح واستبدال النقاط ومظهر المنشأة</h4>
+                            <form onsubmit="saveTenantLoyaltyRules(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (بالعملة المحلية)</label>
                                     <input type="number" id="rule-currency-per-point" value="10" min="1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
@@ -309,25 +342,43 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">نقاط مكافأة الإحالة للعميل الداعي (Referral Bonus)</label>
-                                    <input type="number" id="rule-referral-points" value="25" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm bg-indigo-50/50 border-indigo-200 outline-none">
+                                    <input type="number" id="rule-referral-points" value="25" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm theme-bg-light theme-border outline-none">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">صلاحية النقاط (بالأيام)</label>
                                     <input type="number" id="rule-expiry-days" value="365" min="30" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
-                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                    حفظ ضوابط الولاء والاستبدال
+
+                                <!-- Theme Selector -->
+                                <div class="pt-3 border-t border-gray-100">
+                                    <label class="block text-xs font-bold theme-text-dark mb-1.5">🎨 مظهر وهوية المنشأة البصرية (Theme Color)</label>
+                                    <select id="rule-tenant-theme" onchange="previewTenantTheme(this.value)" class="w-full px-3 py-2.5 border rounded-xl text-sm bg-gray-50 outline-none font-semibold cursor-pointer">
+                                        <option value="indigo">🟦 1. الأزرق الملكي الكلاسيكي (Indigo Royal)</option>
+                                        <option value="rose">🟥 2. الوردي الفاخر - دودي روز (Dody Rose Pink)</option>
+                                        <option value="emerald">🟩 3. الأخضر الزمردي (Emerald Spa & Cafe)</option>
+                                        <option value="purple">🟪 4. البنفسجي المخملي (Velvet Purple)</option>
+                                        <option value="amber">🟧 5. الذهبي الدافئ (Luxury Gold & Amber)</option>
+                                        <option value="teal">🟦 6. الفيروزي العصري (Modern Teal)</option>
+                                        <option value="crimson">🟥 7. الأحمر القرمزي (Crimson Beauty)</option>
+                                        <option value="slate">⬛ 8. الرمادي الداكن الفخم (Executive Slate)</option>
+                                        <option value="cyan">🟦 9. الأزرق السماوي (Ocean Cyan)</option>
+                                        <option value="brown">🟫 10. البني الكلاسيكي (Coffee & Chocolate)</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="w-full bg-indigo-600 theme-bg-primary text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
+                                    حفظ ضوابط الولاء ومظهر المنشأة
                                 </button>
                             </form>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between">
                             <div>
-                                <h4 class="text-base font-bold text-indigo-800 mb-3">📊 إحصائيات محفظة عملاء المنشأة</h4>
+                                <h4 class="text-base font-bold theme-text-dark mb-3">📊 إحصائيات محفظة عملاء المنشأة</h4>
                                 <div class="grid grid-cols-2 gap-4 mt-4">
-                                    <div class="bg-indigo-50 p-4 rounded-xl text-center">
+                                    <div class="theme-bg-light p-4 rounded-xl text-center">
                                         <span class="text-xs text-gray-500 font-semibold block">إجمالي العملاء المرتبطين</span>
-                                        <span id="tenant-stat-customers" class="text-2xl font-bold text-indigo-700 mt-1 block">0</span>
+                                        <span id="tenant-stat-customers" class="text-2xl font-bold theme-text-primary mt-1 block">0</span>
                                     </div>
                                     <div class="bg-emerald-50 p-4 rounded-xl text-center">
                                         <span class="text-xs text-gray-500 font-semibold block">إجمالي النقاط بالمحفظة الفرعية</span>
@@ -342,7 +393,7 @@
                 <!-- Tab: Tenant Direct Registration QR & Link -->
                 <div id="admin-tab-qr" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 max-w-2xl mx-auto text-center space-y-5">
-                        <h4 class="text-lg font-bold text-indigo-800">📲 رمز QR ورابط التسجيل المباشر للعملاء</h4>
+                        <h4 class="text-lg font-bold theme-text-dark">📲 رمز QR ورابط التسجيل المباشر للعملاء</h4>
                         <p class="text-xs text-gray-600">يمكنك طباعة هذا الكود في الاستقبال أو إرساله للعملاء ليتم تسجيلهم مباشرة وربط محافظهم بمنشأتك.</p>
                         
                         <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 inline-block shadow-xs">
@@ -352,13 +403,13 @@
                         <div class="space-y-2 text-right">
                             <label class="block text-xs font-semibold text-gray-700">الرابط المباشر لتسجيل العملاء:</label>
                             <div class="flex gap-2">
-                                <input type="text" id="tenant-direct-reg-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-gray-50 font-mono text-indigo-700">
-                                <button onclick="copyTextValue('tenant-direct-reg-link')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
+                                <input type="text" id="tenant-direct-reg-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-gray-50 font-mono theme-text-primary">
+                                <button onclick="copyTextValue('tenant-direct-reg-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap justify-center gap-3 pt-2">
-                            <button onclick="downloadQrPng('tenant-reg-qrcode', 'tenant-registration-qr.png')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center gap-2">
+                            <button onclick="downloadQrPng('tenant-reg-qrcode', 'tenant-registration-qr.png')" class="bg-indigo-600 theme-bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center gap-2">
                                 <i class="fa-solid fa-download"></i> تحميل الكود بصيغة PNG
                             </button>
                             <button onclick="shareViaWhatsApp('tenant-direct-reg-link', 'مرحباً بك! يسعدنا انضمامك لبرنامج الولاء والمكافآت الخاص بنا عبر الرابط التالي:')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center gap-2">
@@ -371,10 +422,10 @@
                 <!-- Tab 2: About Activity -->
                 <div id="admin-tab-about" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">📖 نبذة تعريفية عن النشاط</h4>
-                        <form onsubmit="saveTenantAbout(event)" class="space-y-3">
+                        <h4 class="text-base font-bold theme-text-dark mb-3">📖 نبذة تعريفية عن النشاط</h4>
+                        <form onsubmit="saveTenantAbout(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                             <textarea id="tenant-about-text" rows="6" placeholder="اكتب نبذة احترافية عن نشاط المنشأة..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none"></textarea>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ النبذة</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ النبذة</button>
                         </form>
                     </div>
                 </div>
@@ -382,12 +433,12 @@
                 <!-- Tab 3: Services & Prices -->
                 <div id="admin-tab-services" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold text-indigo-800">💇‍♀️ إضافة خدمة جديدة للعملاء</h4>
-                        <form onsubmit="addTenantService(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <h4 class="text-base font-bold theme-text-dark">💇‍♀️ إضافة خدمة جديدة للعملاء</h4>
+                        <form onsubmit="addTenantService(event, document.getElementById('current-tenant-id-badge').innerText)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
                             <input type="text" id="srv-name" placeholder="اسم الخدمة" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <input type="number" id="srv-price" placeholder="السعر" min="0" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <input type="text" id="srv-notes" placeholder="ملاحظات (اختياري)" class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">إضافة الخدمة</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">إضافة الخدمة</button>
                         </form>
                         <div id="admin-services-list" class="mt-4 overflow-x-auto text-sm">جاري التحميل...</div>
                     </div>
@@ -396,19 +447,19 @@
                 <!-- Tab 4: Contact & Social Links -->
                 <div id="admin-tab-contact" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold text-indigo-800 mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
-                        <form onsubmit="saveTenantContact(event)" class="space-y-4">
+                        <h4 class="text-base font-bold theme-text-dark mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
+                        <form onsubmit="saveTenantContact(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-phone text-indigo-600 ml-1"></i> رقم الهاتف / الجوال</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-phone theme-text-primary ml-1"></i> رقم الهاتف / الجوال</label>
                                     <input type="text" id="contact-phone" placeholder="05xxxxxxxx أو 01xxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-envelope text-indigo-600 ml-1"></i> البريد الإلكتروني</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-envelope theme-text-primary ml-1"></i> البريد الإلكتروني</label>
                                     <input type="email" id="contact-email" placeholder="info@domain.com" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-globe text-indigo-600 ml-1"></i> الموقع الإلكتروني (Website)</label>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-globe theme-text-primary ml-1"></i> الموقع الإلكتروني (Website)</label>
                                     <input type="url" id="contact-web" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                                 <div>
@@ -436,7 +487,7 @@
                                     <input type="url" id="contact-google-reviews" placeholder="https://maps.app.goo.gl/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                             </div>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ بيانات التواصل والسوشيال</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ بيانات التواصل والسوشيال</button>
                         </form>
                     </div>
                 </div>
@@ -444,12 +495,12 @@
                 <!-- Tab 5: Offers -->
                 <div id="admin-tab-offers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold text-indigo-800">🎁 إضافة عرض ترويجي جديد</h4>
-                        <form onsubmit="addTenantOffer(event)" class="space-y-3">
+                        <h4 class="text-base font-bold theme-text-dark">🎁 إضافة عرض ترويجي جديد</h4>
+                        <form onsubmit="addTenantOffer(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                             <input type="text" id="offer-title" placeholder="عنوان العرض..." required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <textarea id="offer-desc" rows="3" placeholder="تفاصيل العرض والشروط..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none"></textarea>
                             <input type="url" id="offer-img" placeholder="رابط صورة العرض (اختياري URL)" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition cursor-pointer">نشر العرض</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2 rounded-lg text-sm font-semibold transition cursor-pointer">نشر العرض</button>
                         </form>
                         <div id="admin-offers-list" class="mt-4 space-y-3">جاري التحميل...</div>
                     </div>
@@ -458,22 +509,22 @@
                 <!-- Tab 6: Gallery -->
                 <div id="admin-tab-gallery" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
-                        <h4 class="text-base font-bold text-indigo-800">🖼️ إدارة معرض صور المنشأة (رابط مباشر أو ملف نصي بالروابط)</h4>
+                        <h4 class="text-base font-bold theme-text-dark">🖼️ إدارة معرض صور المنشأة (رابط مباشر أو ملف نصي بالروابط)</h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <form onsubmit="addTenantGalleryImage(event)" class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                                <label class="block text-xs font-bold text-indigo-900">1. إضافة رابط صورة واحد مباشرة:</label>
+                            <form onsubmit="addTenantGalleryImage(event, document.getElementById('current-tenant-id-badge').innerText)" class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                                <label class="block text-xs font-bold theme-text-dark">1. إضافة رابط صورة واحد مباشرة:</label>
                                 <div class="flex gap-2">
                                     <input type="url" id="gallery-img-url" placeholder="https://example.com/image.jpg" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white outline-none">
-                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">إضافة</button>
+                                    <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">إضافة</button>
                                 </div>
                             </form>
 
-                            <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-200 space-y-3">
-                                <label class="block text-xs font-bold text-indigo-900">2. رفع ملف نصي (.txt) يحتوي على روابط متعددة (رابط في كل سطر):</label>
+                            <div class="p-4 theme-bg-light rounded-xl border theme-border space-y-3">
+                                <label class="block text-xs font-bold theme-text-dark">2. رفع ملف نصي (.txt) يحتوي على روابط متعددة (رابط في كل سطر):</label>
                                 <div class="flex items-center gap-2">
                                     <input type="file" id="gallery-txt-file" accept=".txt" class="w-full text-xs text-gray-600 file:ml-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
-                                    <button type="button" onclick="uploadGalleryTxtFile()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">رفع الملف</button>
+                                    <button type="button" onclick="uploadGalleryTxtFile(document.getElementById('current-tenant-id-badge').innerText)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition cursor-pointer whitespace-nowrap">رفع الملف</button>
                                 </div>
                             </div>
                         </div>
@@ -486,10 +537,10 @@
                 <div id="admin-tab-customers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
-                            <h4 class="text-base font-bold text-indigo-800">👥 إدارة العملاء وتقارير المناسبات الذكية</h4>
+                            <h4 class="text-base font-bold theme-text-dark">👥 إدارة العملاء وتقارير المناسبات الذكية</h4>
                             <div class="flex flex-wrap gap-2 w-full md:w-auto">
                                 <input type="text" id="search-customers-input" onkeyup="filterAdminCustomers()" placeholder="🔍 بحث بالاسم، الهاتف، البريد..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
-                                <select id="filter-customers-occasion" onchange="filterAdminCustomers()" class="px-3 py-2 border rounded-xl text-xs bg-indigo-50 font-semibold text-indigo-800 outline-none">
+                                <select id="filter-customers-occasion" onchange="filterAdminCustomers()" class="px-3 py-2 border rounded-xl text-xs theme-bg-light font-semibold theme-text-dark outline-none">
                                     <option value="all">جميع العملاء</option>
                                     <option value="birthday_this_month">🎂 أعياد ميلاد خلال الشهر الحالي</option>
                                     <option value="anniversary_this_month">💍 تواريخ زواج خلال الشهر الحالي</option>
@@ -503,20 +554,20 @@
 
             <!-- Cashier POS Dashboard -->
             <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-center flex justify-between items-center">
+                <div class="bg-white p-6 rounded-2xl shadow-md border theme-border text-center flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-indigo-800">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="text-indigo-600">--</span></h3>
+                        <h3 class="text-lg font-bold theme-text-dark">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="theme-text-primary">--</span></h3>
                         <p class="text-xs text-gray-500 mt-0.5">امسح كود الـ QR أو ابحث برقم المعرف أو رقم الهاتف</p>
                     </div>
-                    <button onclick="openChangePasswordModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
+                    <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
                         🔑 تغيير كلمة المرور
                     </button>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex justify-between items-center">
-                        <label class="block text-sm font-bold text-indigo-800">1. قراءة كود العميل (UID) أو إدخال رقم الهاتف / المعرف</label>
-                        <button onclick="toggleCameraScanner()" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        <label class="block text-sm font-bold theme-text-dark">1. قراءة كود العميل (UID) أو إدخال رقم الهاتف / المعرف</label>
+                        <button onclick="toggleCameraScanner(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
                             📷 تشغيل كاميرا المسح
                         </button>
                     </div>
@@ -525,20 +576,20 @@
 
                     <div class="flex gap-2">
                         <input type="text" id="pos-customer-uid" placeholder="أدخل معرف العميل أو رقم الهاتف (الأساسي أو الإضافي)..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none font-mono">
-                        <button onclick="posFindCustomer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
+                        <button onclick="posFindCustomer(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="bg-indigo-600 theme-bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
                     </div>
                 </div>
 
                 <div id="pos-active-session" class="hidden space-y-6">
-                    <div class="p-5 bg-indigo-50 border border-indigo-200 rounded-2xl flex justify-between items-center shadow-sm">
+                    <div class="p-5 theme-bg-light border theme-border rounded-2xl flex justify-between items-center shadow-sm">
                         <div>
-                            <span class="text-xs text-indigo-700 font-semibold block">العميل الحالي</span>
-                            <h4 id="pos-c-name" class="text-lg font-bold text-indigo-900 mt-0.5">--</h4>
+                            <span class="text-xs theme-text-primary font-semibold block">العميل الحالي</span>
+                            <h4 id="pos-c-name" class="text-lg font-bold theme-text-dark mt-0.5">--</h4>
                             <p id="pos-c-phone" class="text-xs text-gray-700 font-semibold mt-0.5" dir="ltr">--</p>
                             <p id="pos-c-email" class="text-xs text-gray-500">--</p>
-                            <p id="pos-c-details" class="text-xs text-indigo-700 font-medium mt-1">--</p>
+                            <p id="pos-c-details" class="text-xs theme-text-primary font-medium mt-1">--</p>
                         </div>
-                        <div class="text-left bg-white px-4 py-3 rounded-xl shadow-xs border border-indigo-100">
+                        <div class="text-left bg-white px-4 py-3 rounded-xl shadow-xs border theme-border">
                             <span class="text-xs text-gray-500 block">رصيد النقاط بالفرع</span>
                             <span id="pos-c-points" class="text-2xl font-extrabold text-emerald-600">0</span>
                             <span id="pos-currency-label" class="text-xs text-gray-600">نقطة</span>
@@ -547,23 +598,23 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
-                            <h5 class="font-bold text-indigo-800 text-sm">➕ إضافة نقاط (منح)</h5>
+                            <h5 class="font-bold theme-text-dark text-sm">➕ إضافة نقاط (منح)</h5>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
-                            <button onclick="posEarnPoints()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                            <button onclick="posEarnPoints(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 حساب ومنح النقاط تلقائياً
                             </button>
                         </div>
 
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
-                            <h5 class="font-bold text-indigo-800 text-sm">➖ استبدال نقاط (خصم خدمة)</h5>
+                            <h5 class="font-bold theme-text-dark text-sm">➖ استبدال نقاط (خصم خدمة)</h5>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
-                            <button onclick="posRedeemPoints()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                            <button onclick="posRedeemPoints(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 خصم النقاط المكافئة تلقائياً
                             </button>
                         </div>
@@ -600,7 +651,7 @@
 
                 <!-- Tabs Navigation for Customer -->
                 <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
-                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition">💳 بطاقات المنشآت والمحافظ</button>
+                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition">💳 بطاقات المنشآت والمحافظ</button>
                     <button onclick="switchCustomerTab('profile', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👤 الملف الشخصي والخصوصية</button>
                 </div>
 
@@ -609,10 +660,10 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                             <div>
-                                <h4 class="text-base font-bold text-indigo-800">💳 بطاقات الولاء المصرفية للمنشآت</h4>
+                                <h4 class="text-base font-bold theme-text-dark">💳 بطاقات الولاء المصرفية للمنشآت</h4>
                                 <p class="text-xs text-gray-500 mt-0.5">اسحب يميناً ويساراً لتصفح بطاقات المنشآت، وانقر على أي بطاقة لعرض تفاصيلها</p>
                             </div>
-                            <button onclick="openJoinTenantModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap">
+                            <button onclick="openJoinTenantModal()" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap">
                                 + انضمام لمنشأة جديدة
                             </button>
                         </div>
@@ -624,20 +675,20 @@
                     </div>
 
                     <!-- Tenant Details Portal for Customer -->
-                    <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border border-indigo-100 space-y-6 transition-all">
+                    <div id="customer-tenant-portal" class="hidden bg-white p-6 rounded-2xl shadow-md border theme-border space-y-6 transition-all">
                         <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                             <div>
-                                <h4 id="portal-tenant-title" class="text-lg font-bold text-indigo-800">--</h4>
-                                <p class="text-xs text-gray-500">معرف المنشأة: <span id="portal-tenant-id-label" class="font-mono font-bold text-indigo-600">--</span></p>
+                                <h4 id="portal-tenant-title" class="text-lg font-bold theme-text-dark">--</h4>
+                                <p class="text-xs text-gray-500">معرف المنشأة: <span id="portal-tenant-id-label" class="font-mono font-bold theme-text-primary">--</span></p>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span id="portal-tenant-points-badge" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-extrabold">0 نقطة</span>
-                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">بوابة المنشأة التفاعلية</span>
+                                <span class="theme-bg-light theme-text-dark px-3 py-1 rounded-full text-xs font-semibold">بوابة المنشأة التفاعلية</span>
                             </div>
                         </div>
 
                         <div class="flex gap-2 border-b border-gray-100 pb-2 overflow-x-auto">
-                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white cursor-pointer transition whitespace-nowrap">📖 عن المنشأة</button>
+                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition whitespace-nowrap">📖 عن المنشأة</button>
                             <button onclick="switchPortalTab('services', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">💇‍♀️ الخدمات والأسعار</button>
                             <button onclick="switchPortalTab('offers', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🎁 العروض والخصومات</button>
                             <button onclick="switchPortalTab('gallery', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🖼️ معرض الصور</button>
@@ -662,8 +713,8 @@
                             جاري تحميل بيانات التواصل...
                         </div>
                         <div id="portal-tab-myqr" class="portal-tab-content hidden text-center py-4 space-y-4">
-                            <div class="max-w-xs mx-auto bg-gradient-to-b from-indigo-50 to-white p-6 rounded-2xl border border-indigo-100 shadow-sm flex flex-col items-center">
-                                <span class="text-xs font-bold text-indigo-700 mb-3">بطاقة التعريف الرقمية لدى المنشأة</span>
+                            <div class="max-w-xs mx-auto theme-bg-light p-6 rounded-2xl border theme-border shadow-sm flex flex-col items-center">
+                                <span class="text-xs font-bold theme-text-dark mb-3">بطاقة التعريف الرقمية لدى المنشأة</span>
                                 <div id="portal-customer-qrcode" class="bg-white p-3 rounded-xl border shadow-xs"></div>
                                 <p class="text-xs font-mono text-gray-500 mt-3" id="portal-customer-uid-text">--</p>
                                 <p class="text-[11px] text-gray-500 mt-1">قم بإبراز هذا الرمز للكاشير لإضافة أو استبدال النقاط</p>
@@ -678,17 +729,17 @@
                             <div class="flex flex-col md:flex-row items-center gap-6 bg-gray-50 p-5 rounded-2xl border">
                                 <div class="bg-white p-3 rounded-xl border shadow-xs flex flex-col items-center">
                                     <div id="cust-referral-qrcode"></div>
-                                    <span class="text-[11px] font-bold text-indigo-800 mt-1">كود الإحالة الخاص بك</span>
+                                    <span class="text-[11px] font-bold theme-text-dark mt-1">كود الإحالة الخاص بك</span>
                                 </div>
 
                                 <div class="flex-grow w-full space-y-3">
                                     <label class="block text-xs font-semibold text-gray-700">رابط الإحالة الخاص بك:</label>
                                     <div class="flex gap-2">
-                                        <input type="text" id="cust-referral-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-white font-mono text-indigo-700">
-                                        <button onclick="copyTextValue('cust-referral-link')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
+                                        <input type="text" id="cust-referral-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-white font-mono theme-text-primary">
+                                        <button onclick="copyTextValue('cust-referral-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
                                     </div>
                                     <div class="flex flex-wrap gap-2 pt-1">
-                                        <button onclick="downloadQrPng('cust-referral-qrcode', 'my-referral-qr.png')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5">
+                                        <button onclick="downloadQrPng('cust-referral-qrcode', 'my-referral-qr.png')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5">
                                             <i class="fa-solid fa-download"></i> تحميل كود الإحالة PNG
                                         </button>
                                         <button onclick="shareViaWhatsApp('cust-referral-link', 'أنصحك بتجربة هذه المنشأة الرائعة! سجل عبر رابط الدعوة الخاص بي واحصل على نقاط ترحيبية:')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5">
@@ -706,7 +757,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                         <div class="flex justify-between items-center border-b pb-3">
                             <div>
-                                <h4 class="text-base font-bold text-indigo-800">👤 تبويب الملف الشخصي والبيانات الخاصة (خصوصية العميل)</h4>
+                                <h4 class="text-base font-bold theme-text-dark">👤 تبويب الملف الشخصي والبيانات الخاصة (خصوصية العميل)</h4>
                                 <p class="text-xs text-gray-500">هذه البيانات الخاصة مخفية تماماً عن الواجهة الرئيسية ومحمية في تبويب الخصوصية.</p>
                             </div>
                             <button onclick="saveCustomerProfile(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
@@ -761,11 +812,11 @@
     <!-- Change Password Modal -->
     <div id="change-pass-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl">
-            <h3 class="text-lg font-bold text-indigo-800">🔑 تغيير كلمة المرور</h3>
+            <h3 class="text-lg font-bold theme-text-dark">🔑 تغيير كلمة المرور</h3>
             <p class="text-xs text-gray-500">سيتم إرسال رابط آمن ومباشر لإعادة تعيين كلمة المرور إلى بريدك الإلكتروني المسجل.</p>
-            <p id="modal-user-email" class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 p-2 rounded-lg text-center" dir="ltr">--</p>
+            <p id="modal-user-email" class="font-mono text-xs font-bold theme-text-primary theme-bg-light p-2 rounded-lg text-center" dir="ltr">--</p>
             <div class="flex gap-2 pt-2">
-                <button onclick="requestPasswordResetFromModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                <button onclick="requestPasswordResetFromModal()" class="w-full bg-indigo-600 theme-bg-primary text-white py-2 rounded-xl text-xs font-bold transition cursor-pointer">
                     إرسال رابط التغيير للإيميل
                 </button>
                 <button onclick="closeChangePasswordModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
@@ -775,31 +826,31 @@
         </div>
     </div>
 
-    <!-- Customer Details Modal (For Admin) -->
+    <!-- Customer Details Modal -->
     <div id="customer-details-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-indigo-800">📋 الملف الشخصي الكامل للمستخدم</h3>
+                <h3 class="text-lg font-bold theme-text-dark">📋 الملف الشخصي الكامل للمستخدم</h3>
                 <button onclick="closeCustomerDetailsModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
             </div>
             <div id="customer-details-content" class="space-y-3 text-sm">
                 جاري التحميل...
             </div>
             <div class="text-left pt-2 border-t">
-                <button onclick="closeCustomerDetailsModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-xs font-bold cursor-pointer">إغلاق</button>
+                <button onclick="closeCustomerDetailsModal()" class="bg-indigo-600 theme-bg-primary text-white px-5 py-2 rounded-xl text-xs font-bold cursor-pointer">إغلاق</button>
             </div>
         </div>
     </div>
 
-    <!-- Join New Tenant Modal (For Customer) -->
+    <!-- Join New Tenant Modal -->
     <div id="join-tenant-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-md w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-indigo-800">+ انضمام لمنشأة جديدة</h3>
+                <h3 class="text-lg font-bold theme-text-dark">+ انضمام لمنشأة جديدة</h3>
                 <button onclick="closeJoinTenantModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
             </div>
             <p class="text-xs text-gray-600 leading-relaxed">
-                أدخل معرف المنشأة (<span class="font-mono font-bold text-indigo-700">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.
+                أدخل معرف المنشأة (<span class="font-mono font-bold theme-text-primary">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.
             </p>
             <form onsubmit="joinNewTenant(event)" class="space-y-4">
                 <div>
@@ -823,1619 +874,7 @@
         جميع الحقوق محفوظة &copy; 2026 - شركة بصمة التميز المتكاملة
     </footer>
 
-    <!-- Firebase SDKs & App Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, increment } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAiEE617Oy2xKSP76RIHY1qgxYyraxssvs",
-            authDomain: "loyality-management-e083e.firebaseapp.com",
-            projectId: "loyality-management-e083e",
-            storageBucket: "loyality-management-e083e.firebasestorage.app",
-            messagingSenderId: "131027720354",
-            appId: "1:131027720354:web:e4103a30a504515d6a5ffb",
-            measurementId: "G-1TMWENBSV9"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let isRegisterMode = false;
-        let isForgotMode = false;
-        let currentUserTenantId = null;
-        let activePosCustomerUid = null;
-        let activeTenantRules = { currencyPerPoint: 10, pointValue: 1, minRedemption: 50, welcomePoints: 50, referralPoints: 25 };
-        let currentTenantCurrency = 'ريال سعودي';
-        let html5QrCode = null;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const paramTenantId = urlParams.get('tenant');
-        const paramReferrerUid = urlParams.get('ref');
-
-        if (paramTenantId || paramReferrerUid) {
-            isRegisterMode = true;
-            document.getElementById('register-fields').classList.remove('hidden');
-            document.getElementById('fullname').required = true;
-            document.getElementById('phone').required = true;
-            document.getElementById('auth-title').innerText = 'إنشاء حساب عميل جديد';
-            document.getElementById('auth-btn').innerText = 'تسجيل وتفعيل الحساب';
-            document.getElementById('toggle-auth-text').innerText = 'لديك حساب بالفعل؟ سجل دخولك';
-            document.getElementById('referral-banner').classList.remove('hidden');
-        }
-
-        window.toggleAuthMode = function() {
-            isRegisterMode = !isRegisterMode;
-            isForgotMode = false;
-            document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('password-field-container').classList.remove('hidden');
-            document.getElementById('fullname').required = isRegisterMode;
-            document.getElementById('phone').required = isRegisterMode;
-            document.getElementById('password').required = true;
-            document.getElementById('auth-title').innerText = isRegisterMode ? 'إنشاء حساب مركزي جديد' : 'تسجيل الدخول للنظام المركزي';
-            document.getElementById('auth-btn').innerText = isRegisterMode ? 'تسجيل الحساب' : 'دخول';
-            document.getElementById('toggle-auth-text').innerText = isRegisterMode ? 'لديك حساب بالفعل؟ سجل دخولك' : 'ليس لديك حساب؟ انشئ حساباً كعميل جديد';
-            document.getElementById('forgot-pass-btn').classList.remove('hidden');
-        }
-
-        window.toggleForgotPasswordMode = function() {
-            isForgotMode = true;
-            isRegisterMode = false;
-            document.getElementById('register-fields').classList.add('hidden');
-            document.getElementById('password-field-container').classList.add('hidden');
-            document.getElementById('password').required = false;
-            document.getElementById('auth-title').innerText = 'استعادة كلمة المرور';
-            document.getElementById('auth-subtitle').innerText = 'نظام إدارة ولاء العملاء الذكي';
-            document.getElementById('auth-btn').innerText = 'إرسال رابط الاستعادة';
-            document.getElementById('toggle-auth-text').innerText = 'العودة لتسجيل الدخول';
-            document.getElementById('forgot-pass-btn').classList.add('hidden');
-        }
-
-        window.handleAuth = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            
-            if (isForgotMode) {
-                if (!email) return alert('الرجاء إدخال البريد الإلكتروني.');
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('تم إرسال رابط إعادة تعيين كلمة المرور وتنبيه الأمان إلى بريدك الإلكتروني بنجاح.');
-                    toggleAuthMode();
-                } catch (err) {
-                    alert('خطأ: ' + err.message);
-                }
-                return;
-            }
-
-            const password = document.getElementById('password').value;
-
-            try {
-                if (isRegisterMode) {
-                    const name = document.getElementById('fullname').value.trim();
-                    const phone = document.getElementById('phone').value.trim();
-                    const secondaryPhone = document.getElementById('secondary-phone').value.trim();
-                    if (!name || !phone) return alert('الرجاء إدخال الاسم الكامل ورقم الهاتف الأساسي.');
-
-                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                    await sendEmailVerification(userCred.user);
-
-                    const targetTenant = paramTenantId || "dody_rose";
-                    const referrerUid = paramReferrerUid || null;
-
-                    await setDoc(doc(db, "users", userCred.user.uid), {
-                        name,
-                        phone,
-                        secondaryPhone,
-                        email,
-                        role: 'customer',
-                        isBlocked: false,
-                        registeredTenant: targetTenant,
-                        joinedTenants: [targetTenant],
-                        referredBy: referrerUid,
-                        gender: '',
-                        country: '',
-                        city: '',
-                        address: '',
-                        birthdate: '',
-                        anniversary: '',
-                        hobbies: '',
-                        createdAt: new Date().toISOString()
-                    });
-                    
-                    let welcomePts = 50;
-                    let referralPts = 25;
-                    const tenantDoc = await getDoc(doc(db, "tenants", targetTenant));
-                    if (tenantDoc.exists() && tenantDoc.data().loyaltyRules) {
-                        welcomePts = tenantDoc.data().loyaltyRules.welcomePoints ?? 50;
-                        referralPts = tenantDoc.data().loyaltyRules.referralPoints ?? 25;
-                    }
-
-                    await setDoc(doc(db, "tenants", targetTenant, "customers", userCred.user.uid), {
-                        name,
-                        phone,
-                        secondaryPhone,
-                        email,
-                        points: welcomePts,
-                        referredBy: referrerUid,
-                        gender: '',
-                        country: '',
-                        city: '',
-                        address: '',
-                        birthdate: '',
-                        anniversary: '',
-                        hobbies: '',
-                        lastVisit: new Date().toISOString()
-                    });
-
-                    if (referrerUid && referrerUid !== userCred.user.uid && referralPts > 0) {
-                        const refWalletRef = doc(db, "tenants", targetTenant, "customers", referrerUid);
-                        const refWalletSnap = await getDoc(refWalletRef);
-                        if (refWalletSnap.exists()) {
-                            await updateDoc(refWalletRef, { points: increment(referralPts) });
-                        }
-                    }
-
-                    alert('تم إنشاء الحساب بنجاح! تم إرسال رسالة تفعيل احترافية إلى بريدك الإلكتروني.');
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-            } catch (error) {
-                // خريطة ترجمة أخطاء Firebase إلى رسائل واضحة ومفهومة للمستخدم
-                const arabicAuthErrors = {
-                    'auth/invalid-credential': '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى التحقق والمحاولة مرة أخرى.',
-                    'auth/wrong-password': '❌ كلمة المرور غير صحيحة.',
-                    'auth/user-not-found': '❌ حساب المستخدم غير مسجل بهذا البريد الإلكتروني.',
-                    'auth/email-already-in-use': '⚠️ البريد الإلكتروني مستخدم بالفعل لحساب آخر.',
-                    'auth/weak-password': '⚠️ كلمة المرور ضعيفة جداً، يجب أن تكون 6 أحرف على الأقل.',
-                    'auth/invalid-email': '⚠️ صيغة البريد الإلكتروني غير صحيحة.',
-                    'auth/network-request-failed': '🌐 تعذر الاتصال بالإنترنت، يرجى التحقق من الشبكة.'
-                };
-
-                // اختيار الرسالة العربية المناسبة، أو عرض الرسالة الافتراضية إذا كان الخطأ غير مدرج
-                const friendlyMessage = arabicAuthErrors[error.code] || ('حدث خطأ: ' + error.message);
-                alert(friendlyMessage);
-            }
-        }
-
-        window.resendVerificationEmail = async function() {
-            if (auth.currentUser) {
-                try {
-                    await sendEmailVerification(auth.currentUser);
-                    alert('تم إعادة إرسال رابط التفعيل الاحترافي إلى بريدك الإلكتروني بنجاح.');
-                } catch (err) {
-                    alert('تعذر الإرسال حالياً: ' + err.message);
-                }
-            }
-        }
-
-        window.checkEmailVerificationStatus = async function() {
-            if (auth.currentUser) {
-                await auth.currentUser.reload();
-                if (auth.currentUser.emailVerified) {
-                    window.location.reload();
-                } else {
-                    alert('لم يتم تفعيل البريد الإلكتروني بعد. الرجاء النقر على الرابط المرسل لبريدك.');
-                }
-            }
-        }
-
-        window.openChangePasswordModal = function() {
-            if (auth.currentUser) {
-                document.getElementById('modal-user-email').innerText = auth.currentUser.email;
-                document.getElementById('change-pass-modal').classList.remove('hidden');
-            }
-        }
-
-        window.closeChangePasswordModal = function() {
-            document.getElementById('change-pass-modal').classList.add('hidden');
-        }
-
-        window.requestPasswordResetFromModal = async function() {
-            if (auth.currentUser && auth.currentUser.email) {
-                try {
-                    await sendPasswordResetEmail(auth, auth.currentUser.email);
-                    alert(`تم إرسال رابط وإشعار تغيير كلمة المرور إلى بريدك الموثق (${auth.currentUser.email}) بنجاح.`);
-                    closeChangePasswordModal();
-                } catch (err) {
-                    alert('خطأ أثناء إرسال الرابط: ' + err.message);
-                }
-            }
-        }
-
-        window.saveCustomerProfile = async function(e) {
-            e.preventDefault();
-            if (!auth.currentUser) return;
-            const uid = auth.currentUser.uid;
-            const gender = document.getElementById('cust-gender').value;
-            const secondaryPhone = document.getElementById('cust-secondary-phone').value.trim();
-            const country = document.getElementById('cust-country').value.trim();
-            const city = document.getElementById('cust-city').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
-            const birthdate = document.getElementById('cust-birthdate').value;
-            const anniversary = document.getElementById('cust-anniversary').value;
-            const hobbies = document.getElementById('cust-hobbies').value.trim();
-
-            try {
-                await updateDoc(doc(db, "users", uid), { gender, secondaryPhone, country, city, address, birthdate, anniversary, hobbies });
-                
-                const tenantsSnap = await getDocs(collection(db, "tenants"));
-                for (const tDoc of tenantsSnap.docs) {
-                    const custRef = doc(db, "tenants", tDoc.id, "customers", uid);
-                    const custSnap = await getDoc(custRef);
-                    if (custSnap.exists()) {
-                        await updateDoc(custRef, { gender, secondaryPhone, country, city, address, birthdate, anniversary, hobbies });
-                    }
-                }
-
-                alert('تم حفظ بياناتك الشخصية في تبويب الخصوصية بنجاح!');
-            } catch (err) {
-                alert('خطأ أثناء الحفظ: ' + err.message);
-            }
-        }
-
-        window.logout = function() { 
-            stopCamera();
-            signOut(auth); 
-        }
-
-        window.switchAdminTab = function(tabName, ev) {
-            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-700');
-            });
-            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
-            if (ev && ev.currentTarget) {
-                ev.currentTarget.classList.remove('bg-gray-100', 'text-gray-700');
-                ev.currentTarget.classList.add('bg-indigo-600', 'text-white');
-            }
-        }
-
-        window.switchCustomerTab = function(tabName, ev) {
-            document.querySelectorAll('.cust-tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.cust-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-700');
-            });
-            document.getElementById(`cust-tab-${tabName}`).classList.remove('hidden');
-            if (ev && ev.currentTarget) {
-                ev.currentTarget.classList.remove('bg-gray-100', 'text-gray-700');
-                ev.currentTarget.classList.add('bg-indigo-600', 'text-white');
-            }
-        }
-
-        window.switchPortalTab = function(tabName, ev) {
-            document.querySelectorAll('.portal-tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.portal-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-700');
-            });
-            document.getElementById(`portal-tab-${tabName}`).classList.remove('hidden');
-            if (ev && ev.currentTarget) {
-                ev.currentTarget.classList.remove('bg-gray-100', 'text-gray-700');
-                ev.currentTarget.classList.add('bg-indigo-600', 'text-white');
-            }
-        }
-
-        window.copyTextValue = function(inputId) {
-            const copyText = document.getElementById(inputId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value);
-            alert("تم نسخ الرابط بنجاح!");
-        }
-
-        window.downloadQrPng = function(containerId, filename) {
-            const container = document.getElementById(containerId);
-            const canvas = container.querySelector('canvas');
-            const img = container.querySelector('img');
-            let dataUrl = '';
-
-            if (canvas) dataUrl = canvas.toDataURL("image/png");
-            else if (img && img.src) dataUrl = img.src;
-            else return alert('تعذر استخراج صورة الباركود.');
-
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        window.shareViaWhatsApp = function(inputId, customMessage) {
-            const urlValue = document.getElementById(inputId).value;
-            const fullText = encodeURIComponent(`${customMessage}\n${urlValue}`);
-            window.open(`https://wa.me/?text=${fullText}`, '_blank');
-        }
-
-        window.createTenant = async function(e) {
-            e.preventDefault();
-            const tenantId = document.getElementById('tenant-id-input').value.trim();
-            const businessName = document.getElementById('tenant-name-input').value.trim();
-            const country = document.getElementById('tenant-country-input').value;
-            const currency = document.getElementById('tenant-currency-input').value;
-            const plan = document.getElementById('tenant-plan-input').value;
-            const now = new Date();
-            let expiresAt = null;
-
-            if (plan.startsWith('trial_')) {
-                const days = parseInt(plan.split('_')[1]);
-                now.setDate(now.getDate() + days);
-                expiresAt = now.toISOString();
-            } else if (plan === 'annual_365') {
-                now.setDate(now.getDate() + 365);
-                expiresAt = now.toISOString();
-            }
-
-            try {
-                await setDoc(doc(db, "tenants", tenantId), {
-                    businessName,
-                    country,
-                    currency,
-                    isActive: true,
-                    isTrial: plan.startsWith('trial_'),
-                    planType: plan,
-                    expiresAt: expiresAt,
-                    createdAt: new Date().toISOString(),
-                    loyaltyRules: { currencyPerPoint: 10, pointValue: 1, minRedemption: 50, welcomePoints: 50, referralPoints: 25, expiryDays: 365 },
-                    about: '',
-                    contact: { phone: '', email: '', web: '', whatsapp: '', facebook: '', instagram: '', snapchat: '', tiktok: '', googleReviews: '' }
-                });
-                alert(`تم إنشاء المنشأة (${businessName}) في ${country} بنجاح!`);
-                document.getElementById('tenant-id-input').value = '';
-                document.getElementById('tenant-name-input').value = '';
-                loadTenants();
-            } catch (error) {
-                alert('خطأ: ' + error.message);
-            }
-        }
-
-        window.createTenantStaff = async function(e) {
-            e.preventDefault();
-            const tenantId = document.getElementById('admin-tenant-select').value;
-            const role = document.getElementById('staff-role-select').value;
-            const name = document.getElementById('admin-name-input').value.trim();
-            const phone = document.getElementById('admin-phone-input').value.trim();
-            const secondaryPhone = document.getElementById('admin-secondary-phone-input').value.trim();
-            const email = document.getElementById('admin-email-input').value.trim();
-            const password = document.getElementById('admin-pass-input').value.trim();
-
-            if (!tenantId) return alert('الرجاء اختيار المنشأة أولاً.');
-            if (!phone) return alert('الرجاء إدخال رقم الهاتف الأساسي للموظف.');
-
-            try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "users", userCred.user.uid), {
-                    name, phone, secondaryPhone, email, role, tenantId, isBlocked: false, createdAt: new Date().toISOString()
-                });
-                alert(`تم إنشاء حساب الصلاحية (${name}) بنجاح!`);
-                document.getElementById('admin-name-input').value = '';
-                document.getElementById('admin-phone-input').value = '';
-                document.getElementById('admin-secondary-phone-input').value = '';
-                document.getElementById('admin-email-input').value = '';
-                document.getElementById('admin-pass-input').value = '';
-                loadUsers();
-            } catch (error) {
-                alert('خطأ أثناء إنشاء حساب الصلاحية: ' + error.message);
-            }
-        }
-
-        window.toggleTenantStatus = async function(tenantId, currentStatus) {
-            await updateDoc(doc(db, "tenants", tenantId), { isActive: !currentStatus });
-            loadTenants();
-        }
-
-        window.extendTenantDays = async function(tenantId, days) {
-            const tDoc = await getDoc(doc(db, "tenants", tenantId));
-            if (!tDoc.exists()) return;
-            const data = tDoc.data();
-            let currentExp = data.expiresAt ? new Date(data.expiresAt) : new Date();
-            if (currentExp < new Date()) currentExp = new Date();
-            currentExp.setDate(currentExp.getDate() + days);
-
-            await updateDoc(doc(db, "tenants", tenantId), { expiresAt: currentExp.toISOString() });
-            alert(`تم تمديد اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
-            loadTenants();
-        }
-
-        window.deleteTenant = async function(tenantId, businessName) {
-            if (!confirm(`هل أنت متأكد من حذف المنشأة "${businessName}"؟`)) return;
-            await deleteDoc(doc(db, "tenants", tenantId));
-            loadTenants();
-        }
-
-        window.adminUpdateUserPassword = async function(userEmail) {
-            try {
-                await sendPasswordResetEmail(auth, userEmail);
-                alert(`تم إرسال رابط إعادة تعيين وتنبيه الأمان إلى البريد: ${userEmail}`);
-            } catch (err) {
-                alert('فشل الإرسال: ' + err.message);
-            }
-        }
-
-        let allTenantsData = [];
-        window.loadTenants = async function() {
-            const listEl = document.getElementById('tenants-list');
-            const selectEl = document.getElementById('admin-tenant-select');
-            const snap = await getDocs(collection(db, "tenants"));
-            allTenantsData = [];
-            let total = 0, active = 0, trial = 0, inactive = 0;
-
-            if (snap.empty) {
-                listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
-                selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
-                return;
-            }
-
-            let selectHtml = '<option value="">-- اختر المنشأة --</option>';
-
-            snap.forEach((d) => {
-                total++;
-                const data = d.data();
-                if (data.isActive) active++; else inactive++;
-                if (data.isTrial) trial++;
-                allTenantsData.push({ id: d.id, ...data });
-                selectHtml += `<option value="${d.id}">${data.businessName} (${data.country || 'السعودية'})</option>`;
-            });
-
-            renderTenantsTable(allTenantsData);
-            selectEl.innerHTML = selectHtml;
-            document.getElementById('stat-total-tenants').innerText = total;
-            document.getElementById('stat-active-tenants').innerText = active;
-            document.getElementById('stat-trial-tenants').innerText = trial;
-            document.getElementById('stat-inactive-tenants').innerText = inactive;
-        }
-
-        window.filterTenants = function() {
-            const search = document.getElementById('search-tenants-input').value.toLowerCase();
-            const statusFilter = document.getElementById('filter-tenants-status').value;
-
-            const filtered = allTenantsData.filter(t => {
-                const matchSearch = t.businessName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
-                const matchStatus = statusFilter === 'all' || (statusFilter === 'active' && t.isActive) || (statusFilter === 'inactive' && !t.isActive);
-                return matchSearch && matchStatus;
-            });
-            renderTenantsTable(filtered);
-        }
-
-        function renderTenantsTable(tenants) {
-            const listEl = document.getElementById('tenants-list');
-            if (tenants.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث.</p>';
-                return;
-            }
-
-            let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف والدولة</th><th class="p-3">الباقة والعملة</th><th class="p-3">الحالة</th><th class="p-3">إجراءات</th>
-                </tr></thead><tbody class="divide-y divide-gray-100">`;
-
-            tenants.forEach(data => {
-                let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم</span>';
-                if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي</span>`;
-                
-                html += `<tr class="hover:bg-gray-50">
-                    <td class="p-3 font-semibold">${data.businessName}</td>
-                    <td class="p-3 text-xs"><span class="font-mono text-indigo-600">${data.id}</span><br><span class="text-gray-500">${data.country || 'المملكة العربية السعودية'}</span></td>
-                    <td class="p-3 text-xs">${planBadge} (${data.currency || 'ريال'})</td>
-                    <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
-                    <td class="p-3 flex gap-1.5 flex-wrap">
-                        <button onclick="toggleTenantStatus('${data.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
-                        <button onclick="extendTenantDays('${data.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
-                        <button onclick="deleteTenant('${data.id}', '${data.businessName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
-                    </td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            listEl.innerHTML = html;
-        }
-
-        let allUsersCache = [];
-        window.loadUsers = async function() {
-            const listEl = document.getElementById('users-list');
-            const snap = await getDocs(collection(db, "users"));
-            allUsersCache = [];
-
-            if (snap.empty) {
-                listEl.innerHTML = '<p class="text-gray-400">لا يوجد مستخدمون.</p>';
-                return;
-            }
-
-            snap.forEach((d) => {
-                const u = d.data();
-                allUsersCache.push({ id: d.id, ...u });
-            });
-
-            renderAdminUsersTable(allUsersCache);
-        }
-
-        window.filterAdminUsers = function() {
-            const search = document.getElementById('search-users-input').value.toLowerCase();
-            const roleFilter = document.getElementById('filter-users-role').value;
-
-            const filtered = allUsersCache.filter(u => {
-                const matchSearch = (u.name && u.name.toLowerCase().includes(search)) || 
-                                    (u.phone && u.phone.toLowerCase().includes(search)) || 
-                                    (u.secondaryPhone && u.secondaryPhone.toLowerCase().includes(search)) || 
-                                    (u.email && u.email.toLowerCase().includes(search));
-                const matchRole = roleFilter === 'all' || u.role === roleFilter;
-                return matchSearch && matchRole;
-            });
-
-            renderAdminUsersTable(filtered);
-        }
-
-        function renderAdminUsersTable(users) {
-            const listEl = document.getElementById('users-list');
-            if (users.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد نتائج مطابقة للبحث أو الفلتر.</p>';
-                return;
-            }
-
-            let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">الاسم</th><th class="p-3">الهواتف</th><th class="p-3">النوع والدولة والمدينة</th><th class="p-3">الدور والمنشأة</th><th class="p-3">المناسبات والاهتمامات</th><th class="p-3">الإجراءات والبيانات</th>
-                </tr></thead><tbody class="divide-y divide-gray-100">`;
-            
-            users.forEach((u) => {
-                html += `<tr class="hover:bg-gray-50">
-                    <td class="p-3 font-semibold">${u.name || '--'}</td>
-                    <td class="p-3 text-xs" dir="ltr">${u.phone || '--'}<br><span class="text-gray-400">${u.secondaryPhone || ''}</span></td>
-                    <td class="p-3 text-xs">${u.gender || '--'} | ${u.country || '--'} - ${u.city || '--'}<br><span class="text-gray-400">${u.address || ''}</span></td>
-                    <td class="p-3 text-xs font-mono">${u.role} (${u.tenantId || u.registeredTenant || 'عام'})</td>
-                    <td class="p-3 text-xs">🎂 ${u.birthdate || 'غير مسجل'}<br>💍 ${u.anniversary || 'غير مسجل'}<br>💡 ${u.hobbies || '--'}</td>
-                    <td class="p-3 flex flex-col gap-1.5">
-                        <button onclick='openCustomerDetailsModal(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
-                            👁️ عرض البيانات الشخصية
-                        </button>
-                        <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer whitespace-nowrap">
-                            🔑 إعادة تعيين الباسورد
-                        </button>
-                    </td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            listEl.innerHTML = html;
-        }
-
-        window.saveTenantLoyaltyRules = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const loyaltyRules = {
-                currencyPerPoint: Number(document.getElementById('rule-currency-per-point').value),
-                pointValue: Number(document.getElementById('rule-point-value').value),
-                minRedemption: Number(document.getElementById('rule-min-redemption').value),
-                welcomePoints: Number(document.getElementById('rule-welcome-points').value),
-                referralPoints: Number(document.getElementById('rule-referral-points').value),
-                expiryDays: Number(document.getElementById('rule-expiry-days').value),
-                updatedAt: new Date().toISOString()
-            };
-            await updateDoc(doc(db, "tenants", currentUserTenantId), { loyaltyRules });
-            alert('تم حفظ ضوابط الولاء ونقاط الإحالة بنجاح!');
-        }
-
-        window.saveTenantAbout = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const about = document.getElementById('tenant-about-text').value.trim();
-            await updateDoc(doc(db, "tenants", currentUserTenantId), { about });
-            alert('تم حفظ نبذة النشاط بنجاح!');
-        }
-
-        window.addTenantService = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const name = document.getElementById('srv-name').value.trim();
-            const price = Number(document.getElementById('srv-price').value);
-            const notes = document.getElementById('srv-notes').value.trim();
-
-            await addDoc(collection(db, "tenants", currentUserTenantId, "services"), {
-                name, price, notes, isActive: true, createdAt: new Date().toISOString()
-            });
-
-            document.getElementById('srv-name').value = '';
-            document.getElementById('srv-price').value = '';
-            document.getElementById('srv-notes').value = '';
-            loadTenantServicesAdmin();
-        }
-
-        window.toggleServiceStatus = async function(srvId, currentStatus) {
-            if (!currentUserTenantId) return;
-            await updateDoc(doc(db, "tenants", currentUserTenantId, "services", srvId), { isActive: !currentStatus });
-            loadTenantServicesAdmin();
-        }
-
-        window.deleteTenantService = async function(srvId) {
-            if (!currentUserTenantId || !confirm('هل أنت متأكد من حذف هذه الخدمة؟')) return;
-            await deleteDoc(doc(db, "tenants", currentUserTenantId, "services", srvId));
-            loadTenantServicesAdmin();
-        }
-
-        window.loadTenantServicesAdmin = async function() {
-            if (!currentUserTenantId) return;
-            const listEl = document.getElementById('admin-services-list');
-            try {
-                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "services"));
-                if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400">لا توجد خدمات مضافة حالياً.</p>';
-                    return;
-                }
-                let html = `<table class="w-full text-right border-collapse"><thead><tr class="border-b bg-gray-50 text-xs text-gray-600"><th class="p-2">الخدمة</th><th class="p-2">السعر (${currentTenantCurrency})</th><th class="p-2">ملاحظات</th><th class="p-2">الحالة</th><th class="p-2">إجراءات</th></tr></thead><tbody class="divide-y">`;
-                snap.forEach(d => {
-                    const s = d.data();
-                    html += `<tr class="hover:bg-gray-50">
-                        <td class="p-2 font-semibold">${s.name}</td>
-                        <td class="p-2 text-indigo-600">${s.price} ${currentTenantCurrency}</td>
-                        <td class="p-2 text-xs text-gray-500">${s.notes || '--'}</td>
-                        <td class="p-2">${s.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs font-bold">نشط</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs">غير نشط</span>'}</td>
-                        <td class="p-2 flex gap-1">
-                            <button onclick="toggleServiceStatus('${d.id}', ${s.isActive})" class="px-2 py-1 rounded text-xs text-white ${s.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${s.isActive ? 'إيقاف' : 'تنشيط'}</button>
-                            <button onclick="deleteTenantService('${d.id}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
-                        </td>
-                    </tr>`;
-                });
-                html += '</tbody></table>';
-                listEl.innerHTML = html;
-            } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل الخدمات.</p>';
-            }
-        }
-
-        window.saveTenantContact = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const contact = {
-                phone: document.getElementById('contact-phone').value.trim(),
-                email: document.getElementById('contact-email').value.trim(),
-                web: document.getElementById('contact-web').value.trim(),
-                whatsapp: document.getElementById('contact-whatsapp').value.trim(),
-                facebook: document.getElementById('contact-facebook').value.trim(),
-                instagram: document.getElementById('contact-instagram').value.trim(),
-                snapchat: document.getElementById('contact-snapchat').value.trim(),
-                tiktok: document.getElementById('contact-tiktok').value.trim(),
-                googleReviews: document.getElementById('contact-google-reviews').value.trim()
-            };
-            await updateDoc(doc(db, "tenants", currentUserTenantId), { contact });
-            alert('تم حفظ بيانات التواصل وروابط السوشيال ميديا بنجاح!');
-        }
-
-        window.addTenantOffer = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const title = document.getElementById('offer-title').value.trim();
-            const desc = document.getElementById('offer-desc').value.trim();
-            const img = document.getElementById('offer-img').value.trim();
-
-            await addDoc(collection(db, "tenants", currentUserTenantId, "offers"), {
-                title, desc, img, createdAt: new Date().toISOString()
-            });
-
-            document.getElementById('offer-title').value = '';
-            document.getElementById('offer-desc').value = '';
-            document.getElementById('offer-img').value = '';
-            loadTenantOffersAdmin();
-        }
-
-        window.deleteTenantOffer = async function(offerId) {
-            if (!currentUserTenantId || !confirm('هل أنت متأكد من حذف هذا العرض؟')) return;
-            await deleteDoc(doc(db, "tenants", currentUserTenantId, "offers", offerId));
-            loadTenantOffersAdmin();
-        }
-
-        window.loadTenantOffersAdmin = async function() {
-            if (!currentUserTenantId) return;
-            const listEl = document.getElementById('admin-offers-list');
-            try {
-                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "offers"));
-                if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400">لا توجد عروض مضافة حالياً.</p>';
-                    return;
-                }
-                let html = '';
-                snap.forEach(d => {
-                    const o = d.data();
-                    html += `<div class="p-3 bg-gray-50 border rounded-xl flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            ${o.img ? `<img src="${o.img}" class="w-16 h-16 object-cover rounded-lg border">` : '<div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-xs text-gray-400">بلا صورة</div>'}
-                            <div>
-                                <h5 class="font-bold text-indigo-900 text-sm">${o.title}</h5>
-                                <p class="text-xs text-gray-600 mt-0.5">${o.desc || ''}</p>
-                            </div>
-                        </div>
-                        <button onclick="deleteTenantOffer('${d.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs cursor-pointer whitespace-nowrap">حذف</button>
-                    </div>`;
-                });
-                listEl.innerHTML = html;
-            } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500">فشل تحميل العروض.</p>';
-            }
-        }
-
-        window.addTenantGalleryImage = async function(e) {
-            e.preventDefault();
-            if (!currentUserTenantId) return;
-            const url = document.getElementById('gallery-img-url').value.trim();
-            if (!url) return;
-
-            await addDoc(collection(db, "tenants", currentUserTenantId, "gallery"), {
-                url, createdAt: new Date().toISOString()
-            });
-
-            document.getElementById('gallery-img-url').value = '';
-            loadTenantGalleryAdmin();
-        }
-
-        window.uploadGalleryTxtFile = function() {
-            if (!currentUserTenantId) return;
-            const fileInput = document.getElementById('gallery-txt-file');
-            const file = fileInput.files[0];
-            if (!file) return alert('الرجاء اختيار ملف نصي (.txt) أولاً.');
-
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const text = event.target.result;
-                const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.startsWith('http://') || line.startsWith('https://'));
-
-                if (lines.length === 0) return alert('لم يتم العثور على روابط صالحة داخل الملف النصي.');
-
-                let addedCount = 0;
-                for (const url of lines) {
-                    await addDoc(collection(db, "tenants", currentUserTenantId, "gallery"), {
-                        url, createdAt: new Date().toISOString()
-                    });
-                    addedCount++;
-                }
-
-                fileInput.value = '';
-                alert(`تم استيراد وإضافة ${addedCount} صورة إلى المعرض بنجاح!`);
-                loadTenantGalleryAdmin();
-            };
-            reader.readAsText(file);
-        }
-
-        window.deleteTenantGalleryImage = async function(imgId) {
-            if (!currentUserTenantId || !confirm('هل أنت متأكد من حذف هذه الصورة من المعرض؟')) return;
-            await deleteDoc(doc(db, "tenants", currentUserTenantId, "gallery", imgId));
-            loadTenantGalleryAdmin();
-        }
-
-        window.loadTenantGalleryAdmin = async function() {
-            if (!currentUserTenantId) return;
-            const listEl = document.getElementById('admin-gallery-list');
-            try {
-                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "gallery"));
-                if (snap.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 col-span-4">لا توجد صور في المعرض حالياً.</p>';
-                    return;
-                }
-                let html = '';
-                snap.forEach(d => {
-                    const img = d.data();
-                    html += `<div class="relative group rounded-xl overflow-hidden border bg-white shadow-xs">
-                        <img src="${img.url}" class="w-full h-32 object-cover">
-                        <button onclick="deleteTenantGalleryImage('${d.id}')" class="absolute top-2 left-2 bg-red-600 text-white p-1.5 rounded-full text-xs opacity-80 hover:opacity-100 cursor-pointer shadow-md">❌</button>
-                    </div>`;
-                });
-                listEl.innerHTML = html;
-            } catch (err) {
-                listEl.innerHTML = '<p class="text-red-500 col-span-4">فشل تحميل معرض الصور.</p>';
-            }
-        }
-
-        let tenantCustomersCache = [];
-        window.loadTenantAdminData = async function() {
-            if (!currentUserTenantId) return;
-            
-            let resolvedTenantId = currentUserTenantId;
-            let tDoc = await getDoc(doc(db, "tenants", resolvedTenantId));
-            if (!tDoc.exists()) {
-                const tenantsSnap = await getDocs(collection(db, "tenants"));
-                if (!tenantsSnap.empty) {
-                    resolvedTenantId = tenantsSnap.docs[0].id;
-                    tDoc = tenantsSnap.docs[0];
-                }
-            }
-
-            currentUserTenantId = resolvedTenantId;
-            document.getElementById('current-tenant-id-badge').innerText = currentUserTenantId;
-
-            const directRegLink = `${window.location.origin}${window.location.pathname}?tenant=${currentUserTenantId}`;
-            document.getElementById('tenant-direct-reg-link').value = directRegLink;
-            const tenantQrEl = document.getElementById('tenant-reg-qrcode');
-            tenantQrEl.innerHTML = '';
-            new QRCode(tenantQrEl, {
-                text: directRegLink,
-                width: 180,
-                height: 180,
-                colorDark: "#1e1b4b",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            if (tDoc && tDoc.exists()) {
-                const data = tDoc.data ? tDoc.data() : tDoc;
-                document.getElementById('current-tenant-name').innerText = data.businessName || 'صالون دودي روز للتزيين النسائي';
-                document.getElementById('tenant-country-badge').innerText = data.country || 'المملكة العربية السعودية';
-                currentTenantCurrency = data.currency || 'ريال سعودي';
-                document.getElementById('tenant-currency-badge').innerText = currentTenantCurrency;
-
-                if (data.loyaltyRules) {
-                    activeTenantRules = data.loyaltyRules;
-                    document.getElementById('rule-currency-per-point').value = data.loyaltyRules.currencyPerPoint || 10;
-                    document.getElementById('rule-point-value').value = data.loyaltyRules.pointValue || 1;
-                    document.getElementById('rule-min-redemption').value = data.loyaltyRules.minRedemption ?? 50;
-                    document.getElementById('rule-welcome-points').value = data.loyaltyRules.welcomePoints ?? 50;
-                    document.getElementById('rule-referral-points').value = data.loyaltyRules.referralPoints ?? 25;
-                    document.getElementById('rule-expiry-days').value = data.loyaltyRules.expiryDays || 365;
-                }
-                if (data.about) document.getElementById('tenant-about-text').value = data.about;
-                if (data.contact) {
-                    document.getElementById('contact-phone').value = data.contact.phone || '';
-                    document.getElementById('contact-email').value = data.contact.email || '';
-                    document.getElementById('contact-web').value = data.contact.web || '';
-                    document.getElementById('contact-whatsapp').value = data.contact.whatsapp || '';
-                    document.getElementById('contact-facebook').value = data.contact.facebook || '';
-                    document.getElementById('contact-instagram').value = data.contact.instagram || '';
-                    document.getElementById('contact-snapchat').value = data.contact.snapchat || '';
-                    document.getElementById('contact-tiktok').value = data.contact.tiktok || '';
-                    document.getElementById('contact-google-reviews').value = data.contact.googleReviews || '';
-                }
-            }
-            loadTenantServicesAdmin();
-            loadTenantOffersAdmin();
-            loadTenantGalleryAdmin();
-
-            try {
-                const snap = await getDocs(collection(db, "tenants", currentUserTenantId, "customers"));
-                tenantCustomersCache = [];
-                let totalPoints = 0;
-                
-                if (snap.empty) {
-                    document.getElementById('tenant-customers-list').innerHTML = '<p class="text-gray-400 py-3">لا توجد محافظ فرعية مسجلة لهذه المنشأة حالياً.</p>';
-                    document.getElementById('tenant-stat-customers').innerText = 0;
-                    document.getElementById('tenant-stat-points').innerText = 0;
-                    return;
-                }
-
-                for (const d of snap.docs) {
-                    const custWallet = d.data();
-                    const custId = d.id;
-                    totalPoints += (custWallet.points || 0);
-
-                    const userDoc = await getDoc(doc(db, "users", custId));
-                    let profileData = {};
-                    if (userDoc.exists()) {
-                        profileData = userDoc.data();
-                    }
-
-                    tenantCustomersCache.push({
-                        id: custId,
-                        name: custWallet.name || profileData.name || '--',
-                        phone: custWallet.phone || profileData.phone || '--',
-                        secondaryPhone: custWallet.secondaryPhone || profileData.secondaryPhone || '--',
-                        email: custWallet.email || profileData.email || '--',
-                        points: custWallet.points || 0,
-                        gender: profileData.gender || custWallet.gender || '',
-                        country: profileData.country || custWallet.country || '',
-                        city: profileData.city || custWallet.city || '',
-                        address: profileData.address || custWallet.address || '',
-                        birthdate: profileData.birthdate || custWallet.birthdate || '',
-                        anniversary: profileData.anniversary || custWallet.anniversary || '',
-                        hobbies: profileData.hobbies || custWallet.hobbies || '',
-                        lastVisit: custWallet.lastVisit || '--'
-                    });
-                }
-
-                renderAdminCustomersTable(tenantCustomersCache);
-                document.getElementById('tenant-stat-customers').innerText = tenantCustomersCache.length;
-                document.getElementById('tenant-stat-points').innerText = totalPoints;
-            } catch (err) {
-                document.getElementById('tenant-customers-list').innerHTML = '<p class="text-red-500">فشل تحميل محافظ العملاء.</p>';
-            }
-        }
-
-        window.filterAdminCustomers = function() {
-            const search = document.getElementById('search-customers-input').value.toLowerCase();
-            const occasion = document.getElementById('filter-customers-occasion').value;
-            const currentMonth = new Date().getMonth() + 1;
-
-            const filtered = tenantCustomersCache.filter(c => {
-                const matchSearch = c.name.toLowerCase().includes(search) || c.phone.toLowerCase().includes(search) || (c.secondaryPhone && c.secondaryPhone.toLowerCase().includes(search)) || c.email.toLowerCase().includes(search);
-                
-                let matchOccasion = true;
-                if (occasion === 'birthday_this_month' && c.birthdate) {
-                    const bMonth = parseInt(c.birthdate.split('-')[1]);
-                    matchOccasion = (bMonth === currentMonth);
-                } else if (occasion === 'birthday_this_month' && !c.birthdate) {
-                    matchOccasion = false;
-                }
-
-                if (occasion === 'anniversary_this_month' && c.anniversary) {
-                    const aMonth = parseInt(c.anniversary.split('-')[1]);
-                    matchOccasion = (aMonth === currentMonth);
-                } else if (occasion === 'anniversary_this_month' && !c.anniversary) {
-                    matchOccasion = false;
-                }
-
-                return matchSearch && matchOccasion;
-            });
-
-            renderAdminCustomersTable(filtered);
-        }
-
-        function renderAdminCustomersTable(customers) {
-            const listEl = document.getElementById('tenant-customers-list');
-            if (customers.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-400 py-4 text-center">لا توجد بيانات مطابقة لفلاتر البحث أو المناسبات خلال هذا الشهر.</p>';
-                return;
-            }
-
-            let html = `<table class="w-full text-right border-collapse">
-                <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-                    <th class="p-3">اسم العميل</th><th class="p-3">الهاتف (أساسي / إضافي)</th><th class="p-3">النوع والدولة والمدينة</th><th class="p-3">رصيد النقاط</th><th class="p-3">المناسبات</th><th class="p-3">الملف الشخصي</th>
-                </tr></thead><tbody class="divide-y">`;
-
-            customers.forEach(c => {
-                let occasionBadge = '';
-                const currentMonth = new Date().getMonth() + 1;
-                if (c.birthdate) {
-                    const bMonth = parseInt(c.birthdate.split('-')[1]);
-                    if (bMonth === currentMonth) occasionBadge += `<span class="bg-pink-100 text-pink-800 px-2 py-0.5 rounded text-[10px] font-bold block mb-1">🎂 عيد ميلاد هذا الشهر (${c.birthdate})</span>`;
-                }
-                if (c.anniversary) {
-                    const aMonth = parseInt(c.anniversary.split('-')[1]);
-                    if (aMonth === currentMonth) occasionBadge += `<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px] font-bold block">💍 ذكرى زواج هذا الشهر (${c.anniversary})</span>`;
-                }
-
-                html += `<tr class="hover:bg-gray-50">
-                    <td class="p-3 font-semibold">${c.name}</td>
-                    <td class="p-3 text-xs font-mono" dir="ltr">${c.phone} ${c.secondaryPhone && c.secondaryPhone !== '--' ? `<br><span class="text-gray-500">إضافي: ${c.secondaryPhone}</span>` : ''}</td>
-                    <td class="p-3 text-xs">${c.gender || '--'} | ${c.country || '--'} - ${c.city || '--'}<br><span class="text-gray-400">${c.address || ''}</span></td>
-                    <td class="p-3 font-bold text-indigo-600">${c.points} نقطة</td>
-                    <td class="p-3 text-xs">${occasionBadge || '<span class="text-gray-400">لا مناسبة مسجلة</span>'}</td>
-                    <td class="p-3">
-                        <button onclick='openCustomerDetailsModal(${JSON.stringify(c)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
-                            👁️ عرض البيانات الشخصية
-                        </button>
-                    </td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            listEl.innerHTML = html;
-        }
-
-        window.openCustomerDetailsModal = function(customer) {
-            const content = document.getElementById('customer-details-content');
-            content.innerHTML = `
-                <div class="bg-indigo-50 p-4 rounded-xl space-y-2">
-                    <p><strong>الاسم الكامل:</strong> ${customer.name || '--'}</p>
-                    <p><strong>الدور بالنظام:</strong> <span class="font-mono">${customer.role || 'customer'}</span></p>
-                    <p><strong>النوع:</strong> ${customer.gender || 'غير مسجل'}</p>
-                    <p><strong>رقم الهاتف الأساسي:</strong> <span dir="ltr">${customer.phone || '--'}</span></p>
-                    <p><strong>رقم الهاتف الإضافي:</strong> <span dir="ltr">${customer.secondaryPhone && customer.secondaryPhone !== '--' ? customer.secondaryPhone : 'غير مسجل'}</span></p>
-                    <p><strong>البريد الإلكتروني:</strong> ${customer.email || '--'}</p>
-                    <p><strong>معرف المستخدم (UID):</strong> <span class="font-mono text-xs text-gray-500">${customer.id || '--'}</span></p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-xl space-y-2">
-                    <p><strong>الدولة والمدينة:</strong> ${customer.country || '--'} - ${customer.city || '--'}</p>
-                    <p><strong>العنوان بالتفصيل:</strong> ${customer.address || 'غير مسجل'}</p>
-                    <p><strong>تاريخ الميلاد:</strong> ${customer.birthdate || 'غير مسجل'}</p>
-                    <p><strong>تاريخ الزواج / المناسبة:</strong> ${customer.anniversary || 'غير مسجل'}</p>
-                    <p><strong>الهوايات والاهتمامات:</strong> ${customer.hobbies || 'غير مسجلة'}</p>
-                </div>
-                ${customer.points !== undefined ? `
-                <div class="bg-emerald-50 p-4 rounded-xl text-center">
-                    <span class="text-xs text-emerald-800 font-semibold block">رصيد النقاط الحالي بالمنشأة</span>
-                    <span class="text-2xl font-extrabold text-emerald-600">${customer.points} نقطة</span>
-                </div>` : ''}
-            `;
-            document.getElementById('customer-details-modal').classList.remove('hidden');
-        }
-
-        window.closeCustomerDetailsModal = function() {
-            document.getElementById('customer-details-modal').classList.add('hidden');
-        }
-
-        window.loadCashierDashboard = async function() {
-            if (!currentUserTenantId) return;
-            const tDoc = await getDoc(doc(db, "tenants", currentUserTenantId));
-            if (tDoc.exists()) {
-                const data = tDoc.data();
-                document.getElementById('cashier-tenant-name').innerText = data.businessName;
-                currentTenantCurrency = data.currency || 'ريال سعودي';
-                document.querySelectorAll('.pos-curr-text').forEach(el => el.innerText = currentTenantCurrency);
-                if (data.loyaltyRules) activeTenantRules = data.loyaltyRules;
-            }
-        }
-
-        window.toggleCameraScanner = function() {
-            const readerDiv = document.getElementById('reader');
-            const btn = document.getElementById('cam-toggle-btn');
-            
-            if (html5QrCode && html5QrCode.isScanning) {
-                stopCamera();
-                return;
-            }
-
-            readerDiv.classList.remove('hidden');
-            btn.innerText = '⏹️ إيقاف الكاميرا';
-            
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 220, height: 220 } },
-                (decodedText) => {
-                    const cleanUid = decodedText.trim();
-                    document.getElementById('pos-customer-uid').value = cleanUid;
-                    stopCamera();
-                    posFindCustomer();
-                },
-                () => {}
-            ).catch(() => {
-                alert('تعذر تشغيل الكاميرا: تأكد من السماح للمتصفح بالوصول للكاميرا.');
-                readerDiv.classList.add('hidden');
-                btn.innerText = '📷 تشغيل كاميرا المسح';
-            });
-        }
-
-        function stopCamera() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                    document.getElementById('reader').classList.add('hidden');
-                    document.getElementById('cam-toggle-btn').innerText = '📷 تشغيل كاميرا المسح';
-                }).catch(err => console.error(err));
-            } else {
-                document.getElementById('reader').classList.add('hidden');
-                document.getElementById('cam-toggle-btn').innerText = '📷 تشغيل كاميرا المسح';
-            }
-        }
-
-        window.posFindCustomer = async function() {
-            stopCamera();
-            const searchVal = document.getElementById('pos-customer-uid').value.trim();
-            if (!searchVal) return alert('الرجاء مسح الكود بالكاميرا أو إدخال معرف العميل أو رقم الهاتف.');
-
-            try {
-                let customerUid = searchVal;
-                let userDoc = await getDoc(doc(db, "users", customerUid));
-
-                if (!userDoc.exists() || userDoc.data().role !== 'customer') {
-                    const usersSnap = await getDocs(collection(db, "users"));
-                    let foundUser = null;
-                    usersSnap.forEach(d => {
-                        const u = d.data();
-                        if (u.role === 'customer' && (u.phone === searchVal || u.secondaryPhone === searchVal)) {
-                            foundUser = { id: d.id, ...u };
-                        }
-                    });
-
-                    if (foundUser) {
-                        customerUid = foundUser.id;
-                        userDoc = await getDoc(doc(db, "users", customerUid));
-                    }
-                }
-
-                if (!userDoc.exists() || userDoc.data().role !== 'customer') {
-                    alert('لم يتم العثور على عميل بهذا المعرف أو رقم الهاتف في النظام المركزي.');
-                    return;
-                }
-
-                const userData = userDoc.data();
-                activePosCustomerUid = customerUid;
-
-                const walletRef = doc(db, "tenants", currentUserTenantId, "customers", customerUid);
-                const walletDoc = await getDoc(walletRef);
-                let currentPoints = walletDoc.exists() ? (walletDoc.data().points || 0) : 0;
-
-                document.getElementById('pos-c-name').innerText = userData.name;
-                document.getElementById('pos-c-phone').innerText = `هاتف: ${userData.phone || '--'} ${userData.secondaryPhone ? `| إضافي: ${userData.secondaryPhone}` : ''}`;
-                document.getElementById('pos-c-email').innerText = userData.email;
-                
-                let detailsText = '';
-                if (userData.gender) detailsText += `النوع: ${userData.gender} `;
-                if (userData.city) detailsText += `| المدينة: ${userData.city} `;
-                if (userData.birthdate) detailsText += `| 🎂 ميلاد: ${userData.birthdate} `;
-                document.getElementById('pos-c-details').innerText = detailsText || 'لا توجد تفاصيل إضافية مسجلة';
-
-                document.getElementById('pos-c-points').innerText = currentPoints;
-                document.getElementById('pos-active-session').classList.remove('hidden');
-            } catch (err) {
-                alert('خطأ أثناء البحث عن العميل: ' + err.message);
-            }
-        }
-
-        window.resetPosSession = function() {
-            activePosCustomerUid = null;
-            const input = document.getElementById('pos-customer-uid');
-            input.value = '';
-            document.getElementById('pos-active-session').classList.add('hidden');
-            document.getElementById('pos-amount-input').value = '';
-            document.getElementById('pos-service-price-input').value = '';
-            input.focus();
-        }
-
-        window.posEarnPoints = async function() {
-            if (!activePosCustomerUid) return;
-            const amount = Number(document.getElementById('pos-amount-input').value);
-            if (amount <= 0) return alert('الرجاء إدخال مبلغ فاتورة صحيح.');
-
-            const currencyPerPoint = activeTenantRules.currencyPerPoint || 10;
-            const earnedPoints = Math.floor(amount / currencyPerPoint);
-
-            const walletRef = doc(db, "tenants", currentUserTenantId, "customers", activePosCustomerUid);
-            const walletDoc = await getDoc(walletRef);
-
-            let newPoints = earnedPoints;
-            const userDoc = await getDoc(doc(db, "users", activePosCustomerUid));
-            const userData = userDoc.data();
-
-            if (walletDoc.exists()) {
-                newPoints += (walletDoc.data().points || 0);
-            }
-
-            await setDoc(walletRef, {
-                name: userData.name,
-                phone: userData.phone || '',
-                secondaryPhone: userData.secondaryPhone || '',
-                email: userData.email,
-                gender: userData.gender || '',
-                country: userData.country || '',
-                city: userData.city || '',
-                address: userData.address || '',
-                birthdate: userData.birthdate || '',
-                anniversary: userData.anniversary || '',
-                hobbies: userData.hobbies || '',
-                points: newPoints,
-                lastVisit: new Date().toISOString()
-            }, { merge: true });
-
-            alert(`تم بنجاح منح العميل ${earnedPoints} نقطة! الرصيد الإجمالي بالمحفظة: ${newPoints} نقطة.`);
-            document.getElementById('pos-c-points').innerText = newPoints;
-            document.getElementById('pos-amount-input').value = '';
-        }
-
-        window.posRedeemPoints = async function() {
-            if (!activePosCustomerUid) return;
-            const servicePrice = Number(document.getElementById('pos-service-price-input').value);
-            if (servicePrice <= 0) return alert('الرجاء إدخال قيمة الخدمة الفعلية.');
-
-            const pointValue = activeTenantRules.pointValue || 1;
-            const minRedemption = activeTenantRules.minRedemption ?? 50;
-            const requiredPoints = Math.ceil(servicePrice / pointValue);
-
-            const walletRef = doc(db, "tenants", currentUserTenantId, "customers", activePosCustomerUid);
-            const walletDoc = await getDoc(walletRef);
-
-            if (!walletDoc.exists()) return alert('لا توجد محفظة لهذا العميل في الفرع.');
-            const currentPts = walletDoc.data().points || 0;
-
-            if (currentPts < minRedemption) {
-                return alert(`عذراً، رصيد العميل الحالي (${currentPts} نقطة) أقل من الحد الأدنى المسموح للاستبدال وهو (${minRedemption} نقطة).`);
-            }
-
-            if (requiredPoints > currentPts) {
-                return alert(`رصيد النقاط الحالي (${currentPts} نقطة) لا يكفي لتغطية هذه الخدمة. النقاط المطلوبة حسب السعر (${servicePrice} ${currentTenantCurrency}) هي: ${requiredPoints} نقطة.`);
-            }
-
-            const remainingPts = currentPts - requiredPoints;
-            await updateDoc(walletRef, {
-                points: remainingPts,
-                lastVisit: new Date().toISOString()
-            });
-
-            alert(`تم استبدال وخصم ${requiredPoints} نقطة مقابل الخدمة بقيمة ${servicePrice} ${currentTenantCurrency}! الرصيد المتبقي: ${remainingPts} نقطة.`);
-            document.getElementById('pos-c-points').innerText = remainingPts;
-            document.getElementById('pos-service-price-input').value = '';
-        }
-
-        window.openJoinTenantModal = function() {
-            document.getElementById('join-tenant-id-input').value = '';
-            document.getElementById('join-tenant-modal').classList.remove('hidden');
-            document.getElementById('join-tenant-id-input').focus();
-        }
-
-        window.closeJoinTenantModal = function() {
-            document.getElementById('join-tenant-modal').classList.add('hidden');
-        }
-
-        window.joinNewTenant = async function(e) {
-            e.preventDefault();
-            if (!auth.currentUser) return;
-
-            const tenantId = document.getElementById('join-tenant-id-input').value.trim();
-            if (!tenantId) return alert('الرجاء إدخال معرف المنشأة (Facility ID).');
-
-            const btn = document.getElementById('join-tenant-submit-btn');
-            btn.disabled = true;
-            btn.innerText = 'جاري التحقق والانضمام...';
-
-            try {
-                const tenantRef = doc(db, "tenants", tenantId);
-                const tenantSnap = await getDoc(tenantRef);
-
-                if (!tenantSnap.exists()) {
-                    alert('عذراً، معرف المنشأة غير صحيح أو غير مسجل في النظام.');
-                    return;
-                }
-
-                const tenantData = tenantSnap.data();
-                if (tenantData.isActive === false) {
-                    alert('عذراً، هذه المنشأة موقوفة حالياً ولا تستقبل اشتراكات جديدة.');
-                    return;
-                }
-
-                const uid = auth.currentUser.uid;
-                const walletRef = doc(db, "tenants", tenantId, "customers", uid);
-                const walletSnap = await getDoc(walletRef);
-
-                if (walletSnap.exists()) {
-                    alert(`أنت مشترك بالفعل في (${tenantData.businessName})! سيتم فتح بطاقة المنشأة الآن.`);
-                    closeJoinTenantModal();
-                    openCustomerTenantPortal(tenantId, tenantData.businessName, walletSnap.data().points || 0);
-                    return;
-                }
-
-                const userRef = doc(db, "users", uid);
-                const userSnap = await getDoc(userRef);
-                const userData = userSnap.exists() ? userSnap.data() : {};
-
-                const welcomePts = (tenantData.loyaltyRules && tenantData.loyaltyRules.welcomePoints !== undefined)
-                    ? Number(tenantData.loyaltyRules.welcomePoints)
-                    : 50;
-
-                await setDoc(walletRef, {
-                    name: userData.name || '',
-                    phone: userData.phone || '',
-                    secondaryPhone: userData.secondaryPhone || '',
-                    email: userData.email || auth.currentUser.email || '',
-                    points: welcomePts,
-                    gender: userData.gender || '',
-                    country: userData.country || '',
-                    city: userData.city || '',
-                    address: userData.address || '',
-                    birthdate: userData.birthdate || '',
-                    anniversary: userData.anniversary || '',
-                    hobbies: userData.hobbies || '',
-                    joinedAt: new Date().toISOString(),
-                    lastVisit: new Date().toISOString()
-                });
-
-                const existingTenants = Array.isArray(userData.joinedTenants) ? userData.joinedTenants : [];
-                if (!existingTenants.includes(tenantId)) {
-                    await updateDoc(userRef, {
-                        joinedTenants: [...existingTenants, tenantId]
-                    });
-                }
-
-                closeJoinTenantModal();
-                alert(`🎉 مبروك! تم انضمامك إلى (${tenantData.businessName}) بنجاح وحصلت على ${welcomePts} نقطة ترحيبية.`);
-                await loadCustomerDashboard(uid);
-                openCustomerTenantPortal(tenantId, tenantData.businessName, welcomePts);
-            } catch (err) {
-                alert('حدث خطأ أثناء الانضمام للمنشأة: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'تأكيد الانضمام وإنشاء المحفظة';
-            }
-        }
-
-        window.loadCustomerDashboard = async function(userId) {
-            const userDoc = await getDoc(doc(db, "users", userId));
-            if (!userDoc.exists()) return;
-            const userData = userDoc.data();
-            document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
-            document.getElementById('customer-phone-display').innerText = userData.phone ? `📱 ${userData.phone}` : '';
-            document.getElementById('customer-uid-badge').innerText = userId;
-
-            document.getElementById('cust-gender').value = userData.gender || '';
-            document.getElementById('cust-secondary-phone').value = userData.secondaryPhone || '';
-            document.getElementById('cust-country').value = userData.country || '';
-            document.getElementById('cust-city').value = userData.city || '';
-            document.getElementById('cust-address').value = userData.address || '';
-            document.getElementById('cust-birthdate').value = userData.birthdate || '';
-            document.getElementById('cust-anniversary').value = userData.anniversary || '';
-            document.getElementById('cust-hobbies').value = userData.hobbies || '';
-
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            new QRCode(qrContainer, {
-                text: userId,
-                width: 140,
-                height: 140,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            const walletsEl = document.getElementById('customer-wallets-list');
-            walletsEl.innerHTML = '<p class="text-gray-400 text-sm py-4">جاري تحميل بطاقات منشآتك...</p>';
-
-            const cardThemes = [
-                'from-indigo-700 via-purple-800 to-slate-900 border-indigo-400/30',
-                'from-emerald-700 via-teal-800 to-slate-900 border-emerald-400/30',
-                'from-slate-800 via-zinc-900 to-stone-900 border-slate-600/30',
-                'from-rose-700 via-pink-800 to-slate-900 border-rose-400/30',
-                'from-amber-700 via-orange-800 to-slate-900 border-amber-400/30'
-            ];
-
-            try {
-                const tenantsSnap = await getDocs(collection(db, "tenants"));
-                if (tenantsSnap.empty) {
-                    walletsEl.innerHTML = '<p class="text-gray-400 text-sm py-4">لا توجد منشآت متاحة حالياً.</p>';
-                    return;
-                }
-
-                let walletsHtml = '';
-                let foundAny = false;
-                let defaultTenant = null;
-                let cardIndex = 0;
-                const syncedTenantIds = [];
-
-                for (const tDoc of tenantsSnap.docs) {
-                    const tenantId = tDoc.id;
-                    const tenantData = tDoc.data();
-                    try {
-                        const custWalletDoc = await getDoc(doc(db, "tenants", tenantId, "customers", userId));
-                        if (custWalletDoc.exists()) {
-                            foundAny = true;
-                            syncedTenantIds.push(tenantId);
-                            const wData = custWalletDoc.data();
-                            const pts = wData.points || 0;
-                            if (!defaultTenant) defaultTenant = { id: tenantId, name: tenantData.businessName, points: pts };
-
-                            const theme = cardThemes[cardIndex % cardThemes.length];
-                            const safeName = (tenantData.businessName || '').replace(/'/g, "\\'");
-
-                            walletsHtml += `
-                                <div onclick="openCustomerTenantPortal('${tenantId}', '${safeName}', ${pts})"
-                                     class="snap-start shrink-0 w-[280px] sm:w-[320px] h-[180px] bg-gradient-to-br ${theme} text-white p-5 rounded-2xl border shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between relative overflow-hidden">
-                                    
-                                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-                                    <div class="flex justify-between items-center z-10">
-                                        <span class="bg-white/20 backdrop-blur-md text-white text-[10px] font-mono px-2.5 py-1 rounded-md tracking-wider">${tenantId}</span>
-                                        <span class="text-xs text-white/80 font-medium">${tenantData.country || ''}</span>
-                                    </div>
-
-                                    <div class="z-10 space-y-1">
-                                        <div class="w-9 h-7 bg-amber-200/80 rounded-md border border-amber-400/50 flex items-center justify-center shadow-xs mb-2">
-                                            <div class="w-6 h-4 border border-amber-600/40 rounded-xs grid grid-cols-2 grid-rows-2 gap-px p-0.5">
-                                                <div class="bg-amber-500/40"></div><div class="bg-amber-500/40"></div>
-                                                <div class="bg-amber-500/40"></div><div class="bg-amber-500/40"></div>
-                                            </div>
-                                        </div>
-                                        <h5 class="text-lg font-black tracking-wide truncate">${tenantData.businessName}</h5>
-                                    </div>
-
-                                    <div class="flex justify-between items-end z-10 pt-2 border-t border-white/15">
-                                        <div class="text-[11px] text-white/70">
-                                            <span>انقر لاستعراض الخدمات</span>
-                                        </div>
-                                        <div class="text-left">
-                                            <span class="text-2xl font-black leading-none">${pts}</span>
-                                            <span class="text-[10px] text-white/80 block">نقطة ولاء</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            cardIndex++;
-                        }
-                    } catch (e) {}
-                }
-
-                if (syncedTenantIds.length > 0) {
-                    const currentJoined = Array.isArray(userData.joinedTenants) ? userData.joinedTenants : [];
-                    if (JSON.stringify(currentJoined.sort()) !== JSON.stringify([...syncedTenantIds].sort())) {
-                        updateDoc(doc(db, "users", userId), { joinedTenants: syncedTenantIds }).catch(() => {});
-                    }
-                }
-
-                if (!foundAny) {
-                    walletsHtml = `
-                        <div class="w-full text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-2">
-                            <p class="text-gray-600 text-sm font-semibold">لست مشتركاً في أي منشأة بعد.</p>
-                            <p class="text-xs text-gray-500">اضغط على زر "+ انضمام لمنشأة جديدة" وأدخل معرف المنشأة للبدء.</p>
-                        </div>
-                    `;
-                }
-                walletsEl.innerHTML = walletsHtml;
-
-                if (defaultTenant) {
-                    openCustomerTenantPortal(defaultTenant.id, defaultTenant.name, defaultTenant.points);
-                }
-            } catch (err) {
-                walletsEl.innerHTML = '<p class="text-red-500 text-sm py-4">فشل تحميل بطاقات المنشآت.</p>';
-            }
-        }
-
-        window.openCustomerTenantPortal = async function(tenantId, businessName, walletPoints = null) {
-            const portalEl = document.getElementById('customer-tenant-portal');
-            portalEl.classList.remove('hidden');
-            document.getElementById('portal-tenant-title').innerText = businessName;
-            document.getElementById('portal-tenant-id-label').innerText = tenantId;
-            if (walletPoints !== null) {
-                document.getElementById('portal-tenant-points-badge').innerText = `${walletPoints} نقطة`;
-            }
-
-            const currentUid = auth.currentUser ? auth.currentUser.uid : '';
-            document.getElementById('portal-customer-uid-text').innerText = currentUid;
-
-            const portalQrEl = document.getElementById('portal-customer-qrcode');
-            portalQrEl.innerHTML = '';
-            new QRCode(portalQrEl, {
-                text: currentUid,
-                width: 150,
-                height: 150,
-                colorDark: "#1e1b4b",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            const referralLink = `${window.location.origin}${window.location.pathname}?tenant=${tenantId}&ref=${currentUid}`;
-            document.getElementById('cust-referral-link').value = referralLink;
-
-            const refQrEl = document.getElementById('cust-referral-qrcode');
-            refQrEl.innerHTML = '';
-            new QRCode(refQrEl, {
-                text: referralLink,
-                width: 130,
-                height: 130,
-                colorDark: "#065f46",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            let tenantCurrency = 'ريال';
-            const tDoc = await getDoc(doc(db, "tenants", tenantId));
-            if (tDoc.exists()) {
-                const data = tDoc.data();
-                tenantCurrency = data.currency || 'ريال';
-                const refBonus = (data.loyaltyRules && data.loyaltyRules.referralPoints !== undefined) ? data.loyaltyRules.referralPoints : 25;
-                document.getElementById('cust-referral-bonus-badge').innerText = refBonus;
-                document.getElementById('portal-tab-about').innerText = data.about || 'لم تقم المنشأة بإضافة نبذة بعد.';
-                
-                const c = data.contact || {};
-                document.getElementById('portal-tab-contact').innerHTML = `
-                    <div class="space-y-3">
-                        <p><i class="fa-solid fa-phone text-indigo-600 ml-2 w-5"></i><strong>الهاتف:</strong> ${c.phone ? `<a href="tel:${c.phone}" class="text-indigo-600 underline">${c.phone}</a>` : '--'}</p>
-                        <p><i class="fa-solid fa-envelope text-indigo-600 ml-2 w-5"></i><strong>البريد الإلكتروني:</strong> ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-600 underline">${c.email}</a>` : '--'}</p>
-                        <hr class="my-2 border-gray-100">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <p>${c.web ? `<i class="fa-solid fa-globe text-indigo-600 ml-2 w-5"></i><strong>الموقع:</strong> <a href="${c.web}" target="_blank" class="text-indigo-600 underline">زيارة الموقع</a>` : '<i class="fa-solid fa-globe text-gray-400 ml-2 w-5"></i><strong>الموقع:</strong> --'}</p>
-                            <p>${c.whatsapp ? `<i class="fa-brands fa-whatsapp text-emerald-600 ml-2 w-5 text-base"></i><strong>واتساب:</strong> <a href="${c.whatsapp}" target="_blank" class="text-emerald-600 underline">مراسلة واتساب</a>` : '<i class="fa-brands fa-whatsapp text-gray-400 ml-2 w-5 text-base"></i><strong>واتساب:</strong> --'}</p>
-                            <p>${c.facebook ? `<i class="fa-brands fa-facebook text-blue-600 ml-2 w-5 text-base"></i><strong>فيسبوك:</strong> <a href="${c.facebook}" target="_blank" class="text-blue-600 underline">رابط فيسبوك</a>` : '<i class="fa-brands fa-facebook text-gray-400 ml-2 w-5 text-base"></i><strong>فيسبوك:</strong> --'}</p>
-                            <p>${c.instagram ? `<i class="fa-brands fa-instagram text-pink-600 ml-2 w-5 text-base"></i><strong>انستجرام:</strong> <a href="${c.instagram}" target="_blank" class="text-pink-600 underline">رابط انستجرام</a>` : '<i class="fa-brands fa-instagram text-gray-400 ml-2 w-5 text-base"></i><strong>انستجرام:</strong> --'}</p>
-                            <p>${c.snapchat ? `<i class="fa-brands fa-snapchat text-yellow-500 ml-2 w-5 text-base"></i><strong>سناب شات:</strong> <a href="${c.snapchat}" target="_blank" class="text-yellow-600 underline">رابط سناب شات</a>` : '<i class="fa-brands fa-snapchat text-gray-400 ml-2 w-5 text-base"></i><strong>سناب شات:</strong> --'}</p>
-                            <p>${c.tiktok ? `<i class="fa-brands fa-tiktok text-gray-900 ml-2 w-5 text-base"></i><strong>تيك توك:</strong> <a href="${c.tiktok}" target="_blank" class="text-gray-900 underline">رابط تيك توك</a>` : '<i class="fa-brands fa-tiktok text-gray-400 ml-2 w-5 text-base"></i><strong>تيك توك:</strong> --'}</p>
-                        </div>
-                        <p class="pt-2">${c.googleReviews ? `<i class="fa-solid fa-star text-amber-500 ml-2 w-5 text-base"></i><strong>تقييمات جوجل:</strong> <a href="${c.googleReviews}" target="_blank" class="text-amber-600 font-bold underline">اضغط هنا لكتابة تقييمك في جوجل</a>` : '<i class="fa-solid fa-star text-gray-400 ml-2 w-5 text-base"></i><strong>تقييمات جوجل:</strong> --'}</p>
-                    </div>
-                `;
-            }
-
-            const srvEl = document.getElementById('portal-tab-services');
-            srvEl.innerHTML = 'جاري التحميل...';
-            const srvSnap = await getDocs(collection(db, "tenants", tenantId, "services"));
-            if (srvSnap.empty) {
-                srvEl.innerHTML = '<p class="text-gray-400 text-sm">لا توجد خدمات متاحة حالياً.</p>';
-            } else {
-                let srvHtml = '';
-                srvSnap.forEach(d => {
-                    const s = d.data();
-                    if (s.isActive !== false) {
-                        srvHtml += `<div class="p-3 bg-gray-50 rounded-xl border flex justify-between items-center">
-                            <div>
-                                <h6 class="font-bold text-indigo-900">${s.name}</h6>
-                                <p class="text-xs text-gray-500">${s.notes || ''}</p>
-                            </div>
-                            <span class="font-bold text-emerald-600">${s.price} ${tenantCurrency}</span>
-                        </div>`;
-                    }
-                });
-                srvEl.innerHTML = srvHtml || '<p class="text-gray-400 text-sm">لا توجد خدمات نشطة حالياً.</p>';
-            }
-
-            const offerEl = document.getElementById('portal-tab-offers');
-            offerEl.innerHTML = 'جاري التحميل...';
-            const offerSnap = await getDocs(collection(db, "tenants", tenantId, "offers"));
-            if (offerSnap.empty) {
-                offerEl.innerHTML = '<p class="text-gray-400 text-sm col-span-2">لا توجد عروض ترويجية حالياً.</p>';
-            } else {
-                let offerHtml = '';
-                offerSnap.forEach(d => {
-                    const o = d.data();
-                    offerHtml += `<div class="bg-white border rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between">
-                        ${o.img ? `<img src="${o.img}" class="w-full h-40 object-cover">` : ''}
-                        <div class="p-4 space-y-2">
-                            <h6 class="font-bold text-indigo-900 text-base">${o.title}</h6>
-                            <p class="text-xs text-gray-600 leading-relaxed">${o.desc || ''}</p>
-                        </div>
-                    </div>`;
-                });
-                offerEl.innerHTML = offerHtml;
-            }
-
-            const galleryEl = document.getElementById('portal-tab-gallery');
-            galleryEl.innerHTML = 'جاري التحميل...';
-            const gallerySnap = await getDocs(collection(db, "tenants", tenantId, "gallery"));
-            if (gallerySnap.empty) {
-                galleryEl.innerHTML = '<p class="text-gray-400 text-sm col-span-4">لا توجد صور في معرض المنشأة حالياً.</p>';
-            } else {
-                let galleryHtml = '';
-                gallerySnap.forEach(d => {
-                    const img = d.data();
-                    galleryHtml += `<div class="rounded-xl overflow-hidden border shadow-xs bg-white">
-                        <img src="${img.url}" class="w-full h-36 object-cover hover:scale-105 transition duration-300">
-                    </div>`;
-                });
-                galleryEl.innerHTML = galleryHtml;
-            }
-
-            portalEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const authSection = document.getElementById('auth-section');
-            const verifySection = document.getElementById('verify-email-section');
-            const dashboardSection = document.getElementById('dashboard-section');
-            const userInfo = document.getElementById('user-info');
-            const roleBadge = document.getElementById('user-role-badge');
-
-            if (user) {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    if (data.isBlocked) { alert('الحساب محظور.'); signOut(auth); return; }
-
-                    if (data.role === 'customer' && !user.emailVerified) {
-                        authSection.classList.add('hidden');
-                        dashboardSection.classList.add('hidden');
-                        userInfo.classList.add('hidden');
-                        verifySection.classList.remove('hidden');
-                        document.getElementById('verify-target-email').innerText = user.email;
-                        return;
-                    }
-
-                    verifySection.classList.add('hidden');
-                    authSection.classList.add('hidden');
-                    dashboardSection.classList.remove('hidden');
-                    userInfo.classList.remove('hidden');
-                    roleBadge.innerText = `الدور: ${data.role} (${data.tenantId || 'عام'})`;
-
-                    document.querySelectorAll('.role-view').forEach(el => el.classList.add('hidden'));
-                    
-                    if (data.role === 'super_admin') {
-                        document.getElementById('super-admin-view').classList.remove('hidden');
-                        loadTenants();
-                        loadUsers();
-                    } else if (data.role === 'tenant_admin') {
-                        currentUserTenantId = data.tenantId || "dody_rose";
-                        document.getElementById('tenant-admin-view').classList.remove('hidden');
-                        document.getElementById('current-tenant-id-badge').innerText = currentUserTenantId;
-                        loadTenantAdminData();
-                    } else if (data.role === 'cashier') {
-                        currentUserTenantId = data.tenantId || "dody_rose";
-                        document.getElementById('cashier-view').classList.remove('hidden');
-                        loadCashierDashboard();
-                    } else {
-                        document.getElementById('customer-view').classList.remove('hidden');
-                        loadCustomerDashboard(user.uid);
-                    }
-                }
-            } else {
-                stopCamera();
-                verifySection.classList.add('hidden');
-                authSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
-                userInfo.classList.add('hidden');
-                currentUserTenantId = null;
-                activePosCustomerUid = null;
-            }
-        });
-    </script>
+    <!-- Main Module Script -->
+    <script type="module" src="./js/app.js"></script>
 </body>
 </html>
