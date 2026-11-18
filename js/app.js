@@ -14,20 +14,6 @@ let currentUserTenantId = null;
 const urlParams = new URLSearchParams(window.location.search);
 const paramTenantId = urlParams.get('tenant');
 const paramReferrerUid = urlParams.get('ref');
-const autoLoginEmail = urlParams.get('autologin');
-
-// معالجة حالة الدخول التلقائي عبر البصمة من الأندرويد
-window.addEventListener('DOMContentLoaded', () => {
-    if (autoLoginEmail) {
-        const authSection = document.getElementById('auth-section');
-        if (authSection) {
-            authSection.innerHTML = `<div style="text-align:center; padding:60px; font-family:Cairo; color:#333;">
-                <h3>جاري التحقق والدخول السريع بالبصمة...</h3>
-                <p style="color:#666; margin-top:10px;">${autoLoginEmail}</p>
-            </div>`;
-        }
-    }
-});
 
 if (paramTenantId || paramReferrerUid) {
     isRegisterMode = true;
