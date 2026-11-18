@@ -416,3 +416,44 @@ window.filterAdminCustomers = function() {
     });
     renderTenantCustomersTable(filtered);
 };
+// عرض الملف الشخصي الكامل للعميل في النافذة المنبثقة (Modal)
+window.viewCustomerFullProfile = async function(customerId) {
+    const modal = document.getElementById('customer-details-modal');
+    const contentEl = document.getElementById('customer-details-content');
+    if (!modal || !contentEl) return;
+
+    contentEl.innerHTML = '<p class="text-gray-400 text-center py-4">جاري تحميل بيانات العميل...</p>';
+    modal.classList.remove('hidden');
+
+    try {
+        const userDoc = await getDoc(doc(db, "users", customerId));
+        if (!userDoc.exists()) {
+            contentEl.innerHTML = '<p class="text-red-500 text-center py-4">عذراً، لم يتم العثور على بيانات هذا العميل في النظام المركزي.</p>';
+            return;
+        }
+
+        const data = userDoc.data();
+        contentEl.innerHTML = `
+            <div class="space-y-3 bg-gray-50 p-4 rounded-xl border">
+                <p><strong>الاسم الكامل:</strong> <span class="text-indigo-900 font-bold">${data.name || '--'}</span></p>
+                <p><strong>رقم الهاتف الأساسي:</strong> <span class="font-mono" dir="ltr">${data.phone || '--'}</span></p>
+                <p><strong>رقم الهاتف الإضافي:</strong> <span class="font-mono" dir="ltr">${data.secondaryPhone || '--'}</span></p>
+                <p><strong>البريد الإلكتروني:</strong> <span class="font-mono" dir="ltr">${data.email || '--'}</span></p>
+                <p><strong>النوع:</strong> ${data.gender || '--'}</p>
+                <p><strong>الدولة والمدينة:</strong> ${data.country || '--'} / ${data.city || '--'}</p>
+                <p><strong>العنوان بالتفصيل:</strong> ${data.address || '--'}</p>
+                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `🎂 ${data.birthdate}` : '--'}</p>
+                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `💍 ${data.anniversary}` : '--'}</p>
+                <p><strong>الهوايات والاهتمامات:</strong> ${data.hobbies || '--'}</p>
+                <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${customerId}</span></p>
+            </div>
+        `;
+    } catch (err) {
+        contentEl.innerHTML = `<p class="text-red-500 text-center py-4">حدث خطأ أثناء تحميل البيانات: ${err.message}</p>`;
+    }
+};
+
+window.closeCustomerDetailsModal = function() {
+    const modal = document.getElementById('customer-details-modal');
+    if (modal) modal.classList.add('hidden');
+};
