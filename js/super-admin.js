@@ -234,7 +234,7 @@ function renderAdminUsersTable(users) {
             <td class="p-3 text-xs font-mono">${u.role} (${u.tenantId || u.registeredTenant || 'عام'})</td>
             <td class="p-3 text-xs">🎂 ${u.birthdate || 'غير مسجل'}<br>💍 ${u.anniversary || 'غير مسجل'}<br>💡 ${u.hobbies || '--'}</td>
             <td class="p-3 flex flex-col gap-1.5">
-                <button onclick='openCustomerDetailsModal(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
+                <button onclick="viewCustomerFullProfile('${u.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
                     👁️ عرض البيانات الشخصية
                 </button>
                 <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer whitespace-nowrap">
@@ -296,29 +296,42 @@ window.createTenantStaff = async function(e) {
     }
 };
 
-// دالة فتح النافذة المنبثقة لعرض التفاصيل الشخصية (مشتركة مع السوبر أدمن)
-window.openCustomerDetailsModal = function(userData) {
+// دالة عرض الملف الشخصي الكامل الموحدة للعملاء والمستخدمين
+window.viewCustomerFullProfile = async function(customerId) {
     const modal = document.getElementById('customer-details-modal');
     const contentEl = document.getElementById('customer-details-content');
     if (!modal || !contentEl) return;
 
-    contentEl.innerHTML = `
-        <div class="space-y-3 bg-gray-50 p-4 rounded-xl border">
-            <p><strong>الاسم الكامل:</strong> <span class="text-indigo-900 font-bold">${userData.name || '--'}</span></p>
-            <p><strong>رقم الهاتف الأساسي:</strong> <span class="font-mono" dir="ltr">${userData.phone || '--'}</span></p>
-            <p><strong>رقم الهاتف الإضافي:</strong> <span class="font-mono" dir="ltr">${userData.secondaryPhone || '--'}</span></p>
-            <p><strong>البريد الإلكتروني:</strong> <span class="font-mono" dir="ltr">${userData.email || '--'}</span></p>
-            <p><strong>الدور والصلاحية:</strong> <span class="font-mono">${userData.role || 'عميل'}</span></p>
-            <p><strong>النوع:</strong> ${userData.gender || '--'}</p>
-            <p><strong>الدولة والمدينة:</strong> ${userData.country || '--'} / ${userData.city || '--'}</p>
-            <p><strong>العنوان بالتفصيل:</strong> ${userData.address || '--'}</p>
-            <p><strong>تاريخ الميلاد:</strong> ${userData.birthdate ? `🎂 ${userData.birthdate}` : '--'}</p>
-            <p><strong>تاريخ المناسبة / الزواج:</strong> ${userData.anniversary ? `💍 ${userData.anniversary}` : '--'}</p>
-            <p><strong>الهوايات والاهتمامات:</strong> ${userData.hobbies || '--'}</p>
-            <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${userData.id || '--'}</span></p>
-        </div>
-    `;
+    contentEl.innerHTML = '<p class="text-gray-400 text-center py-4">جاري تحميل بيانات العميل...</p>';
     modal.classList.remove('hidden');
+
+    try {
+        const userDoc = await getDoc(doc(db, "users", customerId));
+        if (!userDoc.exists()) {
+            contentEl.innerHTML = '<p class="text-red-500 text-center py-4">عذراً، لم يتم العثور على بيانات هذا المستخدم.</p>';
+            return;
+        }
+
+        const data = userDoc.data();
+        contentEl.innerHTML = `
+            <div class="space-y-3 bg-gray-50 p-4 rounded-xl border">
+                <p><strong>الاسم الكامل:</strong> <span class="text-indigo-900 font-bold">${data.name || '--'}</span></p>
+                <p><strong>رقم الهاتف الأساسي:</strong> <span class="font-mono" dir="ltr">${data.phone || '--'}</span></p>
+                <p><strong>رقم الهاتف الإضافي:</strong> <span class="font-mono" dir="ltr">${data.secondaryPhone || '--'}</span></p>
+                <p><strong>البريد الإلكتروني:</strong> <span class="font-mono" dir="ltr">${data.email || '--'}</span></p>
+                <p><strong>الدور والصلاحية:</strong> <span class="font-mono">${data.role || 'عميل'}</span></p>
+                <p><strong>النوع:</strong> ${data.gender || '--'}</p>
+                <p><strong>الدولة والمدينة:</strong> ${data.country || '--'} / ${data.city || '--'}</p>
+                <p><strong>العنوان بالتفصيل:</strong> ${data.address || '--'}</p>
+                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `🎂 ${data.birthdate}` : '--'}</p>
+                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `💍 ${data.anniversary}` : '--'}</p>
+                <p><strong>الهوايات والاهتمامات:</strong> ${data.hobbies || '--'}</p>
+                <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${customerId}</span></p>
+            </div>
+        `;
+    } catch (err) {
+        contentEl.innerHTML = `<p class="text-red-500 text-center py-4">حدث خطأ أثناء تحميل البيانات: ${err.message}</p>`;
+    }
 };
 
 window.closeCustomerDetailsModal = function() {
