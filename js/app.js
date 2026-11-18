@@ -14,6 +14,20 @@ let currentUserTenantId = null;
 const urlParams = new URLSearchParams(window.location.search);
 const paramTenantId = urlParams.get('tenant');
 const paramReferrerUid = urlParams.get('ref');
+const autoLoginEmail = urlParams.get('autologin');
+
+// معالجة حالة الدخول التلقائي عبر البصمة من الأندرويد
+window.addEventListener('DOMContentLoaded', () => {
+    if (autoLoginEmail) {
+        const authSection = document.getElementById('auth-section');
+        if (authSection) {
+            authSection.innerHTML = `<div style="text-align:center; padding:60px; font-family:Cairo; color:#333;">
+                <h3>جاري التحقق والدخول السريع بالبصمة...</h3>
+                <p style="color:#666; margin-top:10px;">${autoLoginEmail}</p>
+            </div>`;
+        }
+    }
+});
 
 if (paramTenantId || paramReferrerUid) {
     isRegisterMode = true;
@@ -84,7 +98,6 @@ window.handleAuth = async function(e) {
             const targetTenant = paramTenantId || "dody_rose";
             const referrerUid = paramReferrerUid || null;
 
-            // تجهيز مصفوفة الصلاحيات الأولية للعميل الجديد
             const initialPermissions = [{
                 facilityId: targetTenant,
                 facilityName: 'المنشأة الرئيسية',
@@ -145,7 +158,6 @@ window.handleAuth = async function(e) {
                 }
             }
 
-            // إرسال البريد إلى تطبيق الأندرويد لتفعيل البصمة لاحقاً
             if (window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
                 try {
                     window.AndroidBridge.saveUserEmail(email);
@@ -156,10 +168,8 @@ window.handleAuth = async function(e) {
 
             alert('تم إنشاء الحساب بنجاح! تم إرسال رسالة تفعيل احترافية إلى بريدك الإلكتروني.');
         } else {
-            // تسجيل الدخول العادي مع استدعاء نظام الصلاحيات المتعددة الذكي
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             
-            // إرسال البريد إلى تطبيق الأندرويد لتفعيل البصمة لاحقاً عند نجاح الدخول
             if (window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
                 try {
                     window.AndroidBridge.saveUserEmail(email);
@@ -211,7 +221,6 @@ onAuthStateChanged(auth, async (user) => {
     const roleBadge = document.getElementById('user-role-badge');
 
     if (user) {
-        // تحديث إرسال البريد للأندرويد احتياطياً هنا أيضاً عند رصد حالة المستخدم المسجل
         if (user.email && window.AndroidBridge && typeof window.AndroidBridge.saveUserEmail === 'function') {
             try {
                 window.AndroidBridge.saveUserEmail(user.email);
@@ -223,7 +232,6 @@ onAuthStateChanged(auth, async (user) => {
             const data = userDoc.data();
             if (data.isBlocked) { alert('الحساب محظور.'); signOut(auth); return; }
 
-            // التحقق من الدور النشط الحالي في الجلسة أو الاعتماد على الدور الافتراضي
             let activeRole = localStorage.getItem("active_user_role") || data.role;
             let activeTenant = localStorage.getItem("active_facility_id") || data.tenantId || data.registeredTenant || "dody_rose";
 
@@ -267,6 +275,6 @@ onAuthStateChanged(auth, async (user) => {
         dashboardSection.classList.add('hidden');
         userInfo.classList.add('hidden');
         currentUserTenantId = null;
-        localStorage.clear(); // مسح السياق عند تسجيل الخروج
+        localStorage.clear();
     }
 });
