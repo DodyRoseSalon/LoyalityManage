@@ -26,7 +26,6 @@ window.handleUserLoginAndRoles = async function(userCredential) {
         }
 
         const userData = userSnap.data();
-        // دعم المصفوفة الجديدة أو النظام القديم كاحتياط
         let permissions = userData.permissions || [];
         if (permissions.length === 0 && userData.role) {
             permissions = [{
@@ -54,7 +53,7 @@ window.handleUserLoginAndRoles = async function(userCredential) {
         console.error("خطأ أثناء تسجيل الدخول ومعالجة الصلاحيات:", error);
         alert("حدث خطأ غير متوقع أثناء تسجيل الدخول.");
     }
-}
+};
 
 function showRoleSelectionModal(permissions) {
     let modal = document.getElementById("roleSwitcherModal");
@@ -66,9 +65,9 @@ function showRoleSelectionModal(permissions) {
     }
 
     let optionsHtml = `
-        <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:450px; box-shadow:0 5px 15px rgba(0,0,0,0.3); font-family:Tahoma, sans-serif; direction:rtl; text-align:right;">
-            <h3 style="margin-top:0; color:#333; border-bottom:2px solid #eee; padding-bottom:10px;">اختر وضع الدخول الحالي</h3>
-            <p style="color:#666; font-size:14px;">لديك عدة صلاحيات مرتبطة بحسابك، يرجى اختيار الصفة التي تريد العمل بها اليوم:</p>
+        <div style="background:#fff; padding:30px; border-radius:12px; width:90%; max-width:450px; box-shadow:0 5px 15px rgba(0,0,0,0.3); font-family:'Cairo', Tahoma, sans-serif; direction:rtl; text-align:right;">
+            <h3 style="margin-top:0; color:#333; border-bottom:2px solid #eee; padding-bottom:10px; font-weight:bold;">اختر وضع الدخول الحالي</h3>
+            <p style="color:#666; font-size:14px; margin-top:8px;">لديك عدة صلاحيات مرتبطة بحسابك، يرجى اختيار الصفة التي تريد العمل بها اليوم:</p>
             <div style="max-height:250px; overflow-y:auto; margin:15px 0;">
     `;
 
@@ -96,7 +95,7 @@ window.selectUserRole = function(index) {
     const permissions = window.tempUserPermissions;
     if (!permissions || !permissions[index]) return;
     activateRoleAndRedirect(permissions[index]);
-}
+};
 
 function activateRoleAndRedirect(perm) {
     localStorage.setItem("active_facility_id", perm.facilityId);
@@ -106,21 +105,14 @@ function activateRoleAndRedirect(perm) {
     const modal = document.getElementById("roleSwitcherModal");
     if (modal) modal.remove();
 
-    if (perm.role === "super_admin" || perm.role === "manager") {
-        window.location.href = "super-admin-dashboard.html";
-    } else if (perm.role === "cashier") {
-        window.location.href = "cashier-pos.html";
-    } else if (perm.role === "customer") {
-        window.location.href = "customer-loyalty.html";
-    } else {
-        window.location.href = "index.html";
-    }
+    window.location.reload();
 }
 
 function getArabicRoleName(role) {
     switch (role) {
         case 'super_admin': return 'مشرف عام (سوبر أدمن)';
-        case 'manager': return 'مدير منشأة';
+        case 'manager':
+        case 'tenant_admin': return 'مدير منشأة';
         case 'cashier': return 'كاشير';
         case 'customer': return 'عميل';
         default: return role;
@@ -130,7 +122,8 @@ function getArabicRoleName(role) {
 function getRoleBadgeColor(role) {
     switch (role) {
         case 'super_admin': return '#d9534f';
-        case 'manager': return '#0275d8';
+        case 'manager':
+        case 'tenant_admin': return '#0275d8';
         case 'cashier': return '#f0ad4e';
         case 'customer': return '#5cb85c';
         default: return '#6c757d';
@@ -143,7 +136,8 @@ function getRoleBadgeColor(role) {
 window.loadTenants = async function() {
     const listEl = document.getElementById('tenants-list');
     const selectEl = document.getElementById('admin-tenant-select');
-    if (!listEl || !selectEl) return;
+    const assignSelectEl = document.getElementById('assign-facility-id');
+    if (!listEl) return;
 
     const snap = await getDocs(collection(db, "tenants"));
     allTenantsData = [];
@@ -151,7 +145,8 @@ window.loadTenants = async function() {
 
     if (snap.empty) {
         listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
-        selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
+        if (selectEl) selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
+        if (assignSelectEl) assignSelectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
         return;
     }
 
@@ -167,7 +162,8 @@ window.loadTenants = async function() {
     });
 
     renderTenantsTable(allTenantsData);
-    selectEl.innerHTML = selectHtml;
+    if (selectEl) selectEl.innerHTML = selectHtml;
+    if (assignSelectEl) assignSelectEl.innerHTML = selectHtml;
     
     if(document.getElementById('stat-total-tenants')) document.getElementById('stat-total-tenants').innerText = total;
     if(document.getElementById('stat-active-tenants')) document.getElementById('stat-active-tenants').innerText = active;
@@ -295,8 +291,81 @@ window.deleteTenant = async function(tenantId, businessName) {
 };
 
 // ==========================================
-// 3. إدارة المستخدمين والصلاحيات
+// 3. إدارة المستخدمين والصلاحيات المتعددة
 // ==========================================
+window.assignExtraRoleToUser = async function(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById('target-user-email');
+    const facilitySelect = document.getElementById('assign-facility-id');
+    const roleSelect = document.getElementById('assign-role-type');
+
+    if (!emailInput || !facilitySelect || !roleSelect) return;
+
+    const email = emailInput.value.trim().toLowerCase();
+    const facilityId = facilitySelect.value;
+    const role = roleSelect.value;
+
+    if (!facilityId) return alert("الرجاء اختيار المنشأة أولاً.");
+
+    try {
+        const usersSnap = await getDocs(collection(db, "users"));
+        let targetUid = null;
+        let userData = null;
+
+        usersSnap.forEach(d => {
+            if ((d.data().email || '').toLowerCase() === email) {
+                targetUid = d.id;
+                userData = d.data();
+            }
+        });
+
+        if (!targetUid) {
+            alert("لم يتم العثور على مستخدم مسجل بهذا البريد الإلكتروني في النظام.");
+            return;
+        }
+
+        let permissions = Array.isArray(userData.permissions) ? [...userData.permissions] : [];
+
+        // ترحيل الصلاحية الأساسية القديمة إلى المصفوفة إذا لم تكن موجودة
+        if (permissions.length === 0 && userData.role) {
+            permissions.push({
+                facilityId: userData.tenantId || userData.registeredTenant || 'dody_rose',
+                facilityName: userData.facilityName || 'المنشأة الأساسية',
+                role: userData.role
+            });
+        }
+
+        // التحقق من عدم تكرار نفس الدور في نفس المنشأة
+        const exists = permissions.some(p => p.facilityId === facilityId && p.role === role);
+        if (exists) {
+            alert("هذا المستخدم يمتلك هذه الصلاحية بالفعل في هذه المنشأة.");
+            return;
+        }
+
+        // جلب اسم المنشأة الفعلي من بيانات المنشآت المحملة
+        const matchedTenant = allTenantsData.find(t => t.id === facilityId);
+        const facilityName = matchedTenant ? (matchedTenant.businessName || matchedTenant.name) : facilityId;
+
+        permissions.push({
+            facilityId: facilityId,
+            facilityName: facilityName,
+            role: role
+        });
+
+        await updateDoc(doc(db, "users", targetUid), {
+            permissions: permissions
+        });
+
+        alert(`تم بنجاح منح صلاحية (${getArabicRoleName(role)}) للمستخدم (${userData.name || email}) في منشأة (${facilityName})!`);
+        emailInput.value = '';
+        if (typeof window.loadUsers === 'function') window.loadUsers();
+
+    } catch (err) {
+        console.error("خطأ في منح الصلاحية:", err);
+        alert("حدث خطأ أثناء تحديث صلاحيات المستخدم: " + err.message);
+    }
+};
+
 window.loadUsers = async function() {
     const listEl = document.getElementById('users-list');
     if (!listEl) return;
@@ -329,7 +398,8 @@ window.filterAdminUsers = function() {
                           (u.phone && u.phone.toLowerCase().includes(search)) || 
                           (u.secondaryPhone && u.secondaryPhone.toLowerCase().includes(search)) || 
                           (u.email && u.email.toLowerCase().includes(search));
-        const matchRole = roleFilter === 'all' || u.role === roleFilter;
+        const hasRoleInPerms = Array.isArray(u.permissions) && u.permissions.some(p => p.role === roleFilter || (roleFilter === 'tenant_admin' && p.role === 'manager'));
+        const matchRole = roleFilter === 'all' || u.role === roleFilter || hasRoleInPerms;
         return matchSearch && matchRole;
     });
 
@@ -347,15 +417,24 @@ function renderAdminUsersTable(users) {
 
     let html = `<table class="w-full text-right border-collapse">
         <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-            <th class="p-3">الاسم</th><th class="p-3">الهواتف</th><th class="p-3">النوع والدولة والمدينة</th><th class="p-3">الدور والمنشأة</th><th class="p-3">المناسبات والاهتمامات</th><th class="p-3">الإجراءات والبيانات</th>
+            <th class="p-3">الاسم</th><th class="p-3">الهواتف والبريد</th><th class="p-3">النوع والدولة والمدينة</th><th class="p-3">الصلاحيات والمنشآت</th><th class="p-3">المناسبات والاهتمامات</th><th class="p-3">الإجراءات والبيانات</th>
         </tr></thead><tbody class="divide-y divide-gray-100">`;
     
     users.forEach((u) => {
+        let permsHtml = '';
+        if (Array.isArray(u.permissions) && u.permissions.length > 0) {
+            permsHtml = u.permissions.map(p => 
+                `<span class="inline-block bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded text-[11px] font-semibold mb-1 ml-1">${getArabicRoleName(p.role)} (${p.facilityId})</span>`
+            ).join('');
+        } else {
+            permsHtml = `<span class="font-mono text-xs">${u.role} (${u.tenantId || u.registeredTenant || 'عام'})</span>`;
+        }
+
         html += `<tr class="hover:bg-gray-50">
             <td class="p-3 font-semibold">${u.name || '--'}</td>
-            <td class="p-3 text-xs" dir="ltr">${u.phone || '--'}<br><span class="text-gray-400">${u.secondaryPhone || ''}</span></td>
+            <td class="p-3 text-xs" dir="ltr">${u.phone || '--'}<br><span class="text-gray-500">${u.email || ''}</span></td>
             <td class="p-3 text-xs">${u.gender || '--'} | ${u.country || '--'} - ${u.city || '--'}<br><span class="text-gray-400">${u.address || ''}</span></td>
-            <td class="p-3 text-xs font-mono">${u.role} (${u.tenantId || u.registeredTenant || 'عام'})</td>
+            <td class="p-3 text-xs">${permsHtml}</td>
             <td class="p-3 text-xs">🎂 ${u.birthdate || 'غير مسجل'}<br>💍 ${u.anniversary || 'غير مسجل'}<br>💡 ${u.hobbies || '--'}</td>
             <td class="p-3 flex flex-col gap-1.5">
                 <button onclick="viewCustomerFullProfile('${u.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
@@ -406,7 +485,6 @@ window.createTenantStaff = async function(e) {
     try {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         
-        // تجهيز مصفوفة الصلاحيات الجديدة للموظف الجديد
         const initialPermissions = [{
             facilityId: tenantId,
             facilityName: selectEl.options[selectEl.selectedIndex].text.split('(')[0].trim(),
@@ -447,13 +525,20 @@ window.viewCustomerFullProfile = async function(customerId) {
         }
 
         const data = userDoc.data();
+        let permsList = '';
+        if (Array.isArray(data.permissions) && data.permissions.length > 0) {
+            permsList = data.permissions.map(p => `${getArabicRoleName(p.role)} - ${p.facilityName || p.facilityId}`).join(' | ');
+        } else {
+            permsList = data.role || 'عميل';
+        }
+
         contentEl.innerHTML = `
             <div class="space-y-3 bg-gray-50 p-4 rounded-xl border">
                 <p><strong>الاسم الكامل:</strong> <span class="text-indigo-900 font-bold">${data.name || '--'}</span></p>
                 <p><strong>رقم الهاتف الأساسي:</strong> <span class="font-mono" dir="ltr">${data.phone || '--'}</span></p>
                 <p><strong>رقم الهاتف الإضافي:</strong> <span class="font-mono" dir="ltr">${data.secondaryPhone || '--'}</span></p>
                 <p><strong>البريد الإلكتروني:</strong> <span class="font-mono" dir="ltr">${data.email || '--'}</span></p>
-                <p><strong>الدور والصلاحية:</strong> <span class="font-mono">${data.role || 'عميل'}</span></p>
+                <p><strong>الصلاحيات الممنوحة:</strong> <span class="font-semibold text-indigo-700">${permsList}</span></p>
                 <p><strong>النوع:</strong> ${data.gender || '--'}</p>
                 <p><strong>الدولة والمدينة:</strong> ${data.country || '--'} / ${data.city || '--'}</p>
                 <p><strong>العنوان بالتفصيل:</strong> ${data.address || '--'}</p>

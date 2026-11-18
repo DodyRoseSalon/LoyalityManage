@@ -211,7 +211,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة حساب مدير منشأة أو كاشير</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة حساب مدير منشأة أو كاشير جديد</h3>
                         <form onsubmit="createTenantStaff(event)" class="space-y-3 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">اختر المنشأة المرتبطة</label>
@@ -251,6 +251,39 @@
                             </button>
                         </form>
                     </div>
+                </div>
+
+                <!-- قسم منح صلاحيات متعددة لمستخدم مسجل مسبقاً -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-indigo-200 space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-indigo-800">🔑 منح صلاحيات متعددة لمستخدم حالي (Multi-Role Assignment)</h3>
+                        <p class="text-xs text-gray-500 mt-1">ابحث عن أي مستخدم مسجل بالبريد الإلكتروني وامنحه دوراً إضافياً (مدير، كاشير، أو عميل) في أي منشأة دون الحاجة لإنشاء حساب جديد.</p>
+                    </div>
+                    <form onsubmit="assignExtraRoleToUser(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">البريد الإلكتروني للمستخدم</label>
+                            <input type="email" id="target-user-email" placeholder="user@domain.com" dir="ltr" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none text-right">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">اختر المنشأة</label>
+                            <select id="assign-facility-id" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                <option value="">جاري تحميل المنشآت...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">الدور الجديد المضاف</label>
+                            <select id="assign-role-type" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                <option value="manager">مدير منشأة (Manager)</option>
+                                <option value="cashier">كاشير (Cashier)</option>
+                                <option value="customer">عميل (Customer)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition cursor-pointer">
+                                + إضافة الصلاحية للحساب
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Tenants List & Search -->
