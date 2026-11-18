@@ -38,11 +38,25 @@
 
     <!-- Header / Navbar -->
     <header id="main-header" class="bg-indigo-700 theme-bg-primary text-white shadow-md transition-colors duration-300">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">✨ نظام إدارة ولاء العملاء الذكي</h1>
-            <div id="user-info" class="hidden flex items-center gap-4">
-                <span id="user-role-badge" class="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold"></span>
-                <button onclick="exitApp()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition cursor-pointer">خروج من التطبيق</button>
+        <div class="container mx-auto px-3 sm:px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <h1 class="text-base sm:text-xl font-bold leading-snug">✨ نظام إدارة ولاء العملاء الذكي</h1>
+            
+            <div id="user-info" class="hidden flex items-center gap-2 sm:gap-3 relative">
+                <span id="user-role-badge" class="bg-white/20 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold"></span>
+
+                <!-- أيقونة ثلاث شرطات لتبديل الصلاحيات (تظهر فقط عند تعدد الصلاحيات) -->
+                <div id="role-menu-container" class="hidden relative">
+                    <button type="button" onclick="toggleRoleSwitcherMenu()" title="تبديل الصلاحية" class="bg-white/20 hover:bg-white/30 text-white px-2.5 py-1.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div id="role-switcher-dropdown" class="hidden absolute left-0 mt-2 w-64 bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-200 p-2 z-50 text-right space-y-1">
+                        <!-- يتم تعبئة خيارات الصلاحيات تلقائياً من app.js -->
+                    </div>
+                </div>
+
+                <button type="button" onclick="exitApp()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm transition cursor-pointer shrink-0">
+                    خروج من التطبيق
+                </button>
             </div>
         </div>
     </header>
