@@ -300,13 +300,13 @@
                                         <div>
                                             <label class="block text-xs font-semibold text-gray-700 mb-1">نظام الاشتراك والمدة</label>
                                             <select id="tenant-plan-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-												<option value="lifetime">اشتراك دائم (بدون انتهاء)</option>
-												<option value="quarterly_90">ثلاثة أشهر (90 يوم + 7 أيام سماح)</option>
-												<option value="monthly_30">شهر (30 يوم + 3 أيام سماح)</option>
-												<option value="trial_30">شهر تجريبي (30 يوم - إيقاف فوري)</option>
-												<option value="trial_14">14 يوم تجريبي (إيقاف فوري)</option>
-												<option value="trial_7">7 أيام تجريبي (إيقاف فوري)</option>
-											</select>
+                                                <option value="lifetime">اشتراك دائم (بدون انتهاء)</option>
+                                                <option value="quarterly_90">ثلاثة أشهر (90 يوم + 7 أيام سماح)</option>
+                                                <option value="monthly_30">شهر (30 يوم + 3 أيام سماح)</option>
+                                                <option value="trial_30">شهر تجريبي (30 يوم - إيقاف فوري)</option>
+                                                <option value="trial_14">14 يوم تجريبي (إيقاف فوري)</option>
+                                                <option value="trial_7">7 أيام تجريبي (إيقاف فوري)</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <label class="block text-xs font-semibold text-gray-700 mb-1">الهوية اللونية الافتراضية</label>
@@ -1126,80 +1126,73 @@
         </section>
     </main>
 
-    <!-- Super Admin: Change Tenant Plan & Subscription Rules Modal -->
-    <div id="subscription-plan-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl max-w-xl w-full space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3">
+    <!-- Super Admin: Change Tenant Plan & Timing Calculation Modal -->
+    <div id="change-tenant-plan-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 text-white border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
                 <div>
-                    <h3 class="text-lg font-extrabold text-indigo-950 flex items-center gap-2">
-                        <i class="fa-solid fa-arrows-rotate text-indigo-600"></i>
-                        <span>تغيير باقة وحالة اشتراك المنشأة</span>
-                    </h3>
-                    <p id="sub-modal-tenant-info" class="text-xs text-gray-500 mt-0.5">--</p>
+                    <h3 class="text-base font-extrabold text-white">تغيير باقة المنشأة وطريقة احتساب المدة</h3>
+                    <p class="text-xs text-slate-300 mt-0.5">
+                        <span id="plan-modal-tenant-name" class="font-bold text-indigo-300">--</span>
+                        (<span id="plan-modal-tenant-id" class="font-mono">--</span>)
+                    </p>
                 </div>
-                <button type="button" onclick="window.closeChangeTenantPlanModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">
+                <button type="button" onclick="window.closeChangeTenantPlanModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <form id="subscription-plan-form" onsubmit="window.saveTenantPlanChange(event)" class="space-y-4 text-right">
-                <input type="hidden" id="sub-modal-tenant-id">
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 text-xs space-y-1">
+                <div>الباقة الحالية: <span id="plan-modal-current-plan" class="font-bold text-amber-300">--</span></div>
+                <div>الانتهاء الحالي: <span id="plan-modal-current-expiry" class="font-bold text-slate-200">--</span></div>
+            </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">الباقة الجديدة (بدون قيود تحويل)</label>
-                        <select id="sub-modal-plan-select" onchange="window.previewPlanChangeCalculation(true)" class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 font-semibold outline-none">
-                            <option value="lifetime">اشتراك دائم (بدون انتهاء)</option>
-                            <option value="quarterly_90">ثلاثة أشهر (90 يوم + 7 أيام سماح)</option>
-                            <option value="monthly_30">شهر (30 يوم + 3 أيام سماح)</option>
-                            <option value="trial_30">شهر تجريبي (30 يوم - إيقاف فوري)</option>
-                            <option value="trial_14">14 يوم تجريبي (إيقاف فوري)</option>
-                            <option value="trial_7">7 أيام تجريبي (إيقاف فوري)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">حالة المنشأة</label>
-                        <select id="sub-modal-status-mode" class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 font-semibold outline-none">
-                            <option value="active">نشط (تفعيل فوري)</option>
-                            <option value="inactive">موقوف (إيقاف فوري)</option>
-                            <option value="auto">تلقائي حسب تاريخ النهاية وفترة السماح</option>
-                        </select>
-                    </div>
+            <form onsubmit="window.saveTenantPlanChange(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-200 mb-1">الباقة الجديدة</label>
+                    <select id="plan-modal-new-plan" onchange="window.updatePlanChangePreview()" class="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-600 text-white text-xs font-semibold outline-none">
+                        <option value="lifetime">اشتراك دائم (بدون انتهاء)</option>
+                        <option value="quarterly_90">ثلاثة أشهر (90 يوم + 7 أيام سماح)</option>
+                        <option value="monthly_30">شهر (30 يوم + 3 أيام سماح)</option>
+                        <option value="trial_30">شهر تجريبي (30 يوم - إيقاف فوري)</option>
+                        <option value="trial_14">14 يوم تجريبي (إيقاف فوري)</option>
+                        <option value="trial_7">7 أيام تجريبي (إيقاف فوري)</option>
+                    </select>
                 </div>
 
-                <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-3.5 space-y-3">
-                    <div class="text-xs font-extrabold text-indigo-950">شروط احتساب مدة وتاريخ نهاية الباقة الجديدة:</div>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-700 mb-1">1. مرجع بداية الفترة الجديدة:</label>
-                        <select id="sub-modal-start-mode" onchange="window.previewPlanChangeCalculation(true)" class="w-full px-3 py-2 border rounded-xl text-xs bg-white outline-none">
-                            <option value="from_change_date">بداية الفترة من تاريخ التغيير (اليوم)</option>
-                            <option value="continue_current_period">استكمال بعد نهاية الفترة الحالية</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-700 mb-1">2. احتساب ما مر من الفترة الحالية ضمن الباقة الجديدة:</label>
-                        <select id="sub-modal-elapsed-mode" onchange="window.previewPlanChangeCalculation(true)" class="w-full px-3 py-2 border rounded-xl text-xs bg-white outline-none">
-                            <option value="ignore_elapsed">عدم خصم ما مر (تطبيق كامل مدة الباقة الجديدة)</option>
-                            <option value="include_elapsed">احتساب ما مر من الفترة الحالية ضمن الباقة الجديدة (خصم الأيام المنقضية)</option>
-                        </select>
-                    </div>
-
-                    <div id="sub-modal-calc-summary" class="text-[11px] text-indigo-900 bg-white/80 border border-indigo-100 rounded-lg p-2.5 leading-relaxed">--</div>
+                <div id="plan-modal-timing-section" class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-200">طريقة احتساب مدة الباقة الجديدة</label>
+                    <label class="flex items-start gap-2 bg-slate-800/60 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 cursor-pointer text-xs">
+                        <input type="radio" name="plan-timing-mode" value="start_now" onchange="window.updatePlanChangePreview()" checked class="mt-0.5">
+                        <span>بدء المدة كاملة من اليوم (تاريخ التحويل)</span>
+                    </label>
+                    <label class="flex items-start gap-2 bg-slate-800/60 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 cursor-pointer text-xs">
+                        <input type="radio" name="plan-timing-mode" value="append_after_current" onchange="window.updatePlanChangePreview()" class="mt-0.5">
+                        <span>إضافة المدة بعد نهاية الفترة الحالية (الاحتفاظ بالمتبقي)</span>
+                    </label>
+                    <label class="flex items-start gap-2 bg-slate-800/60 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 cursor-pointer text-xs">
+                        <input type="radio" name="plan-timing-mode" value="include_elapsed" onchange="window.updatePlanChangePreview()" class="mt-0.5">
+                        <span>احتساب الأيام المنقضية من الفترة الحالية ضمن مدة الباقة الجديدة</span>
+                    </label>
                 </div>
 
-                <div id="sub-modal-end-date-wrapper">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">تاريخ نهاية الاشتراك (يمكن تعديله يدوياً)</label>
-                    <input type="date" id="sub-modal-expires-date" class="w-full px-3 py-2 border rounded-xl text-xs bg-gray-50 font-mono outline-none">
+                <div id="plan-modal-custom-date-box" class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-200">تاريخ الانتهاء المحسوب (يمكن تعديله يدوياً)</label>
+                    <input type="date" id="plan-modal-custom-expiry" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-white text-xs font-mono outline-none">
                 </div>
 
-                <div class="flex gap-2 pt-2 border-t">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
-                        حفظ وتطبيق تغيير الباقة والحالة
+                <div id="plan-modal-preview-box" class="bg-indigo-950/60 border border-indigo-700/60 rounded-xl p-3 text-xs text-slate-200 space-y-1"></div>
+
+                <label class="flex items-center gap-2 text-xs text-slate-200 cursor-pointer">
+                    <input type="checkbox" id="plan-modal-activate-now" checked class="rounded">
+                    <span>تنشيط المنشأة فوراً عند الحفظ</span>
+                </label>
+
+                <div class="flex gap-2 pt-2 border-t border-slate-700">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
+                        حفظ وتطبيق الباقة
                     </button>
-                    <button type="button" onclick="window.closeChangeTenantPlanModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                    <button type="button" onclick="window.closeChangeTenantPlanModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer">
                         إلغاء
                     </button>
                 </div>
