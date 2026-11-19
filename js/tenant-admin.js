@@ -181,7 +181,7 @@ window.loadTenantServices = async function(tenantId) {
                 <td class="p-2 text-emerald-600 font-bold">${s.price}</td>
                 <td class="p-2 text-gray-500">${s.notes || '--'}</td>
                 <td class="p-2 text-center">
-                    <button onclick="deleteTenantService('${tenantId}', '${d.id}')" class="text-red-500 hover:text-red-700 text-xs font-semibold cursor-pointer">حذف</button>
+                    <button onclick="deleteTenantService('${tenantId}', '${d.id}')" class="text-red-500 hover:text-red-700 text-xs font-semibold cursor-pointer inline-flex items-center gap-1"><i class="fa-solid fa-trash-can"></i><span>حذف</span></button>
                 </td>
             </tr>`;
         });
@@ -239,7 +239,7 @@ window.loadTenantOffers = async function(tenantId) {
                     <h6 class="font-bold text-indigo-900">${o.title}</h6>
                     <p class="text-xs text-gray-500">${o.desc || ''}</p>
                 </div>
-                <button onclick="deleteTenantOffer('${tenantId}', '${d.id}')" class="text-red-500 hover:text-red-700 text-xs font-semibold cursor-pointer">حذف</button>
+                <button onclick="deleteTenantOffer('${tenantId}', '${d.id}')" class="text-red-500 hover:text-red-700 text-xs font-semibold cursor-pointer inline-flex items-center gap-1"><i class="fa-solid fa-trash-can"></i><span>حذف</span></button>
             </div>`;
         });
         listEl.innerHTML = html;
@@ -310,7 +310,7 @@ window.loadTenantGallery = async function(tenantId) {
             const img = d.data();
             html += `<div class="relative group rounded-xl overflow-hidden border shadow-xs bg-white">
                 <img src="${img.url}" class="w-full h-32 object-cover">
-                <button onclick="deleteTenantGalleryImage('${tenantId}', '${d.id}')" class="absolute top-2 left-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition shadow-md cursor-pointer">✕</button>
+                <button onclick="deleteTenantGalleryImage('${tenantId}', '${d.id}')" class="absolute top-2 left-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition shadow-md cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
         });
         listEl.innerHTML = html;
@@ -379,10 +379,10 @@ window.renderTenantCustomersTable = function(customers) {
             <td class="p-3 font-bold text-indigo-900">${c.name || '--'}</td>
             <td class="p-3 font-mono text-xs" dir="ltr">${c.phone || '--'}</td>
             <td class="p-3 font-extrabold text-emerald-600">${c.points || 0} نقطة</td>
-            <td class="p-3 text-xs text-gray-600">${c.birthdate ? `🎂 ${c.birthdate}` : '--'}</td>
-            <td class="p-3 text-xs text-gray-600">${c.anniversary ? `💍 ${c.anniversary}` : '--'}</td>
+            <td class="p-3 text-xs text-gray-600">${c.birthdate ? `<i class="fa-solid fa-cake-candles text-pink-500 ml-1"></i>${c.birthdate}` : '--'}</td>
+            <td class="p-3 text-xs text-gray-600">${c.anniversary ? `<i class="fa-solid fa-ring text-amber-500 ml-1"></i>${c.anniversary}` : '--'}</td>
             <td class="p-3 text-center">
-                <button onclick="viewCustomerFullProfile('${c.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer">عرض الملف</button>
+                <button onclick="viewCustomerFullProfile('${c.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer inline-flex items-center gap-1"><i class="fa-regular fa-eye"></i><span>عرض الملف</span></button>
             </td>
         </tr>`;
     });
@@ -416,6 +416,7 @@ window.filterAdminCustomers = function() {
     });
     renderTenantCustomersTable(filtered);
 };
+
 // عرض الملف الشخصي الكامل للعميل في النافذة المنبثقة (Modal)
 window.viewCustomerFullProfile = async function(customerId) {
     const modal = document.getElementById('customer-details-modal');
@@ -442,8 +443,8 @@ window.viewCustomerFullProfile = async function(customerId) {
                 <p><strong>النوع:</strong> ${data.gender || '--'}</p>
                 <p><strong>الدولة والمدينة:</strong> ${data.country || '--'} / ${data.city || '--'}</p>
                 <p><strong>العنوان بالتفصيل:</strong> ${data.address || '--'}</p>
-                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `🎂 ${data.birthdate}` : '--'}</p>
-                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `💍 ${data.anniversary}` : '--'}</p>
+                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `<i class="fa-solid fa-cake-candles text-pink-500 ml-1"></i> ${data.birthdate}` : '--'}</p>
+                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `<i class="fa-solid fa-ring text-amber-500 ml-1"></i> ${data.anniversary}` : '--'}</p>
                 <p><strong>الهوايات والاهتمامات:</strong> ${data.hobbies || '--'}</p>
                 <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${customerId}</span></p>
             </div>

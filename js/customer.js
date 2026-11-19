@@ -113,7 +113,7 @@ window.joinNewTenant = async function(e) {
         }
 
         closeJoinTenantModal();
-        alert(`🎉 مبروك! تم انضمامك إلى (${tenantData.businessName}) بنجاح وحصلت على ${welcomePts} نقطة ترحيبية.`);
+        alert(`تم انضمامك إلى (${tenantData.businessName}) بنجاح وحصلت على ${welcomePts} نقطة ترحيبية.`);
         await loadCustomerDashboard(uid);
         openCustomerTenantPortal(tenantId);
     } catch (err) {
@@ -129,7 +129,11 @@ window.loadCustomerDashboard = async function(userId) {
     if (!userDoc.exists()) return;
     const userData = userDoc.data();
     if(document.getElementById('customer-welcome-name')) document.getElementById('customer-welcome-name').innerText = `أهلاً بك، ${userData.name || 'عميل الشبكة'}`;
-    if(document.getElementById('customer-phone-display')) document.getElementById('customer-phone-display').innerText = userData.phone ? `📱 ${userData.phone}` : '';
+    if(document.getElementById('customer-phone-display')) {
+        document.getElementById('customer-phone-display').innerHTML = userData.phone
+            ? `<i class="fa-solid fa-mobile-screen-button ml-1"></i><span>${userData.phone}</span>`
+            : '';
+    }
     if(document.getElementById('customer-uid-badge')) document.getElementById('customer-uid-badge').innerText = userId;
 
     if(document.getElementById('cust-gender')) document.getElementById('cust-gender').value = userData.gender || '';
@@ -186,7 +190,6 @@ window.loadCustomerDashboard = async function(userId) {
                     const themeKey = tenantData.theme || 'indigo';
                     const themeObj = TENANT_THEMES[themeKey] || TENANT_THEMES.indigo;
                     const gradientClass = themeObj.cardGradient;
-                    const safeName = (tenantData.businessName || '').replace(/'/g, "\\'");
 
                     walletsHtml += `
                         <div onclick="openCustomerTenantPortal('${tenantId}')"
@@ -235,7 +238,7 @@ window.loadCustomerDashboard = async function(userId) {
             walletsHtml = `
                 <div class="w-full text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-2">
                     <p class="text-gray-600 text-sm font-semibold">لست مشتركاً في أي منشأة بعد.</p>
-                    <p class="text-xs text-gray-500">اضغط على زر "+ انضمام لمنشأة جديدة" وأدخل معرف المنشأة للبدء.</p>
+                    <p class="text-xs text-gray-500">اضغط على زر "انضمام لمنشأة جديدة" وأدخل معرف المنشأة للبدء.</p>
                 </div>
             `;
         }

@@ -38,7 +38,7 @@ window.toggleCameraScanner = function(currentUserTenantId) {
     }
 
     readerDiv.classList.remove('hidden');
-    btn.innerText = '⏹️ إيقاف الكاميرا';
+    btn.innerHTML = '<i class="fa-solid fa-stop"></i><span>إيقاف الكاميرا</span>';
     
     html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
@@ -54,7 +54,7 @@ window.toggleCameraScanner = function(currentUserTenantId) {
     ).catch(() => {
         alert('تعذر تشغيل الكاميرا: تأكد من السماح للمتصفح بالوصول للكاميرا.');
         readerDiv.classList.add('hidden');
-        btn.innerText = '📷 تشغيل كاميرا المسح';
+        btn.innerHTML = '<i class="fa-solid fa-camera"></i><span>تشغيل كاميرا المسح</span>';
     });
 };
 
@@ -63,11 +63,11 @@ function stopCamera() {
         html5QrCode.stop().then(() => {
             html5QrCode.clear();
             document.getElementById('reader').classList.add('hidden');
-            document.getElementById('cam-toggle-btn').innerText = '📷 تشغيل كاميرا المسح';
+            document.getElementById('cam-toggle-btn').innerHTML = '<i class="fa-solid fa-camera"></i><span>تشغيل كاميرا المسح</span>';
         }).catch(err => console.error(err));
     } else {
         if(document.getElementById('reader')) document.getElementById('reader').classList.add('hidden');
-        if(document.getElementById('cam-toggle-btn')) document.getElementById('cam-toggle-btn').innerText = '📷 تشغيل كاميرا المسح';
+        if(document.getElementById('cam-toggle-btn')) document.getElementById('cam-toggle-btn').innerHTML = '<i class="fa-solid fa-camera"></i><span>تشغيل كاميرا المسح</span>';
     }
 }
 
@@ -115,7 +115,7 @@ window.posFindCustomer = async function(currentUserTenantId) {
         let detailsText = '';
         if (userData.gender) detailsText += `النوع: ${userData.gender} `;
         if (userData.city) detailsText += `| المدينة: ${userData.city} `;
-        if (userData.birthdate) detailsText += `| 🎂 ميلاد: ${userData.birthdate} `;
+        if (userData.birthdate) detailsText += `| ميلاد: ${userData.birthdate} `;
         document.getElementById('pos-c-details').innerText = detailsText || 'لا توجد تفاصيل إضافية مسجلة';
 
         document.getElementById('pos-c-points').innerText = currentPoints;

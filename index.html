@@ -39,7 +39,10 @@
     <!-- Header / Navbar -->
     <header id="main-header" class="bg-indigo-700 theme-bg-primary text-white shadow-md transition-colors duration-300">
         <div class="container mx-auto px-3 sm:px-4 py-3 flex flex-wrap justify-between items-center gap-2">
-            <h1 class="text-base sm:text-xl font-bold leading-snug">✨ نظام إدارة ولاء العملاء الذكي</h1>
+            <h1 class="text-base sm:text-xl font-bold leading-snug flex items-center gap-2">
+                <i class="fa-solid fa-crown text-amber-300"></i>
+                <span>نظام إدارة ولاء العملاء الذكي</span>
+            </h1>
             
             <div id="user-info" class="hidden flex items-center gap-2 sm:gap-3 relative">
                 <span id="user-role-badge" class="bg-white/20 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold"></span>
@@ -54,8 +57,9 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="exitApp()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm transition cursor-pointer shrink-0">
-                    خروج من التطبيق
+                <button type="button" onclick="exitApp()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm transition cursor-pointer shrink-0 flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>خروج من التطبيق</span>
                 </button>
             </div>
         </div>
@@ -69,8 +73,9 @@
             <div class="text-center mb-6">
                 <h2 id="auth-title" class="text-2xl font-bold text-indigo-700">تسجيل الدخول للنظام المركزي</h2>
                 <p id="auth-subtitle" class="text-sm text-gray-500 mt-1">نظام إدارة ولاء العملاء الذكي</p>
-                <div id="referral-banner" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl font-semibold">
-                    🎉 أنت تقوم بالتسجيل عبر رابط دعوة مباشر للمنشأة!
+                <div id="referral-banner" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-gift text-emerald-600"></i>
+                    <span>أنت تقوم بالتسجيل عبر رابط دعوة مباشر للمنشأة!</span>
                 </div>
             </div>
 
@@ -127,11 +132,13 @@
                 الرجاء فتح رسالة البريد والنقر على رابط التفعيل لإكمال التسجيل، ثم الضغط على زر التأكيد أدناه.
             </p>
             <div class="space-y-2 pt-2">
-                <button onclick="checkEmailVerificationStatus()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition cursor-pointer">
-                    ✅ لقد قمت بتفعيل البريد، متابعة الدخول
+                <button onclick="checkEmailVerificationStatus()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>لقد قمت بتفعيل البريد، متابعة الدخول</span>
                 </button>
-                <button onclick="resendVerificationEmail()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2 rounded-xl text-sm transition cursor-pointer">
-                    🔄 إعادة إرسال رابط التفعيل
+                <button onclick="resendVerificationEmail()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>إعادة إرسال رابط التفعيل</span>
                 </button>
                 <button onclick="exitApp()" class="w-full text-xs text-red-500 hover:underline pt-2 cursor-pointer">
                     خروج من التطبيق
@@ -165,7 +172,10 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد الدولة والعملة</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-building-circle-plus text-indigo-600"></i>
+                            <span>إضافة منشأة جديدة وتحديد الدولة والعملة</span>
+                        </h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة الرقمي (مثال: 1001 أو 1002)</label>
@@ -205,27 +215,31 @@
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">مظهر المنشأة (Theme)</label>
                                     <select id="tenant-theme-input" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none font-semibold">
-                                        <option value="indigo">🟦 1. الأزرق الملكي</option>
-                                        <option value="rose">🟥 2. الوردي الفاخر</option>
-                                        <option value="emerald">🟩 3. الأخضر الزمردي</option>
-                                        <option value="purple">🟪 4. البنفسجي المخملي</option>
-                                        <option value="amber">🟧 5. الذهبي الدافئ</option>
-                                        <option value="teal">🟦 6. الفيروزي العصري</option>
-                                        <option value="crimson">🟥 7. الأحمر القرمزي</option>
-                                        <option value="slate">⬛ 8. الرمادي الداكن</option>
-                                        <option value="cyan">🟦 9. الأزرق السماوي</option>
-                                        <option value="brown">🟫 10. البني الكلاسيكي</option>
+                                        <option value="indigo">1. الأزرق الملكي</option>
+                                        <option value="rose">2. الوردي الفاخر</option>
+                                        <option value="emerald">3. الأخضر الزمردي</option>
+                                        <option value="purple">4. البنفسجي المخملي</option>
+                                        <option value="amber">5. الذهبي الدافئ</option>
+                                        <option value="teal">6. الفيروزي العصري</option>
+                                        <option value="crimson">7. الأحمر القرمزي</option>
+                                        <option value="slate">8. الرمادي الداكن</option>
+                                        <option value="cyan">9. الأزرق السماوي</option>
+                                        <option value="brown">10. البني الكلاسيكي</option>
                                     </select>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                حفظ المنشأة وإضافتها للنظام
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>حفظ المنشأة وإضافتها للنظام</span>
                             </button>
                         </form>
                     </div>
 
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة حساب مدير منشأة أو كاشير جديد</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-emerald-600"></i>
+                            <span>إضافة حساب مدير منشأة أو كاشير جديد</span>
+                        </h3>
                         <form onsubmit="createTenantStaff(event)" class="space-y-3 mt-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">اختر المنشأة المرتبطة</label>
@@ -260,8 +274,9 @@
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">كلمة المرور المؤقتة</label>
                                 <input type="password" id="admin-pass-input" placeholder="********" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
-                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                إنشاء حساب الصلاحية وربطه
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-user-check"></i>
+                                <span>إنشاء حساب الصلاحية وربطه</span>
                             </button>
                         </form>
                     </div>
@@ -270,7 +285,10 @@
                 <!-- قسم منح صلاحيات متعددة لمستخدم مسجل مسبقاً -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-indigo-200 space-y-4">
                     <div>
-                        <h3 class="text-lg font-bold text-indigo-800">🔑 منح صلاحيات متعددة لمستخدم حالي (Multi-Role Assignment)</h3>
+                        <h3 class="text-lg font-bold text-indigo-800 flex items-center gap-2">
+                            <i class="fa-solid fa-key text-indigo-600"></i>
+                            <span>منح صلاحيات متعددة لمستخدم حالي (Multi-Role Assignment)</span>
+                        </h3>
                         <p class="text-xs text-gray-500 mt-1">ابحث عن أي مستخدم مسجل بالبريد الإلكتروني وامنحه دوراً إضافياً (مدير، كاشير، أو عميل) في أي منشأة دون الحاجة لإنشاء حساب جديد.</p>
                     </div>
                     <form onsubmit="assignExtraRoleToUser(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
@@ -293,8 +311,9 @@
                             </select>
                         </div>
                         <div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition cursor-pointer">
-                                + إضافة الصلاحية للحساب
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition cursor-pointer flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>إضافة الصلاحية للحساب</span>
                             </button>
                         </div>
                     </form>
@@ -303,9 +322,15 @@
                 <!-- Tenants List & Search -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <h4 class="text-lg font-bold text-indigo-800">إدارة المنشآت والاشتراكات</h4>
+                        <h4 class="text-lg font-bold text-indigo-800 flex items-center gap-2">
+                            <i class="fa-solid fa-building text-indigo-600"></i>
+                            <span>إدارة المنشآت والاشتراكات</span>
+                        </h4>
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                            <input type="text" id="search-tenants-input" onkeyup="filterTenants()" placeholder="🔍 بحث بالاسم أو المعرف الرقمي..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                <input type="text" id="search-tenants-input" onkeyup="filterTenants()" placeholder="بحث بالاسم أو المعرف الرقمي..." class="pr-8 pl-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full">
+                            </div>
                             <select id="filter-tenants-status" onchange="filterTenants()" class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
                                 <option value="all">جميع الحالات</option>
                                 <option value="active">النشطة فقط</option>
@@ -319,9 +344,15 @@
                 <!-- Users List & Search -->
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
-                        <h4 class="text-lg font-bold text-indigo-800">إدارة المستخدمين والصلاحيات والبيانات الشخصية</h4>
+                        <h4 class="text-lg font-bold text-indigo-800 flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear text-indigo-600"></i>
+                            <span>إدارة المستخدمين والصلاحيات والبيانات الشخصية</span>
+                        </h4>
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                            <input type="text" id="search-users-input" onkeyup="filterAdminUsers()" placeholder="🔍 بحث بالاسم، الهاتف، البريد..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                <input type="text" id="search-users-input" onkeyup="filterAdminUsers()" placeholder="بحث بالاسم، الهاتف، البريد..." class="pr-8 pl-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full">
+                            </div>
                             <select id="filter-users-role" onchange="filterAdminUsers()" class="px-3 py-2 border rounded-xl text-xs bg-indigo-50 font-semibold text-indigo-800 outline-none">
                                 <option value="all">جميع الأدوار</option>
                                 <option value="customer">العملاء فقط</option>
@@ -343,8 +374,9 @@
                         <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold theme-text-primary">--</span> | المعرف الرقمي: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
-                            🔑 تغيير كلمة المرور
+                        <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-key"></i>
+                            <span>تغيير كلمة المرور</span>
                         </button>
                         <div class="theme-bg-light px-4 py-2 rounded-xl text-center">
                             <span class="text-xs theme-text-dark font-semibold block">حالة الاشتراك</span>
@@ -355,21 +387,40 @@
 
                 <!-- Tabs Navigation for Tenant Admin -->
                 <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
-                    <button onclick="switchAdminTab('rules', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition">⚙️ القواعد والنقاط والمظهر</button>
-                    <button onclick="switchAdminTab('qr', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📲 رابط وباركود المنشأة</button>
-                    <button onclick="switchAdminTab('about', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📖 نبذة عن النشاط</button>
-                    <button onclick="switchAdminTab('services', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">💇‍♀️ الخدمات والأسعار</button>
-                    <button onclick="switchAdminTab('contact', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">📞 التواصل والسوشيال</button>
-                    <button onclick="switchAdminTab('offers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🎁 العروض والخصومات</button>
-                    <button onclick="switchAdminTab('gallery', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">🖼️ معرض الصور</button>
-                    <button onclick="switchAdminTab('customers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👥 العملاء والتقارير الذكية</button>
+                    <button onclick="switchAdminTab('rules', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-sliders"></i><span>القواعد والنقاط والمظهر</span>
+                    </button>
+                    <button onclick="switchAdminTab('qr', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-qrcode"></i><span>رابط وباركود المنشأة</span>
+                    </button>
+                    <button onclick="switchAdminTab('about', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-circle-info"></i><span>نبذة عن النشاط</span>
+                    </button>
+                    <button onclick="switchAdminTab('services', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-list-check"></i><span>الخدمات والأسعار</span>
+                    </button>
+                    <button onclick="switchAdminTab('contact', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-address-book"></i><span>التواصل والسوشيال</span>
+                    </button>
+                    <button onclick="switchAdminTab('offers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-tags"></i><span>العروض والخصومات</span>
+                    </button>
+                    <button onclick="switchAdminTab('gallery', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-images"></i><span>معرض الصور</span>
+                    </button>
+                    <button onclick="switchAdminTab('customers', event)" class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-users"></i><span>العملاء والتقارير الذكية</span>
+                    </button>
                 </div>
 
                 <!-- Tab 1: Rules & Constants & Theme -->
                 <div id="admin-tab-rules" class="admin-tab-content space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                            <h4 class="text-base font-bold theme-text-dark mb-3">⚙️ ضوابط وقواعد منح واستبدال النقاط ومظهر المنشأة</h4>
+                            <h4 class="text-base font-bold theme-text-dark mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-gears theme-text-primary"></i>
+                                <span>ضوابط وقواعد منح واستبدال النقاط ومظهر المنشأة</span>
+                            </h4>
                             <form onsubmit="saveTenantLoyaltyRules(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الإنفاق لكل 1 نقطة (بالعملة المحلية)</label>
@@ -398,30 +449,37 @@
 
                                 <!-- Theme Selector -->
                                 <div class="pt-3 border-t border-gray-100">
-                                    <label class="block text-xs font-bold theme-text-dark mb-1.5">🎨 مظهر وهوية المنشأة البصرية (Theme Color)</label>
+                                    <label class="block text-xs font-bold theme-text-dark mb-1.5 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-palette theme-text-primary"></i>
+                                        <span>مظهر وهوية المنشأة البصرية (Theme Color)</span>
+                                    </label>
                                     <select id="rule-tenant-theme" onchange="previewTenantTheme(this.value)" class="w-full px-3 py-2.5 border rounded-xl text-sm bg-gray-50 outline-none font-semibold cursor-pointer">
-                                        <option value="indigo">🟦 1. الأزرق الملكي الكلاسيكي (Indigo Royal)</option>
-                                        <option value="rose">🟥 2. الوردي الفاخر - دودي روز (Dody Rose Pink)</option>
-                                        <option value="emerald">🟩 3. الأخضر الزمردي (Emerald Spa & Cafe)</option>
-                                        <option value="purple">🟪 4. البنفسجي المخملي (Velvet Purple)</option>
-                                        <option value="amber">🟧 5. الذهبي الدافئ (Luxury Gold & Amber)</option>
-                                        <option value="teal">🟦 6. الفيروزي العصري (Modern Teal)</option>
-                                        <option value="crimson">🟥 7. الأحمر القرمزي (Crimson Beauty)</option>
-                                        <option value="slate">⬛ 8. الرمادي الداكن الفخم (Executive Slate)</option>
-                                        <option value="cyan">🟦 9. الأزرق السماوي (Ocean Cyan)</option>
-                                        <option value="brown">🟫 10. البني الكلاسيكي (Coffee & Chocolate)</option>
+                                        <option value="indigo">1. الأزرق الملكي الكلاسيكي (Indigo Royal)</option>
+                                        <option value="rose">2. الوردي الفاخر - دودي روز (Dody Rose Pink)</option>
+                                        <option value="emerald">3. الأخضر الزمردي (Emerald Spa & Cafe)</option>
+                                        <option value="purple">4. البنفسجي المخملي (Velvet Purple)</option>
+                                        <option value="amber">5. الذهبي الدافئ (Luxury Gold & Amber)</option>
+                                        <option value="teal">6. الفيروزي العصري (Modern Teal)</option>
+                                        <option value="crimson">7. الأحمر القرمزي (Crimson Beauty)</option>
+                                        <option value="slate">8. الرمادي الداكن الفخم (Executive Slate)</option>
+                                        <option value="cyan">9. الأزرق السماوي (Ocean Cyan)</option>
+                                        <option value="brown">10. البني الكلاسيكي (Coffee & Chocolate)</option>
                                     </select>
                                 </div>
 
-                                <button type="submit" class="w-full bg-indigo-600 theme-bg-primary text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer">
-                                    حفظ ضوابط الولاء ومظهر المنشأة
+                                <button type="submit" class="w-full bg-indigo-600 theme-bg-primary text-white py-2.5 rounded-lg font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span>حفظ ضوابط الولاء ومظهر المنشأة</span>
                                 </button>
                             </form>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between">
                             <div>
-                                <h4 class="text-base font-bold theme-text-dark mb-3">📊 إحصائيات محفظة عملاء المنشأة</h4>
+                                <h4 class="text-base font-bold theme-text-dark mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-pie theme-text-primary"></i>
+                                    <span>إحصائيات محفظة عملاء المنشأة</span>
+                                </h4>
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <div class="theme-bg-light p-4 rounded-xl text-center">
                                         <span class="text-xs text-gray-500 font-semibold block">إجمالي العملاء المرتبطين</span>
@@ -440,7 +498,10 @@
                 <!-- Tab: Tenant Direct Registration QR & Link -->
                 <div id="admin-tab-qr" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 max-w-2xl mx-auto text-center space-y-5">
-                        <h4 class="text-lg font-bold theme-text-dark">📲 رمز QR ورابط التسجيل المباشر للعملاء</h4>
+                        <h4 class="text-lg font-bold theme-text-dark flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-qrcode theme-text-primary"></i>
+                            <span>رمز QR ورابط التسجيل المباشر للعملاء</span>
+                        </h4>
                         <p class="text-xs text-gray-600">يمكنك طباعة هذا الكود في الاستقبال أو إرساله للعملاء ليتم تسجيلهم مباشرة وربط محافظهم بمنشأتك.</p>
                         
                         <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 inline-block shadow-xs">
@@ -451,7 +512,10 @@
                             <label class="block text-xs font-semibold text-gray-700">الرابط المباشر لتسجيل العملاء:</label>
                             <div class="flex gap-2">
                                 <input type="text" id="tenant-direct-reg-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-gray-50 font-mono theme-text-primary">
-                                <button onclick="copyTextValue('tenant-direct-reg-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
+                                <button onclick="copyTextValue('tenant-direct-reg-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                                    <i class="fa-regular fa-copy"></i>
+                                    <span>نسخ الرابط</span>
+                                </button>
                             </div>
                         </div>
 
@@ -469,10 +533,16 @@
                 <!-- Tab 2: About Activity -->
                 <div id="admin-tab-about" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold theme-text-dark mb-3">📖 نبذة تعريفية عن النشاط</h4>
+                        <h4 class="text-base font-bold theme-text-dark mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info theme-text-primary"></i>
+                            <span>نبذة تعريفية عن النشاط</span>
+                        </h4>
                         <form onsubmit="saveTenantAbout(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                             <textarea id="tenant-about-text" rows="6" placeholder="اكتب نبذة احترافية عن نشاط المنشأة..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none"></textarea>
-                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ النبذة</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>حفظ النبذة</span>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -480,12 +550,18 @@
                 <!-- Tab 3: Services & Prices -->
                 <div id="admin-tab-services" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold theme-text-dark">💇‍♀️ إضافة خدمة جديدة للعملاء</h4>
+                        <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                            <i class="fa-solid fa-list-check theme-text-primary"></i>
+                            <span>إضافة خدمة جديدة للعملاء</span>
+                        </h4>
                         <form onsubmit="addTenantService(event, document.getElementById('current-tenant-id-badge').innerText)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
                             <input type="text" id="srv-name" placeholder="اسم الخدمة" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <input type="number" id="srv-price" placeholder="السعر" min="0" required class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <input type="text" id="srv-notes" placeholder="ملاحظات (اختياري)" class="px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">إضافة الخدمة</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>إضافة الخدمة</span>
+                            </button>
                         </form>
                         <div id="admin-services-list" class="mt-4 overflow-x-auto text-sm">جاري التحميل...</div>
                     </div>
@@ -494,7 +570,10 @@
                 <!-- Tab 4: Contact & Social Links -->
                 <div id="admin-tab-contact" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                        <h4 class="text-base font-bold theme-text-dark mb-3">📞 أرقام التواصل وروابط وسائل التواصل الاجتماعي</h4>
+                        <h4 class="text-base font-bold theme-text-dark mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-address-book theme-text-primary"></i>
+                            <span>أرقام التواصل وروابط وسائل التواصل الاجتماعي</span>
+                        </h4>
                         <form onsubmit="saveTenantContact(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -534,7 +613,10 @@
                                     <input type="url" id="contact-google-reviews" placeholder="https://maps.app.goo.gl/..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                                 </div>
                             </div>
-                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">حفظ بيانات التواصل والسوشيال</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>حفظ بيانات التواصل والسوشيال</span>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -542,12 +624,18 @@
                 <!-- Tab 5: Offers -->
                 <div id="admin-tab-offers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                        <h4 class="text-base font-bold theme-text-dark">🎁 إضافة عرض ترويجي جديد</h4>
+                        <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                            <i class="fa-solid fa-tags theme-text-primary"></i>
+                            <span>إضافة عرض ترويجي جديد</span>
+                        </h4>
                         <form onsubmit="addTenantOffer(event, document.getElementById('current-tenant-id-badge').innerText)" class="space-y-3">
                             <input type="text" id="offer-title" placeholder="عنوان العرض..." required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             <textarea id="offer-desc" rows="3" placeholder="تفاصيل العرض والشروط..." class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none"></textarea>
                             <input type="url" id="offer-img" placeholder="رابط صورة العرض (اختياري URL)" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
-                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2 rounded-lg text-sm font-semibold transition cursor-pointer">نشر العرض</button>
+                            <button type="submit" class="bg-indigo-600 theme-bg-primary text-white px-6 py-2 rounded-lg text-sm font-semibold transition cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn"></i>
+                                <span>نشر العرض</span>
+                            </button>
                         </form>
                         <div id="admin-offers-list" class="mt-4 space-y-3">جاري التحميل...</div>
                     </div>
@@ -556,7 +644,10 @@
                 <!-- Tab 6: Gallery -->
                 <div id="admin-tab-gallery" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
-                        <h4 class="text-base font-bold theme-text-dark">🖼️ إدارة معرض صور المنشأة (رابط مباشر أو ملف نصي بالروابط)</h4>
+                        <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                            <i class="fa-solid fa-images theme-text-primary"></i>
+                            <span>إدارة معرض صور المنشأة (رابط مباشر أو ملف نصي بالروابط)</span>
+                        </h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <form onsubmit="addTenantGalleryImage(event, document.getElementById('current-tenant-id-badge').innerText)" class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
@@ -584,13 +675,19 @@
                 <div id="admin-tab-customers" class="admin-tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-5">
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
-                            <h4 class="text-base font-bold theme-text-dark">👥 إدارة العملاء وتقارير المناسبات الذكية</h4>
+                            <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                                <i class="fa-solid fa-users theme-text-primary"></i>
+                                <span>إدارة العملاء وتقارير المناسبات الذكية</span>
+                            </h4>
                             <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                                <input type="text" id="search-customers-input" onkeyup="filterAdminCustomers()" placeholder="🔍 بحث بالاسم، الهاتف، البريد..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                                <div class="relative w-full md:w-64">
+                                    <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                                    <input type="text" id="search-customers-input" onkeyup="filterAdminCustomers()" placeholder="بحث بالاسم، الهاتف، البريد..." class="pr-8 pl-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full">
+                                </div>
                                 <select id="filter-customers-occasion" onchange="filterAdminCustomers()" class="px-3 py-2 border rounded-xl text-xs theme-bg-light font-semibold theme-text-dark outline-none">
                                     <option value="all">جميع العملاء</option>
-                                    <option value="birthday_this_month">🎂 أعياد ميلاد خلال الشهر الحالي</option>
-                                    <option value="anniversary_this_month">💍 تواريخ زواج خلال الشهر الحالي</option>
+                                    <option value="birthday_this_month">أعياد ميلاد خلال الشهر الحالي</option>
+                                    <option value="anniversary_this_month">تواريخ زواج خلال الشهر الحالي</option>
                                 </select>
                             </div>
                         </div>
@@ -603,11 +700,15 @@
             <div id="cashier-view" class="role-view hidden space-y-6 max-w-2xl mx-auto">
                 <div class="bg-white p-6 rounded-2xl shadow-md border theme-border text-center flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold theme-text-dark">🛒 محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="theme-text-primary">--</span></h3>
+                        <h3 class="text-lg font-bold theme-text-dark flex items-center gap-2">
+                            <i class="fa-solid fa-cash-register theme-text-primary"></i>
+                            <span>محطة الكاشير الذكية - فرع: <span id="cashier-tenant-name" class="theme-text-primary">--</span></span>
+                        </h3>
                         <p class="text-xs text-gray-500 mt-0.5">امسح كود الـ QR أو ابحث برقم المعرف أو رقم الهاتف</p>
                     </div>
-                    <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
-                        🔑 تغيير كلمة المرور
+                    <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <i class="fa-solid fa-key"></i>
+                        <span>تغيير كلمة المرور</span>
                     </button>
                 </div>
 
@@ -615,7 +716,8 @@
                     <div class="flex justify-between items-center">
                         <label class="block text-sm font-bold theme-text-dark">1. قراءة كود العميل (UID) أو إدخال رقم الهاتف / المعرف</label>
                         <button onclick="toggleCameraScanner(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
-                            📷 تشغيل كاميرا المسح
+                            <i class="fa-solid fa-camera"></i>
+                            <span>تشغيل كاميرا المسح</span>
                         </button>
                     </div>
 
@@ -623,7 +725,10 @@
 
                     <div class="flex gap-2">
                         <input type="text" id="pos-customer-uid" placeholder="أدخل معرف العميل أو رقم الهاتف (الأساسي أو الإضافي)..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none font-mono">
-                        <button onclick="posFindCustomer(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" class="bg-indigo-600 theme-bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
+                        <button onclick="posFindCustomer(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" class="bg-indigo-600 theme-bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>بحث وعرض المحفظة</span>
+                        </button>
                     </div>
                 </div>
 
@@ -645,7 +750,10 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
-                            <h5 class="font-bold theme-text-dark text-sm">➕ إضافة نقاط (منح)</h5>
+                            <h5 class="font-bold theme-text-dark text-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-plus text-emerald-600"></i>
+                                <span>إضافة نقاط (منح)</span>
+                            </h5>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
@@ -656,7 +764,10 @@
                         </div>
 
                         <div class="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-3">
-                            <h5 class="font-bold theme-text-dark text-sm">➖ استبدال نقاط (خصم خدمة)</h5>
+                            <h5 class="font-bold theme-text-dark text-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-minus text-amber-600"></i>
+                                <span>استبدال نقاط (خصم خدمة)</span>
+                            </h5>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
@@ -682,11 +793,13 @@
                         <p id="customer-phone-display" class="text-xs opacity-90 mt-1 font-semibold" dir="ltr">--</p>
                         <p class="text-xs opacity-75 mt-1 font-mono">معرف العميل (UID): <span id="customer-uid-badge">--</span></p>
                         <div class="mt-3 flex flex-wrap gap-2">
-                            <button onclick="openChangePasswordModal()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer">
-                                🔑 تغيير كلمة المرور
+                            <button onclick="openChangePasswordModal()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
+                                <i class="fa-solid fa-key"></i>
+                                <span>تغيير كلمة المرور</span>
                             </button>
-                            <button onclick="openJoinTenantModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition shadow-md cursor-pointer">
-                                + انضمام لمنشأة جديدة
+                            <button onclick="openJoinTenantModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition shadow-md cursor-pointer flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>انضمام لمنشأة جديدة</span>
                             </button>
                         </div>
                     </div>
@@ -698,8 +811,12 @@
 
                 <!-- Tabs Navigation for Customer -->
                 <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
-                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition">💳 بطاقات المنشآت والمحافظ</button>
-                    <button onclick="switchCustomerTab('profile', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition">👤 الملف الشخصي والخصوصية</button>
+                    <button onclick="switchCustomerTab('wallets', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-credit-card"></i><span>بطاقات المنشآت والمحافظ</span>
+                    </button>
+                    <button onclick="switchCustomerTab('profile', event)" class="cust-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-user-shield"></i><span>الملف الشخصي والخصوصية</span>
+                    </button>
                 </div>
 
                 <!-- Tab 1: Horizontal Bank Cards Wallets -->
@@ -707,11 +824,15 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                             <div>
-                                <h4 class="text-base font-bold theme-text-dark">💳 بطاقات الولاء المصرفية للمنشآت</h4>
+                                <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                                    <i class="fa-solid fa-credit-card theme-text-primary"></i>
+                                    <span>بطاقات الولاء المصرفية للمنشآت</span>
+                                </h4>
                                 <p class="text-xs text-gray-500 mt-0.5">اسحب يميناً ويساراً لتصفح بطاقات المنشآت، وانقر على أي بطاقة لعرض تفاصيلها</p>
                             </div>
-                            <button onclick="openJoinTenantModal()" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap">
-                                + انضمام لمنشأة جديدة
+                            <button onclick="openJoinTenantModal()" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>انضمام لمنشأة جديدة</span>
                             </button>
                         </div>
                         
@@ -735,13 +856,27 @@
                         </div>
 
                         <div class="flex gap-2 border-b border-gray-100 pb-2 overflow-x-auto">
-                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition whitespace-nowrap">📖 عن المنشأة</button>
-                            <button onclick="switchPortalTab('services', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">💇‍♀️ الخدمات والأسعار</button>
-                            <button onclick="switchPortalTab('offers', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🎁 العروض والخصومات</button>
-                            <button onclick="switchPortalTab('gallery', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🖼️ معرض الصور</button>
-                            <button onclick="switchPortalTab('contact', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">📞 التواصل والسوشيال</button>
-                            <button onclick="switchPortalTab('myqr', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">📲 الباركود الخاص بي</button>
-                            <button onclick="switchPortalTab('referral', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap">🎁 اربح نقاط الإحالة</button>
+                            <button onclick="switchPortalTab('about', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 theme-bg-primary text-white cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info"></i><span>عن المنشأة</span>
+                            </button>
+                            <button onclick="switchPortalTab('services', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-list-check"></i><span>الخدمات والأسعار</span>
+                            </button>
+                            <button onclick="switchPortalTab('offers', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-tags"></i><span>العروض والخصومات</span>
+                            </button>
+                            <button onclick="switchPortalTab('gallery', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-images"></i><span>معرض الصور</span>
+                            </button>
+                            <button onclick="switchPortalTab('contact', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-address-book"></i><span>التواصل والسوشيال</span>
+                            </button>
+                            <button onclick="switchPortalTab('myqr', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-qrcode"></i><span>الباركود الخاص بي</span>
+                            </button>
+                            <button onclick="switchPortalTab('referral', event)" class="portal-tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 cursor-pointer transition whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-gift"></i><span>اربح نقاط الإحالة</span>
+                            </button>
                         </div>
 
                         <div id="portal-tab-about" class="portal-tab-content text-sm text-gray-600 leading-relaxed">
@@ -769,7 +904,10 @@
                         </div>
                         <div id="portal-tab-referral" class="portal-tab-content hidden space-y-4">
                             <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-900 text-xs space-y-1">
-                                <p class="font-bold text-sm">🎉 شارك واربح نقاطاً مجانية!</p>
+                                <p class="font-bold text-sm flex items-center gap-1.5">
+                                    <i class="fa-solid fa-gift text-emerald-600"></i>
+                                    <span>شارك واربح نقاطاً مجانية!</span>
+                                </p>
                                 <p>عند تسجيل أي صديق جديد في هذه المنشأة عبر الرابط أو الباركود الخاص بك أدناه، ستحصل تلقائياً على <span id="cust-referral-bonus-badge" class="font-extrabold text-emerald-700">--</span> نقطة مجانية في محفظتك!</p>
                             </div>
 
@@ -783,7 +921,10 @@
                                     <label class="block text-xs font-semibold text-gray-700">رابط الإحالة الخاص بك:</label>
                                     <div class="flex gap-2">
                                         <input type="text" id="cust-referral-link" readonly dir="ltr" class="w-full px-3 py-2 border rounded-lg text-xs bg-white font-mono theme-text-primary">
-                                        <button onclick="copyTextValue('cust-referral-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap">نسخ الرابط</button>
+                                        <button onclick="copyTextValue('cust-referral-link')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                                            <i class="fa-regular fa-copy"></i>
+                                            <span>نسخ الرابط</span>
+                                        </button>
                                     </div>
                                     <div class="flex flex-wrap gap-2 pt-1">
                                         <button onclick="downloadQrPng('cust-referral-qrcode', 'my-referral-qr.png')" class="bg-indigo-600 theme-bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5">
@@ -804,11 +945,15 @@
                     <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                         <div class="flex justify-between items-center border-b pb-3">
                             <div>
-                                <h4 class="text-base font-bold theme-text-dark">👤 تبويب الملف الشخصي والبيانات الخاصة (خصوصية العميل)</h4>
+                                <h4 class="text-base font-bold theme-text-dark flex items-center gap-2">
+                                    <i class="fa-solid fa-user-shield theme-text-primary"></i>
+                                    <span>تبويب الملف الشخصي والبيانات الخاصة (خصوصية العميل)</span>
+                                </h4>
                                 <p class="text-xs text-gray-500">هذه البيانات الخاصة مخفية تماماً عن الواجهة الرئيسية ومحمية في تبويب الخصوصية.</p>
                             </div>
-                            <button onclick="saveCustomerProfile(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
-                                حفظ البيانات الشخصية
+                            <button onclick="saveCustomerProfile(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>حفظ البيانات الشخصية</span>
                             </button>
                         </div>
 
@@ -859,7 +1004,10 @@
     <!-- Change Password Modal -->
     <div id="change-pass-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl">
-            <h3 class="text-lg font-bold theme-text-dark">🔑 تغيير كلمة المرور</h3>
+            <h3 class="text-lg font-bold theme-text-dark flex items-center gap-2">
+                <i class="fa-solid fa-key theme-text-primary"></i>
+                <span>تغيير كلمة المرور</span>
+            </h3>
             <p class="text-xs text-gray-500">سيتم إرسال رابط آمن ومباشر لإعادة تعيين كلمة المرور إلى بريدك الإلكتروني المسجل.</p>
             <p id="modal-user-email" class="font-mono text-xs font-bold theme-text-primary theme-bg-light p-2 rounded-lg text-center" dir="ltr">--</p>
             <div class="flex gap-2 pt-2">
@@ -877,8 +1025,13 @@
     <div id="customer-details-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold theme-text-dark">📋 الملف الشخصي الكامل للمستخدم</h3>
-                <button onclick="closeCustomerDetailsModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
+                <h3 class="text-lg font-bold theme-text-dark flex items-center gap-2">
+                    <i class="fa-solid fa-id-card theme-text-primary"></i>
+                    <span>الملف الشخصي الكامل للمستخدم</span>
+                </h3>
+                <button onclick="closeCustomerDetailsModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
             <div id="customer-details-content" class="space-y-3 text-sm">
                 جاري التحميل...
@@ -893,8 +1046,13 @@
     <div id="join-tenant-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-2xl max-w-md w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold theme-text-dark">+ انضمام لمنشأة جديدة</h3>
-                <button onclick="closeJoinTenantModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
+                <h3 class="text-lg font-bold theme-text-dark flex items-center gap-2">
+                    <i class="fa-solid fa-store theme-text-primary"></i>
+                    <span>انضمام لمنشأة جديدة</span>
+                </h3>
+                <button onclick="closeJoinTenantModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
             <p class="text-xs text-gray-600 leading-relaxed">
                 أدخل المعرف الرقمي للمنشأة (<span class="font-mono font-bold theme-text-primary">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.

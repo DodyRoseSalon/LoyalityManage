@@ -47,8 +47,8 @@ function ensureAutoIdGeneratorButton() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'auto-generate-tenant-id-btn';
-    btn.textContent = '🎲 توليد رقم تلقائي';
-    btn.className = 'mt-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer';
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles ml-1"></i> توليد رقم تلقائي';
+    btn.className = 'mt-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer inline-flex items-center';
     btn.onclick = () => window.generateNextTenantId(true);
 
     inputEl.insertAdjacentElement('afterend', btn);
@@ -490,13 +490,19 @@ function renderAdminUsersTable(users) {
             <td class="p-3 text-xs" dir="ltr">${u.phone || '--'}<br><span class="text-gray-500">${u.email || ''}</span></td>
             <td class="p-3 text-xs">${u.gender || '--'} | ${u.country || '--'} - ${u.city || '--'}<br><span class="text-gray-400">${u.address || ''}</span></td>
             <td class="p-3 text-xs">${permsHtml}</td>
-            <td class="p-3 text-xs">🎂 ${u.birthdate || 'غير مسجل'}<br>💍 ${u.anniversary || 'غير مسجل'}<br>💡 ${u.hobbies || '--'}</td>
+            <td class="p-3 text-xs">
+                <div><i class="fa-solid fa-cake-candles text-pink-500 ml-1"></i>${u.birthdate || 'غير مسجل'}</div>
+                <div><i class="fa-solid fa-ring text-amber-500 ml-1"></i>${u.anniversary || 'غير مسجل'}</div>
+                <div><i class="fa-solid fa-heart text-indigo-500 ml-1"></i>${u.hobbies || '--'}</div>
+            </td>
             <td class="p-3 flex flex-col gap-1.5">
-                <button onclick="viewCustomerFullProfile('${u.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">
-                    👁️ عرض البيانات الشخصية
+                <button onclick="viewCustomerFullProfile('${u.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-eye"></i>
+                    <span>عرض البيانات الشخصية</span>
                 </button>
-                <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer whitespace-nowrap">
-                    🔑 إعادة تعيين الباسورد
+                <button onclick="adminUpdateUserPassword('${u.email}')" class="px-3 py-1 rounded text-xs bg-amber-100 text-amber-800 font-semibold hover:bg-amber-200 cursor-pointer whitespace-nowrap inline-flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-key"></i>
+                    <span>إعادة تعيين الباسورد</span>
                 </button>
             </td>
         </tr>`;
@@ -597,8 +603,8 @@ window.viewCustomerFullProfile = async function(customerId) {
                 <p><strong>النوع:</strong> ${data.gender || '--'}</p>
                 <p><strong>الدولة والمدينة:</strong> ${data.country || '--'} / ${data.city || '--'}</p>
                 <p><strong>العنوان بالتفصيل:</strong> ${data.address || '--'}</p>
-                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `🎂 ${data.birthdate}` : '--'}</p>
-                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `💍 ${data.anniversary}` : '--'}</p>
+                <p><strong>تاريخ الميلاد:</strong> ${data.birthdate ? `<i class="fa-solid fa-cake-candles text-pink-500 ml-1"></i> ${data.birthdate}` : '--'}</p>
+                <p><strong>تاريخ المناسبة / الزواج:</strong> ${data.anniversary ? `<i class="fa-solid fa-ring text-amber-500 ml-1"></i> ${data.anniversary}` : '--'}</p>
                 <p><strong>الهوايات والاهتمامات:</strong> ${data.hobbies || '--'}</p>
                 <p class="text-xs text-gray-400 pt-2 border-t">معرف النظام (UID): <span class="font-mono">${customerId}</span></p>
             </div>
