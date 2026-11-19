@@ -15,7 +15,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const paramTenantId = urlParams.get('tenant');
 const paramReferrerUid = urlParams.get('ref');
 
-// دوال تبديل الصلاحيات والخروج الآمن (تحافظ على البصمة ولا تمسح الذاكرة)
+// ==========================================
+// دوال تبديل الصلاحيات والخروج الآمن والقوائم
+// ==========================================
 window.switchUserRoleOrTenant = function(newRole, newTenantId) {
     localStorage.setItem("active_user_role", newRole);
     localStorage.setItem("active_facility_id", newTenantId);
@@ -27,11 +29,96 @@ window.switchRoleFromDropdown = function(val) {
     window.switchUserRoleOrTenant(role, tenantId);
 };
 
+window.toggleRoleSwitcherMenu = function() {
+    const dropdown = document.getElementById('role-switcher-dropdown');
+    if (!dropdown) return;
+    dropdown.classList.toggle('hidden');
+};
+
+document.addEventListener('click', function(e) {
+    const container = document.getElementById('role-menu-container');
+    const dropdown = document.getElementById('role-switcher-dropdown');
+    if (container && dropdown && !container.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
 window.exitApp = function() {
     if (window.AndroidBridge && typeof window.AndroidBridge.closeApp === 'function') {
         window.AndroidBridge.closeApp();
     } else {
         window.close();
+    }
+};
+
+window.toggleSidebarDrawer = function(mode = 'tenant', forceState = null) {
+    const sidebarId = mode === 'super' ? 'super-admin-sidebar' : 'tenant-admin-sidebar';
+    const sidebar = document.getElementById(sidebarId);
+    if (!sidebar) return;
+
+    const isHidden = sidebar.classList.contains('hidden');
+    const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
+
+    if (shouldShow) {
+        sidebar.classList.remove('hidden');
+    } else if (window.innerWidth < 1024) {
+        sidebar.classList.add('hidden');
+    }
+};
+
+window.switchSuperSection = function(secName, event) {
+    document.querySelectorAll('.super-section-content').forEach(el => el.classList.add('hidden'));
+    const targetSec = document.getElementById(`super-sec-${secName}`);
+    if (targetSec) targetSec.classList.remove('hidden');
+
+    document.querySelectorAll('.super-nav-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'font-bold');
+        btn.classList.add('bg-gray-50', 'text-gray-700', 'font-semibold');
+    });
+
+    const activeBtn = event?.currentTarget || document.querySelector(`.super-nav-btn[onclick*="'${secName}'"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-50', 'text-gray-700', 'font-semibold');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'font-bold');
+        const labelEl = document.getElementById('super-active-label');
+        if (labelEl) {
+            const cleanText = activeBtn.innerText.trim();
+            if (cleanText) labelEl.innerText = cleanText;
+        }
+    }
+
+    if (window.innerWidth < 1024) {
+        window.toggleSidebarDrawer('super', false);
+    }
+};
+
+window.switchAdminTab = function(tabName, event) {
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+    const targetTab = document.getElementById(`admin-tab-${tabName}`);
+    if (targetTab) targetTab.classList.remove('hidden');
+
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'theme-bg-primary', 'text-white', 'font-bold');
+        btn.classList.add('bg-gray-50', 'text-gray-700', 'font-semibold');
+    });
+
+    const activeBtn = event?.currentTarget || document.querySelector(`.admin-tab-btn[onclick*="'${tabName}'"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-50', 'text-gray-700', 'font-semibold');
+        activeBtn.classList.add('bg-indigo-600', 'theme-bg-primary', 'text-white', 'font-bold');
+        const labelEl = document.getElementById('tenant-active-label');
+        if (labelEl) {
+            const cleanText = activeBtn.innerText.trim();
+            if (cleanText) labelEl.innerText = cleanText;
+        }
+    }
+
+    if (tabName === 'customers' && currentUserTenantId && typeof window.renderTenantReportsDashboard === 'function') {
+        window.renderTenantReportsDashboard(currentUserTenantId);
+    }
+
+    if (window.innerWidth < 1024) {
+        window.toggleSidebarDrawer('tenant', false);
     }
 };
 
@@ -252,8 +339,8 @@ onAuthStateChanged(auth, async (user) => {
             authSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             userInfo.classList.remove('hidden');
+            userInfo.classList.add('flex');
 
-            // عرض الصلاحية الحالية كشارة نصية نظيفة وإدراج الصلاحيات المتعددة تحت أيقونة الثلاث شرطات
             const userPermissions = Array.isArray(data.permissions) ? data.permissions : [];
             if (roleBadge) {
                 roleBadge.textContent = `الدور: ${activeRole} (${activeTenant})`;
@@ -307,6 +394,7 @@ onAuthStateChanged(auth, async (user) => {
         authSection.classList.remove('hidden');
         dashboardSection.classList.add('hidden');
         userInfo.classList.add('hidden');
+        userInfo.classList.remove('flex');
         if (roleMenuContainer) roleMenuContainer.classList.add('hidden');
         if (roleSwitcherDropdown) roleSwitcherDropdown.classList.add('hidden');
         currentUserTenantId = null;
