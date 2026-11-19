@@ -9,6 +9,7 @@ import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://
 let allTenantsData = [];
 let allUsersCache = [];
 let currentSuperReportFilter = 'all';
+let editingPlanTenantId = null;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const REMINDER_DAYS_BEFORE_EXPIRY = 3;
@@ -659,7 +660,7 @@ function getRoleBadgeColor(role) {
 }
 
 // ==========================================
-// 2. إدارة المنشآت (Tenants)
+// 2. إدارة المنشآت (Tenants) وتغيير الباقات
 // ==========================================
 window.loadTenants = async function() {
     const listEl = document.getElementById('tenants-list');
@@ -779,6 +780,7 @@ function renderTenantsTable(tenants) {
             <td class="p-3 text-xs">${planBadge} <span class="font-semibold">${sub.planLabel}</span> (${data.currency || 'ريال'})</td>
             <td class="p-3 text-xs">${statusBadge}<br><span class="text-[11px] text-gray-500">ينتهي: ${expFormatted}</span></td>
             <td class="p-3 flex gap-1.5 flex-wrap">
+                <button onclick="openChangeTenantPlanModal('${data.id}')" class="px-2.5 py-1 rounded text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold cursor-pointer">تغيير الباقة</button>
                 <button onclick="toggleTenantStatus('${data.id}', ${Boolean(data.isActive)})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
                 <button onclick="extendTenantDays('${data.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
                 <button onclick="window.previewTenantTheme('${data.theme || 'indigo'}')" class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-700 cursor-pointer">معاينة السكيم</button>
@@ -789,6 +791,208 @@ function renderTenantsTable(tenants) {
     html += '</tbody></table>';
     listEl.innerHTML = html;
 }
+
+// ==========================================
+// نافذة تحويل الباقة وتحديد طريقة احتساب المدة
+// ==========================================
+function formatDateInputYYYYMMDD(dateObj) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getPreviousPlanStartMs(tenant, currentPlanCfg, nowMs) {
+    if (tenant.planStartedAt) {
+        const parsed = new Date(tenant.planStartedAt).getTime();
+        if (!Number.isNaN(parsed)) return parsed;
+    }
+    if (tenant.renewedAt) {
+        const parsed = new Date(tenant.renewedAt).getTime();
+        if (!Number.isNaN(parsed)) return parsed;
+    }
+    if (tenant.expiresAt && currentPlanCfg.durationDays) {
+        const expMs = new Date(tenant.expiresAt).getTime();
+        if (!Number.isNaN(expMs)) {
+            return expMs - (currentPlanCfg.durationDays * DAY_MS);
+        }
+    }
+    if (tenant.createdAt) {
+        const parsed = new Date(tenant.createdAt).getTime();
+        if (!Number.isNaN(parsed)) return parsed;
+    }
+    return nowMs;
+}
+
+window.openChangeTenantPlanModal = function(tenantId) {
+    const tenant = allTenantsData.find(t => String(t.id) === String(tenantId));
+    if (!tenant) return;
+
+    editingPlanTenantId = tenant.id;
+    const sub = computeSubscriptionState(tenant);
+
+    const modal = document.getElementById('change-tenant-plan-modal');
+    if (!modal) return;
+
+    document.getElementById('plan-modal-tenant-name').innerText = tenant.businessName || tenant.name || '--';
+    document.getElementById('plan-modal-tenant-id').innerText = tenant.id;
+    document.getElementById('plan-modal-current-plan').innerText = sub.planLabel;
+    document.getElementById('plan-modal-current-expiry').innerText = sub.isLifetime
+        ? 'اشتراك دائم (بدون تاريخ انتهاء)'
+        : (tenant.expiresAt ? new Date(tenant.expiresAt).toLocaleDateString('ar-SA') : 'غير محدد');
+
+    const newPlanSelect = document.getElementById('plan-modal-new-plan');
+    if (newPlanSelect) {
+        newPlanSelect.value = sub.planKey || 'lifetime';
+    }
+
+    const defaultRadio = document.querySelector('input[name="plan-timing-mode"][value="start_now"]');
+    if (defaultRadio) defaultRadio.checked = true;
+
+    const activateCheckbox = document.getElementById('plan-modal-activate-now');
+    if (activateCheckbox) activateCheckbox.checked = true;
+
+    window.updatePlanChangePreview();
+    modal.classList.remove('hidden');
+};
+
+window.closeChangeTenantPlanModal = function() {
+    editingPlanTenantId = null;
+    const modal = document.getElementById('change-tenant-plan-modal');
+    if (modal) modal.classList.add('hidden');
+};
+
+window.updatePlanChangePreview = function() {
+    if (!editingPlanTenantId) return;
+    const tenant = allTenantsData.find(t => String(t.id) === String(editingPlanTenantId));
+    if (!tenant) return;
+
+    const newPlanKey = document.getElementById('plan-modal-new-plan').value;
+    const newPlanCfg = getPlanConfig(newPlanKey);
+    const currentPlanCfg = getPlanConfig(tenant.plan || tenant.planKey || 'monthly_30');
+
+    const timingSection = document.getElementById('plan-modal-timing-section');
+    const customDateBox = document.getElementById('plan-modal-custom-date-box');
+    const customExpiryInput = document.getElementById('plan-modal-custom-expiry');
+    const previewBox = document.getElementById('plan-modal-preview-box');
+
+    if (newPlanCfg.isLifetime) {
+        if (timingSection) timingSection.classList.add('hidden');
+        if (customDateBox) customDateBox.classList.add('hidden');
+        if (customExpiryInput) customExpiryInput.value = '';
+        if (previewBox) {
+            previewBox.innerHTML = `
+                <div class="font-bold text-emerald-300 mb-1">معاينة التحويل إلى: ${newPlanCfg.label}</div>
+                <div>• الاشتراك سيصبح دائماً بدون تاريخ انتهاء ولن يتم إيقافه تلقائياً.</div>
+            `;
+        }
+        return;
+    }
+
+    if (timingSection) timingSection.classList.remove('hidden');
+    if (customDateBox) customDateBox.classList.remove('hidden');
+
+    const selectedModeEl = document.querySelector('input[name="plan-timing-mode"]:checked');
+    const mode = selectedModeEl ? selectedModeEl.value : 'start_now';
+    const nowMs = Date.now();
+    let computedExpiryMs = nowMs + (newPlanCfg.durationDays * DAY_MS);
+    let modeExplanation = 'تبدأ المدة كاملة من تاريخ اليوم.';
+
+    if (mode === 'append_after_current') {
+        const currentExpMs = tenant.expiresAt ? new Date(tenant.expiresAt).getTime() : NaN;
+        if (!currentPlanCfg.isLifetime && !Number.isNaN(currentExpMs) && currentExpMs > nowMs) {
+            computedExpiryMs = currentExpMs + (newPlanCfg.durationDays * DAY_MS);
+            const remainingDays = Math.ceil((currentExpMs - nowMs) / DAY_MS);
+            modeExplanation = `تم الاحتفاظ بـ (${remainingDays}) يوم متبقي من الباقة الحالية + (${newPlanCfg.durationDays}) يوم للباقة الجديدة.`;
+        } else {
+            computedExpiryMs = nowMs + (newPlanCfg.durationDays * DAY_MS);
+            modeExplanation = `الباقة الحالية منتهية أو دائمة؛ لذا تبدأ مدة الباقة الجديدة (${newPlanCfg.durationDays} يوم) من اليوم.`;
+        }
+    } else if (mode === 'include_elapsed') {
+        const prevStartMs = getPreviousPlanStartMs(tenant, currentPlanCfg, nowMs);
+        const elapsedDays = Math.max(0, Math.floor((nowMs - prevStartMs) / DAY_MS));
+        computedExpiryMs = prevStartMs + (newPlanCfg.durationDays * DAY_MS);
+        modeExplanation = `تم احتساب (${elapsedDays}) يوم مرّت منذ بداية الفترة السابقة ضمن مدة الباقة الجديدة (${newPlanCfg.durationDays} يوم).`;
+    }
+
+    const computedDate = new Date(computedExpiryMs);
+    if (customExpiryInput) {
+        customExpiryInput.value = formatDateInputYYYYMMDD(computedDate);
+    }
+
+    const graceEndDate = new Date(computedExpiryMs + (newPlanCfg.graceDays * DAY_MS));
+    const graceNote = newPlanCfg.graceDays > 0
+        ? `• فترة السماح: ${newPlanCfg.graceDays} أيام (الإيقاف الفعلي في ${graceEndDate.toLocaleDateString('ar-SA')}).`
+        : '• فترة السماح: لا توجد (إيقاف تلقائي مباشر عند الانتهاء).';
+
+    if (previewBox) {
+        previewBox.innerHTML = `
+            <div class="font-bold text-indigo-300 mb-1">معاينة الباقة الجديدة: ${newPlanCfg.label}</div>
+            <div>• ${modeExplanation}</div>
+            <div>• تاريخ انتهاء الاشتراك: <span class="font-bold text-amber-300">${computedDate.toLocaleDateString('ar-SA')}</span></div>
+            <div>${graceNote}</div>
+        `;
+    }
+};
+
+window.saveTenantPlanChange = async function(event) {
+    event.preventDefault();
+    if (!editingPlanTenantId) return;
+
+    const tenant = allTenantsData.find(t => String(t.id) === String(editingPlanTenantId));
+    if (!tenant) return;
+
+    const newPlanKey = document.getElementById('plan-modal-new-plan').value;
+    const newPlanCfg = getPlanConfig(newPlanKey);
+    const activateNow = document.getElementById('plan-modal-activate-now').checked;
+    const customExpiryVal = document.getElementById('plan-modal-custom-expiry').value;
+    const selectedModeEl = document.querySelector('input[name="plan-timing-mode"]:checked');
+    const mode = selectedModeEl ? selectedModeEl.value : 'start_now';
+    const nowIso = new Date().toISOString();
+
+    let finalExpiresAt = null;
+    if (!newPlanCfg.isLifetime) {
+        if (!customExpiryVal) {
+            return alert('الرجاء تحديد تاريخ انتهاء الاشتراك الجديد.');
+        }
+        const [y, m, d] = customExpiryVal.split('-').map(Number);
+        const now = new Date();
+        const expiryDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
+        finalExpiresAt = expiryDateObj.toISOString();
+    }
+
+    const updates = {
+        plan: newPlanCfg.key,
+        planLabel: newPlanCfg.label,
+        billingCycle: newPlanCfg.billingCycle,
+        graceDays: newPlanCfg.graceDays,
+        isTrial: newPlanCfg.isTrial,
+        isLifetime: newPlanCfg.isLifetime,
+        expiresAt: finalExpiresAt,
+        planStartedAt: mode === 'start_now' ? nowIso : (tenant.planStartedAt || tenant.createdAt || nowIso),
+        planChangedAt: nowIso,
+        planChangeMode: newPlanCfg.isLifetime ? 'lifetime' : mode,
+        preExpiryNotifiedForCycle: false,
+        expiryNotifiedForCycle: false
+    };
+
+    if (activateNow) {
+        updates.isActive = true;
+        updates.reactivatedAt = nowIso;
+    }
+
+    try {
+        await updateDoc(doc(db, "tenants", editingPlanTenantId), updates);
+        alert(`تم تحويل اشتراك منشأة (${tenant.businessName || tenant.name || tenant.id}) إلى (${newPlanCfg.label}) بنجاح!`);
+        window.closeChangeTenantPlanModal();
+        if (typeof window.loadTenants === 'function') {
+            await window.loadTenants();
+        }
+    } catch (err) {
+        console.error('Error updating tenant plan:', err);
+        alert('حدث خطأ أثناء تحديث باقة المنشأة: ' + err.message);
+    }
+};
 
 window.createTenant = async function(event) {
     event.preventDefault();
@@ -816,6 +1020,7 @@ window.createTenant = async function(event) {
 
     const planCfg = getPlanConfig(planKey);
     const now = new Date();
+    const nowIso = now.toISOString();
     const expiresAt = planCfg.isLifetime || planCfg.durationDays === null
         ? null
         : new Date(now.getTime() + (planCfg.durationDays * DAY_MS)).toISOString();
@@ -845,9 +1050,10 @@ window.createTenant = async function(event) {
             isTrial: planCfg.isTrial,
             isLifetime: planCfg.isLifetime,
             expiresAt,
+            planStartedAt: nowIso,
             preExpiryNotifiedForCycle: false,
             expiryNotifiedForCycle: false,
-            createdAt: now.toISOString()
+            createdAt: nowIso
         });
 
         alert(`تم إنشاء المنشأة بنجاح بالمعرف الرقمي (${tenantId}) وتحديد الباقة (${planCfg.label}) وهويتها البصرية!`);
