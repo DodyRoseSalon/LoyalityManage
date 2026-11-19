@@ -10,6 +10,54 @@ let allTenantsData = [];
 let allUsersCache = [];
 
 // ==========================================
+// أداة توليد أرقام المعرفات تلقائياً
+// ==========================================
+window.generateNextTenantId = function(setInput = true) {
+    const usedIds = new Set(
+        allTenantsData
+            .map(t => String(t.id || '').trim())
+            .filter(id => /^[0-9]+$/.test(id))
+    );
+
+    let maxNum = 1000;
+    usedIds.forEach(id => {
+        const num = parseInt(id, 10);
+        if (!Number.isNaN(num) && num >= maxNum) {
+            maxNum = num;
+        }
+    });
+
+    let candidate = maxNum + 1;
+    while (usedIds.has(String(candidate))) {
+        candidate++;
+    }
+
+    const nextId = String(candidate);
+    const inputEl = document.getElementById('tenant-id-input');
+    if (setInput && inputEl) {
+        inputEl.value = nextId;
+    }
+    return nextId;
+};
+
+function ensureAutoIdGeneratorButton() {
+    const inputEl = document.getElementById('tenant-id-input');
+    if (!inputEl || document.getElementById('auto-generate-tenant-id-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'auto-generate-tenant-id-btn';
+    btn.textContent = '🎲 توليد رقم تلقائي';
+    btn.className = 'mt-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer';
+    btn.onclick = () => window.generateNextTenantId(true);
+
+    inputEl.insertAdjacentElement('afterend', btn);
+    if (!inputEl.value.trim()) {
+        window.generateNextTenantId(true);
+    }
+}
+
+// ==========================================
 // 1. نظام تسجيل الدخول ومعالجة الصلاحيات المتعددة
 // ==========================================
 window.handleUserLoginAndRoles = async function(userCredential) {
@@ -147,6 +195,7 @@ window.loadTenants = async function() {
         listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
         if (selectEl) selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
         if (assignSelectEl) assignSelectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
+        ensureAutoIdGeneratorButton();
         return;
     }
 
@@ -169,6 +218,8 @@ window.loadTenants = async function() {
     if(document.getElementById('stat-active-tenants')) document.getElementById('stat-active-tenants').innerText = active;
     if(document.getElementById('stat-trial-tenants')) document.getElementById('stat-trial-tenants').innerText = trial;
     if(document.getElementById('stat-inactive-tenants')) document.getElementById('stat-inactive-tenants').innerText = inactive;
+
+    ensureAutoIdGeneratorButton();
 };
 
 window.filterTenants = function() {
@@ -181,7 +232,7 @@ window.filterTenants = function() {
 
     const filtered = allTenantsData.filter(t => {
         const bName = t.businessName || t.name || '';
-        const matchSearch = bName.toLowerCase().includes(search) || t.id.toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
+        const matchSearch = bName.toLowerCase().includes(search) || String(t.id).toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
         const matchStatus = statusFilter === 'all' || (statusFilter === 'active' && t.isActive) || (statusFilter === 'inactive' && !t.isActive);
         return matchSearch && matchStatus;
     });
@@ -235,7 +286,11 @@ window.createTenant = async function(event) {
 
     if (!tenantIdInput || !tenantNameInput) return;
 
-    const tenantId = tenantIdInput.value.trim().toLowerCase();
+    let tenantId = tenantIdInput.value.trim();
+    if (!/^[0-9]+$/.test(tenantId)) {
+        tenantId = window.generateNextTenantId(false);
+    }
+
     const businessName = tenantNameInput.value.trim();
     const country = countryInput ? countryInput.value : "المملكة العربية السعودية";
     const currency = currencyInput ? currencyInput.value : "ريال سعودي";
@@ -247,7 +302,8 @@ window.createTenant = async function(event) {
         const tenantSnap = await getDoc(tenantRef);
 
         if (tenantSnap.exists()) {
-            alert('خطأ: معرف المنشأة هذا موجود مسبقاً، الرجاء اختيار معرف آخر.');
+            const suggestedId = window.generateNextTenantId(true);
+            alert(`خطأ: معرف المنشأة (${tenantId}) موجود مسبقاً. تم توليد المعرف الرقمي التالي تلقائياً (${suggestedId}) في الحقل.`);
             return;
         }
 
@@ -256,10 +312,12 @@ window.createTenant = async function(event) {
             isActive: true, isTrial: plan.startsWith('trial'), createdAt: new Date().toISOString()
         });
 
-        alert('تم إنشاء المنشأة بنجاح وتحديد هويتها البصرية!');
-        tenantIdInput.value = '';
+        alert(`تم إنشاء المنشأة بنجاح بالمعرف الرقمي (${tenantId}) وتحديد هويتها البصرية!`);
         tenantNameInput.value = '';
-        if (typeof window.loadTenants === 'function') window.loadTenants();
+        if (typeof window.loadTenants === 'function') {
+            await window.loadTenants();
+            window.generateNextTenantId(true);
+        }
     } catch (err) {
         console.error("Error creating tenant:", err);
         alert('حدث خطأ أثناء إنشاء المنشأة: ' + err.message);
@@ -326,24 +384,21 @@ window.assignExtraRoleToUser = async function(e) {
 
         let permissions = Array.isArray(userData.permissions) ? [...userData.permissions] : [];
 
-        // ترحيل الصلاحية الأساسية القديمة إلى المصفوفة إذا لم تكن موجودة
         if (permissions.length === 0 && userData.role) {
             permissions.push({
-                facilityId: userData.tenantId || userData.registeredTenant || 'dody_rose',
+                facilityId: userData.tenantId || userData.registeredTenant || '1001',
                 facilityName: userData.facilityName || 'المنشأة الأساسية',
                 role: userData.role
             });
         }
 
-        // التحقق من عدم تكرار نفس الدور في نفس المنشأة
         const exists = permissions.some(p => p.facilityId === facilityId && p.role === role);
         if (exists) {
             alert("هذا المستخدم يمتلك هذه الصلاحية بالفعل في هذه المنشأة.");
             return;
         }
 
-        // جلب اسم المنشأة الفعلي من بيانات المنشآت المحملة
-        const matchedTenant = allTenantsData.find(t => t.id === facilityId);
+        const matchedTenant = allTenantsData.find(t => String(t.id) === String(facilityId));
         const facilityName = matchedTenant ? (matchedTenant.businessName || matchedTenant.name) : facilityId;
 
         permissions.push({
