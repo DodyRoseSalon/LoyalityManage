@@ -168,8 +168,8 @@
                         <h3 class="text-lg font-bold text-indigo-800 mb-1">إضافة منشأة جديدة وتحديد الدولة والعملة</h3>
                         <form onsubmit="createTenant(event)" class="space-y-3 mt-3">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة (مثال: dody_rose أو dody_rose_egy)</label>
-                                <input type="text" id="tenant-id-input" pattern="[a-zA-Z0-9_]+" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">معرف المنشأة الرقمي (مثال: 1001 أو 1002)</label>
+                                <input type="text" id="tenant-id-input" pattern="[0-9]+" inputmode="numeric" dir="ltr" placeholder="1001" required class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none text-right font-mono">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">اسم المنشأة التجاري</label>
@@ -305,7 +305,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                         <h4 class="text-lg font-bold text-indigo-800">إدارة المنشآت والاشتراكات</h4>
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                            <input type="text" id="search-tenants-input" onkeyup="filterTenants()" placeholder="🔍 بحث بالاسم أو المعرف..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
+                            <input type="text" id="search-tenants-input" onkeyup="filterTenants()" placeholder="🔍 بحث بالاسم أو المعرف الرقمي..." class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none w-full md:w-64">
                             <select id="filter-tenants-status" onchange="filterTenants()" class="px-3 py-2 border rounded-xl text-xs bg-gray-50 outline-none">
                                 <option value="all">جميع الحالات</option>
                                 <option value="active">النشطة فقط</option>
@@ -340,7 +340,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-md border theme-border flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-xl font-bold theme-text-dark">لوحة تحكم المنشأة: <span id="current-tenant-name" class="theme-text-primary">--</span></h3>
-                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold theme-text-primary">--</span> | المعرف: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
+                        <p class="text-xs text-gray-500 mt-1">الدولة: <span id="tenant-country-badge" class="font-bold text-gray-700">--</span> | العملة: <span id="tenant-currency-badge" class="font-bold theme-text-primary">--</span> | المعرف الرقمي: <span id="current-tenant-id-badge" class="font-mono font-bold">--</span></p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button onclick="openChangePasswordModal()" class="theme-bg-light theme-text-dark px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
@@ -614,7 +614,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
                     <div class="flex justify-between items-center">
                         <label class="block text-sm font-bold theme-text-dark">1. قراءة كود العميل (UID) أو إدخال رقم الهاتف / المعرف</label>
-                        <button onclick="toggleCameraScanner(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+                        <button onclick="toggleCameraScanner(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" id="cam-toggle-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 shadow-sm">
                             📷 تشغيل كاميرا المسح
                         </button>
                     </div>
@@ -623,7 +623,7 @@
 
                     <div class="flex gap-2">
                         <input type="text" id="pos-customer-uid" placeholder="أدخل معرف العميل أو رقم الهاتف (الأساسي أو الإضافي)..." class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50 outline-none font-mono">
-                        <button onclick="posFindCustomer(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="bg-indigo-600 theme-bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
+                        <button onclick="posFindCustomer(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" class="bg-indigo-600 theme-bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold transition cursor-pointer whitespace-nowrap">بحث وعرض المحفظة</button>
                     </div>
                 </div>
 
@@ -650,7 +650,7 @@
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الفاتورة (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-amount-input" placeholder="مثال: 200" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
-                            <button onclick="posEarnPoints(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                            <button onclick="posEarnPoints(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 حساب ومنح النقاط تلقائياً
                             </button>
                         </div>
@@ -661,7 +661,7 @@
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">قيمة الخدمة الفعلية (<span class="pos-curr-text">ريال</span>)</label>
                                 <input type="number" id="pos-service-price-input" placeholder="مثال: 50" min="0" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 outline-none">
                             </div>
-                            <button onclick="posRedeemPoints(document.getElementById('current-tenant-id-badge')?.innerText || 'dody_rose')" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
+                            <button onclick="posRedeemPoints(document.getElementById('current-tenant-id-badge')?.innerText || '1001')" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition cursor-pointer">
                                 خصم النقاط المكافئة تلقائياً
                             </button>
                         </div>
@@ -726,7 +726,7 @@
                         <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                             <div>
                                 <h4 id="portal-tenant-title" class="text-lg font-bold theme-text-dark">--</h4>
-                                <p class="text-xs text-gray-500">معرف المنشأة: <span id="portal-tenant-id-label" class="font-mono font-bold theme-text-primary">--</span></p>
+                                <p class="text-xs text-gray-500">المعرف الرقمي للمنشأة: <span id="portal-tenant-id-label" class="font-mono font-bold theme-text-primary">--</span></p>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span id="portal-tenant-points-badge" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-extrabold">0 نقطة</span>
@@ -897,12 +897,12 @@
                 <button onclick="closeJoinTenantModal()" class="text-gray-400 hover:text-red-600 font-bold text-lg cursor-pointer">✕</button>
             </div>
             <p class="text-xs text-gray-600 leading-relaxed">
-                أدخل معرف المنشأة (<span class="font-mono font-bold theme-text-primary">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.
+                أدخل المعرف الرقمي للمنشأة (<span class="font-mono font-bold theme-text-primary">Facility ID</span>) الخاص بالمتجر أو الصالون للانضمام فوراً والحصول على نقاطك الترحيبية.
             </p>
             <form onsubmit="joinNewTenant(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">معرف المنشأة (Facility ID)</label>
-                    <input type="text" id="join-tenant-id-input" required placeholder="مثال: dody_rose" dir="ltr" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50 font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">المعرف الرقمي للمنشأة (Facility ID)</label>
+                    <input type="text" id="join-tenant-id-input" pattern="[0-9]+" inputmode="numeric" required placeholder="مثال: 1001" dir="ltr" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50 font-mono outline-none focus:ring-2 focus:ring-indigo-500 text-right">
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" id="join-tenant-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">
