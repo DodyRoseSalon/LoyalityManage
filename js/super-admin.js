@@ -1,5 +1,5 @@
 /**
- * نظام إدارة السوبر أدمن والصلاحيات المتعددة - Dody Rose Platform (النسخة الشاملة والمحدثة)
+ * نظام إدارة السوبر أدمن والصلاحيات المتعددة - Dody Rose Platform (النسخة الشاملة والتقارير)
  */
 
 import { db, auth } from "./firebase-config.js";
@@ -8,6 +8,11 @@ import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://
 
 let allTenantsData = [];
 let allUsersCache = [];
+let currentSuperReportFilter = 'all';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const GRACE_DAYS = 3;
+const REMINDER_DAYS_BEFORE_EXPIRY = 3;
 
 // ==========================================
 // أداة توليد أرقام المعرفات تلقائياً
@@ -56,6 +61,299 @@ function ensureAutoIdGeneratorButton() {
         window.generateNextTenantId(true);
     }
 }
+
+// ==========================================
+// منطق الاشتراكات الشهري والتجريبي وفترة السماح
+// ==========================================
+function isMonthlyPlan(plan, isTrial) {
+    if (isTrial) return false;
+    return String(plan || '').startsWith('monthly');
+}
+
+function getPlanDurationDays(plan) {
+    if (plan === 'trial_7') return 7;
+    if (plan === 'trial_14') return 14;
+    if (plan === 'monthly_30') return 30;
+    return 30;
+}
+
+function computeSubscriptionState(tenantData, nowMs = Date.now()) {
+    const isTrial = Boolean(tenantData.isTrial) || String(tenantData.plan || '').startsWith('trial');
+    const monthly = isMonthlyPlan(tenantData.plan, isTrial);
+    const expiresAtMs = tenantData.expiresAt ? new Date(tenantData.expiresAt).getTime() : null;
+
+    if (!expiresAtMs || Number.isNaN(expiresAtMs)) {
+        return {
+            isMonthly: monthly,
+            isTrial,
+            expiresAtMs: null,
+            graceEndMs: null,
+            daysUntilExpiry: null,
+            isNearExpiry: false,
+            shouldDeactivate: false,
+            inGracePeriod: false,
+            needsPreExpiryReminder: false,
+            statusLabel: tenantData.isActive ? 'نشط' : 'موقوف',
+            statusType: tenantData.isActive ? 'active' : 'inactive',
+            planLabel: isTrial ? 'تجريبي / مجاني' : 'شهري'
+        };
+    }
+
+    const msUntilExpiry = expiresAtMs - nowMs;
+    const daysUntilExpiry = msUntilExpiry / DAY_MS;
+
+    if (!monthly) {
+        const expired = nowMs >= expiresAtMs;
+        const nearTrial = !expired && daysUntilExpiry <= REMINDER_DAYS_BEFORE_EXPIRY;
+        return {
+            isMonthly: false,
+            isTrial: true,
+            expiresAtMs,
+            graceEndMs: expiresAtMs,
+            daysUntilExpiry,
+            isNearExpiry: nearTrial,
+            shouldDeactivate: expired,
+            inGracePeriod: false,
+            needsPreExpiryReminder: false,
+            statusLabel: expired ? 'منتهي / موقوف' : (tenantData.isActive ? 'تجريبي نشط' : 'موقوف'),
+            statusType: expired || !tenantData.isActive ? 'inactive' : 'active',
+            planLabel: 'تجريبي / مجاني'
+        };
+    }
+
+    const graceEndMs = expiresAtMs + (GRACE_DAYS * DAY_MS);
+    const isNearExpiry = daysUntilExpiry <= REMINDER_DAYS_BEFORE_EXPIRY && daysUntilExpiry > 0;
+    const needsPreExpiryReminder = isNearExpiry && !tenantData.preExpiryNotifiedForCycle;
+    const inGracePeriod = nowMs >= expiresAtMs && nowMs < graceEndMs;
+    const graceExpired = nowMs >= graceEndMs;
+
+    let statusLabel = 'شهري نشط';
+    let statusType = 'active';
+
+    if (graceExpired) {
+        statusLabel = 'موقوف بعد السماح';
+        statusType = 'inactive';
+    } else if (inGracePeriod) {
+        const remainingGraceDays = Math.max(1, Math.ceil((graceEndMs - nowMs) / DAY_MS));
+        statusLabel = `فترة سماح (${remainingGraceDays} يوم)`;
+        statusType = 'grace';
+    } else if (!tenantData.isActive) {
+        statusLabel = 'موقوف';
+        statusType = 'inactive';
+    } else if (isNearExpiry) {
+        statusLabel = 'قريب الانتهاء (تنبيه)';
+        statusType = 'active';
+    }
+
+    return {
+        isMonthly: true,
+        isTrial: false,
+        expiresAtMs,
+        graceEndMs,
+        daysUntilExpiry,
+        isNearExpiry,
+        shouldDeactivate: graceExpired,
+        inGracePeriod,
+        needsPreExpiryReminder,
+        statusLabel,
+        statusType,
+        planLabel: 'شهري'
+    };
+}
+
+async function triggerPreExpiryReminderNotification(tenantId, tenantData, subState) {
+    const targetEmail = tenantData.managerEmail || tenantData.contactEmail || '';
+    const expDateStr = new Date(subState.expiresAtMs).toISOString().slice(0, 10);
+
+    const notifRef = doc(collection(db, "subscription_notifications"));
+    await setDoc(notifRef, {
+        tenantId,
+        businessName: tenantData.businessName || tenantData.name || tenantId,
+        recipientEmail: targetEmail,
+        type: 'pre_expiry_3_days',
+        expiresAt: new Date(subState.expiresAtMs).toISOString(),
+        graceEndAt: new Date(subState.graceEndMs).toISOString(),
+        message: `تنبيه: اشتراك منشأة (${tenantData.businessName || tenantId}) ينتهي بتاريخ ${expDateStr}، ولديكم 3 أيام سماح بعد الانتهاء (إجمالي 6 أيام للسداد والتنشيط).`,
+        createdAt: new Date().toISOString(),
+        status: targetEmail ? 'queued_for_email' : 'missing_manager_email'
+    });
+
+    await updateDoc(doc(db, "tenants", tenantId), {
+        preExpiryNotifiedForCycle: true,
+        lastReminderSentAt: new Date().toISOString()
+    });
+}
+
+window.runSubscriptionLifecycleCheck = async function(showSummaryAlert = false) {
+    const nowMs = Date.now();
+    let deactivatedCount = 0;
+    let remindersCount = 0;
+
+    for (const tenant of allTenantsData) {
+        const state = computeSubscriptionState(tenant, nowMs);
+
+        if (state.needsPreExpiryReminder) {
+            await triggerPreExpiryReminderNotification(tenant.id, tenant, state);
+            remindersCount++;
+        }
+
+        if (state.shouldDeactivate && tenant.isActive !== false) {
+            await updateDoc(doc(db, "tenants", tenant.id), {
+                isActive: false,
+                deactivatedAt: new Date().toISOString(),
+                deactivationReason: state.isMonthly ? 'monthly_grace_period_ended' : 'trial_expired'
+            });
+            tenant.isActive = false;
+            deactivatedCount++;
+        }
+    }
+
+    if (showSummaryAlert) {
+        alert(`تم فحص الاشتراكات: تم إيقاف (${deactivatedCount}) منشأة منتهية، وتسجيل (${remindersCount}) إشعار تجديد قبل الانتهاء بـ 3 أيام.`);
+        if (typeof window.loadTenants === 'function') {
+            await window.loadTenants();
+        }
+    }
+};
+
+// ==========================================
+// تقرير السوبر أدمن: المنشآت والاشتراكات والتنبيهات
+// ==========================================
+window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReportFilter) {
+    currentSuperReportFilter = filterMode;
+    const reportBox = document.getElementById('super-admin-reports-box');
+    if (!reportBox) return;
+
+    const nowMs = Date.now();
+    const enriched = allTenantsData.map(t => ({ tenant: t, sub: computeSubscriptionState(t, nowMs) }));
+
+    const activeCount = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'active').length;
+    const graceCount = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'grace').length;
+    const nearExpiryCount = enriched.filter(x => x.sub.isNearExpiry).length;
+    const inactiveCount = enriched.filter(x => !x.tenant.isActive || x.sub.statusType === 'inactive').length;
+
+    let filteredList = enriched;
+    if (filterMode === 'active') {
+        filteredList = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'active');
+    } else if (filterMode === 'grace') {
+        filteredList = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'grace');
+    } else if (filterMode === 'near_expiry') {
+        filteredList = enriched.filter(x => x.sub.isNearExpiry);
+    } else if (filterMode === 'inactive') {
+        filteredList = enriched.filter(x => !x.tenant.isActive || x.sub.statusType === 'inactive');
+    }
+
+    const filterLabelMap = {
+        all: 'تقرير جميع المنشآت والاشتراكات',
+        active: 'تقرير المنشآت النشطة',
+        grace: 'تقرير المنشآت في فترة السماح',
+        near_expiry: 'تقرير الاشتراكات القريبة من الانتهاء (خلال 3 أيام)',
+        inactive: 'تقرير المنشآت الموقوفة والمنتهية'
+    };
+
+    let rowsHtml = '';
+    if (filteredList.length === 0) {
+        rowsHtml = '<tr><td colspan="5" class="p-4 text-center text-gray-400">لا توجد منشآت ضمن هذا التصنيف حالياً.</td></tr>';
+    } else {
+        filteredList.forEach(({ tenant, sub }) => {
+            const name = tenant.businessName || tenant.name || '--';
+            const expStr = tenant.expiresAt ? new Date(tenant.expiresAt).toLocaleDateString('ar-SA') : '--';
+            const graceStr = (sub.isMonthly && sub.graceEndMs) ? new Date(sub.graceEndMs).toLocaleDateString('ar-SA') : 'لا يوجد (إيقاف مباشر)';
+            rowsHtml += `
+                <tr class="hover:bg-gray-50 text-xs">
+                    <td class="p-2.5 font-bold text-gray-800">${name} <span class="font-mono text-indigo-600">(${tenant.id})</span></td>
+                    <td class="p-2.5">${sub.planLabel} • ${tenant.currency || 'ريال'}</td>
+                    <td class="p-2.5 font-semibold">${sub.statusLabel}</td>
+                    <td class="p-2.5">${expStr}</td>
+                    <td class="p-2.5 text-gray-500">${graceStr}</td>
+                </tr>
+            `;
+        });
+    }
+
+    reportBox.innerHTML = `
+        <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+                <div>
+                    <h4 class="font-extrabold text-sm text-indigo-950">${filterLabelMap[filterMode] || filterLabelMap.all}</h4>
+                    <p class="text-[11px] text-gray-500">إجمالي السجلات المعروضة: ${filteredList.length} من أصل ${allTenantsData.length} منشأة</p>
+                </div>
+                <button type="button" onclick="window.exportSuperAdminTenantsCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>تصدير التقرير CSV</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-right">
+                <button type="button" onclick="window.renderSuperAdminReportsSummary('all')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 hover:bg-gray-100 text-gray-800'}">
+                    <div class="font-bold">الكل</div>
+                    <div class="text-sm font-extrabold mt-0.5">${allTenantsData.length}</div>
+                </button>
+                <button type="button" onclick="window.renderSuperAdminReportsSummary('active')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'active' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-emerald-50/60 hover:bg-emerald-100 text-emerald-900'}">
+                    <div class="font-bold">نشط</div>
+                    <div class="text-sm font-extrabold mt-0.5">${activeCount}</div>
+                </button>
+                <button type="button" onclick="window.renderSuperAdminReportsSummary('near_expiry')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'near_expiry' ? 'bg-amber-600 text-white border-amber-600' : 'bg-amber-50/70 hover:bg-amber-100 text-amber-900'}">
+                    <div class="font-bold">قريب الانتهاء</div>
+                    <div class="text-sm font-extrabold mt-0.5">${nearExpiryCount}</div>
+                </button>
+                <button type="button" onclick="window.renderSuperAdminReportsSummary('grace')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'grace' ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-50/70 hover:bg-orange-100 text-orange-900'}">
+                    <div class="font-bold">فترة سماح</div>
+                    <div class="text-sm font-extrabold mt-0.5">${graceCount}</div>
+                </button>
+                <button type="button" onclick="window.renderSuperAdminReportsSummary('inactive')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'inactive' ? 'bg-red-600 text-white border-red-600' : 'bg-red-50/60 hover:bg-red-100 text-red-900'}">
+                    <div class="font-bold">موقوف / منتهي</div>
+                    <div class="text-sm font-extrabold mt-0.5">${inactiveCount}</div>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b text-[11px] text-gray-600">
+                            <th class="p-2.5">المنشأة</th>
+                            <th class="p-2.5">الباقة والعملة</th>
+                            <th class="p-2.5">حالة الاشتراك</th>
+                            <th class="p-2.5">تاريخ الانتهاء</th>
+                            <th class="p-2.5">نهاية فترة السماح</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">${rowsHtml}</tbody>
+                </table>
+            </div>
+        </div>
+    `;
+};
+
+window.exportSuperAdminTenantsCSV = function() {
+    if (!allTenantsData.length) return alert('لا توجد بيانات منشآت لتصديرها.');
+    const nowMs = Date.now();
+    const headers = ['المعرف', 'اسم المنشأة', 'بريد المدير', 'الدولة', 'العملة', 'الباقة', 'الحالة', 'تاريخ الانتهاء'];
+    const lines = [headers.join(',')];
+
+    allTenantsData.forEach(t => {
+        const sub = computeSubscriptionState(t, nowMs);
+        const row = [
+            `"${String(t.id || '').replace(/"/g, '""')}"`,
+            `"${String(t.businessName || t.name || '').replace(/"/g, '""')}"`,
+            `"${String(t.managerEmail || '').replace(/"/g, '""')}"`,
+            `"${String(t.country || '').replace(/"/g, '""')}"`,
+            `"${String(t.currency || '').replace(/"/g, '""')}"`,
+            `"${String(sub.planLabel || '').replace(/"/g, '""')}"`,
+            `"${String(sub.statusLabel || '').replace(/"/g, '""')}"`,
+            `"${t.expiresAt ? new Date(t.expiresAt).toISOString().slice(0, 10) : ''}"`
+        ];
+        lines.push(row.join(','));
+    });
+
+    const blob = new Blob(["\uFEFF" + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `super_admin_tenants_report_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+};
 
 // ==========================================
 // 1. نظام تسجيل الدخول ومعالجة الصلاحيات المتعددة
@@ -189,12 +487,16 @@ window.loadTenants = async function() {
 
     const snap = await getDocs(collection(db, "tenants"));
     allTenantsData = [];
-    let total = 0, active = 0, trial = 0, inactive = 0;
 
     if (snap.empty) {
         listEl.innerHTML = '<p class="text-gray-400 py-4">لا توجد منشآت مسجلة حالياً.</p>';
         if (selectEl) selectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
         if (assignSelectEl) assignSelectEl.innerHTML = '<option value="">لا توجد منشآت متاحة</option>';
+        if (document.getElementById('stat-total-tenants')) document.getElementById('stat-total-tenants').innerText = 0;
+        if (document.getElementById('stat-active-tenants')) document.getElementById('stat-active-tenants').innerText = 0;
+        if (document.getElementById('stat-trial-tenants')) document.getElementById('stat-trial-tenants').innerText = 0;
+        if (document.getElementById('stat-inactive-tenants')) document.getElementById('stat-inactive-tenants').innerText = 0;
+        window.renderSuperAdminReportsSummary(currentSuperReportFilter);
         ensureAutoIdGeneratorButton();
         return;
     }
@@ -202,15 +504,27 @@ window.loadTenants = async function() {
     let selectHtml = '<option value="">-- اختر المنشأة --</option>';
 
     snap.forEach((d) => {
-        total++;
         const data = d.data();
-        if (data.isActive) active++; else inactive++;
-        if (data.isTrial) trial++;
         allTenantsData.push({ id: d.id, ...data });
         selectHtml += `<option value="${d.id}">${data.businessName || data.name} (${data.country || 'السعودية'})</option>`;
     });
 
+    await window.runSubscriptionLifecycleCheck(false);
+
+    let total = 0, active = 0, trial = 0, inactive = 0;
+    allTenantsData.forEach((t) => {
+        total++;
+        const sub = computeSubscriptionState(t);
+        if (sub.isTrial) trial++;
+        if (t.isActive && sub.statusType !== 'inactive') {
+            active++;
+        } else {
+            inactive++;
+        }
+    });
+
     renderTenantsTable(allTenantsData);
+    window.renderSuperAdminReportsSummary(currentSuperReportFilter);
     if (selectEl) selectEl.innerHTML = selectHtml;
     if (assignSelectEl) assignSelectEl.innerHTML = selectHtml;
     
@@ -233,7 +547,12 @@ window.filterTenants = function() {
     const filtered = allTenantsData.filter(t => {
         const bName = t.businessName || t.name || '';
         const matchSearch = bName.toLowerCase().includes(search) || String(t.id).toLowerCase().includes(search) || (t.country && t.country.toLowerCase().includes(search));
-        const matchStatus = statusFilter === 'all' || (statusFilter === 'active' && t.isActive) || (statusFilter === 'inactive' && !t.isActive);
+        const sub = computeSubscriptionState(t);
+        const matchStatus =
+            statusFilter === 'all' ||
+            (statusFilter === 'active' && t.isActive && sub.statusType === 'active') ||
+            (statusFilter === 'grace' && t.isActive && sub.statusType === 'grace') ||
+            (statusFilter === 'inactive' && (!t.isActive || sub.statusType === 'inactive'));
         return matchSearch && matchStatus;
     });
     renderTenantsTable(filtered);
@@ -250,21 +569,31 @@ function renderTenantsTable(tenants) {
 
     let html = `<table class="w-full text-right border-collapse">
         <thead><tr class="border-b bg-gray-50 text-xs text-gray-600">
-            <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف والدولة</th><th class="p-3">الباقة والعملة</th><th class="p-3">الحالة</th><th class="p-3">إجراءات</th>
+            <th class="p-3">اسم المنشأة</th><th class="p-3">المعرف والدولة</th><th class="p-3">الباقة والعملة</th><th class="p-3">الحالة والانتهاء</th><th class="p-3">إجراءات</th>
         </tr></thead><tbody class="divide-y divide-gray-100">`;
 
     tenants.forEach(data => {
-        let planBadge = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">دائم</span>';
-        if (data.isTrial) planBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي</span>`;
-        
+        const sub = computeSubscriptionState(data);
+        const planBadge = sub.isTrial
+            ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي / مجاني</span>'
+            : '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">شهري</span>';
+
+        let statusBadge = '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوف</span>';
+        if (data.isActive && sub.statusType === 'grace') {
+            statusBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs font-bold">${sub.statusLabel}</span>`;
+        } else if (data.isActive && sub.statusType === 'active') {
+            statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">${sub.statusLabel}</span>`;
+        }
+
+        const expFormatted = data.expiresAt ? new Date(data.expiresAt).toLocaleDateString('ar-SA') : '--';
         const bName = data.businessName || data.name || '--';
         html += `<tr class="hover:bg-gray-50">
             <td class="p-3 font-semibold">${bName}</td>
             <td class="p-3 text-xs"><span class="font-mono text-indigo-600">${data.id}</span><br><span class="text-gray-500">${data.country || 'المملكة العربية السعودية'}</span></td>
             <td class="p-3 text-xs">${planBadge} (${data.currency || 'ريال'})</td>
-            <td class="p-3">${data.isActive ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">نشطة</span>' : '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوفة</span>'}</td>
+            <td class="p-3 text-xs">${statusBadge}<br><span class="text-[11px] text-gray-500">ينتهي: ${expFormatted}</span></td>
             <td class="p-3 flex gap-1.5 flex-wrap">
-                <button onclick="toggleTenantStatus('${data.id}', ${data.isActive})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
+                <button onclick="toggleTenantStatus('${data.id}', ${Boolean(data.isActive)})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
                 <button onclick="extendTenantDays('${data.id}', 30)" class="px-2 py-1 rounded text-xs bg-indigo-100 text-indigo-700 cursor-pointer">+30 يوم</button>
                 <button onclick="window.previewTenantTheme('${data.theme || 'indigo'}')" class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-700 cursor-pointer">معاينة السكيم</button>
                 <button onclick="deleteTenant('${data.id}', '${bName}')" class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 cursor-pointer">حذف</button>
@@ -279,6 +608,7 @@ window.createTenant = async function(event) {
     event.preventDefault();
     const tenantIdInput = document.getElementById('tenant-id-input');
     const tenantNameInput = document.getElementById('tenant-name-input');
+    const managerEmailInput = document.getElementById('tenant-manager-email-input');
     const countryInput = document.getElementById('tenant-country-input');
     const currencyInput = document.getElementById('tenant-currency-input');
     const planInput = document.getElementById('tenant-plan-input');
@@ -292,10 +622,16 @@ window.createTenant = async function(event) {
     }
 
     const businessName = tenantNameInput.value.trim();
+    const managerEmail = managerEmailInput ? managerEmailInput.value.trim().toLowerCase() : '';
     const country = countryInput ? countryInput.value : "المملكة العربية السعودية";
     const currency = currencyInput ? currencyInput.value : "ريال سعودي";
-    const plan = planInput ? planInput.value : "unlimited";
+    const plan = planInput ? planInput.value : "monthly_30";
     const theme = themeInput ? themeInput.value : "indigo";
+
+    const isTrial = plan.startsWith('trial');
+    const durationDays = getPlanDurationDays(plan);
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + (durationDays * DAY_MS)).toISOString();
 
     try {
         const tenantRef = doc(db, "tenants", tenantId);
@@ -308,12 +644,25 @@ window.createTenant = async function(event) {
         }
 
         await setDoc(tenantRef, {
-            businessName, name: businessName, country, currency, plan, theme,
-            isActive: true, isTrial: plan.startsWith('trial'), createdAt: new Date().toISOString()
+            businessName,
+            name: businessName,
+            managerEmail,
+            country,
+            currency,
+            plan,
+            billingCycle: isTrial ? 'trial' : 'monthly',
+            graceDays: isTrial ? 0 : GRACE_DAYS,
+            theme,
+            isActive: true,
+            isTrial,
+            expiresAt,
+            preExpiryNotifiedForCycle: false,
+            createdAt: now.toISOString()
         });
 
         alert(`تم إنشاء المنشأة بنجاح بالمعرف الرقمي (${tenantId}) وتحديد هويتها البصرية!`);
         tenantNameInput.value = '';
+        if (managerEmailInput) managerEmailInput.value = '';
         if (typeof window.loadTenants === 'function') {
             await window.loadTenants();
             window.generateNextTenantId(true);
@@ -325,7 +674,13 @@ window.createTenant = async function(event) {
 };
 
 window.toggleTenantStatus = async function(tenantId, currentStatus) {
-    await updateDoc(doc(db, "tenants", tenantId), { isActive: !currentStatus });
+    const nextActive = !currentStatus;
+    const updates = { isActive: nextActive };
+    if (nextActive) {
+        updates.preExpiryNotifiedForCycle = false;
+        updates.reactivatedAt = new Date().toISOString();
+    }
+    await updateDoc(doc(db, "tenants", tenantId), updates);
     if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
@@ -337,8 +692,13 @@ window.extendTenantDays = async function(tenantId, days) {
     if (currentExp < new Date()) currentExp = new Date();
     currentExp.setDate(currentExp.getDate() + days);
 
-    await updateDoc(doc(db, "tenants", tenantId), { expiresAt: currentExp.toISOString() });
-    alert(`تم تمديد اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
+    await updateDoc(doc(db, "tenants", tenantId), {
+        expiresAt: currentExp.toISOString(),
+        isActive: true,
+        preExpiryNotifiedForCycle: false,
+        renewedAt: new Date().toISOString()
+    });
+    alert(`تم تمديد وتنشيط اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
     if (typeof window.loadTenants === 'function') window.loadTenants();
 };
 
@@ -557,6 +917,12 @@ window.createTenantStaff = async function(e) {
             permissions: initialPermissions,
             isBlocked: false, createdAt: new Date().toISOString()
         });
+
+        if (role === 'tenant_admin' || role === 'manager') {
+            await updateDoc(doc(db, "tenants", tenantId), {
+                managerEmail: email.toLowerCase()
+            }).catch(() => {});
+        }
 
         alert(`تم إنشاء حساب الصلاحية (${name}) بنجاح!`);
         nameEl.value = '';

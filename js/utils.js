@@ -28,6 +28,14 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// إظهار/إخفاء الشريط الجانبي على الشاشات الصغيرة
+window.toggleSidebarDrawer = function(scope) {
+    const sidebarId = scope === 'super' ? 'super-admin-sidebar' : 'tenant-admin-sidebar';
+    const sidebar = document.getElementById(sidebarId);
+    if (!sidebar) return;
+    sidebar.classList.toggle('hidden');
+};
+
 // تطبيق السكيم والتدرج اللوني الواضح على واجهة التطبيق بالكامل
 window.applyTenantTheme = function(themeKey = 'indigo') {
     const theme = TENANT_THEMES[themeKey] || TENANT_THEMES.indigo;
@@ -93,20 +101,47 @@ window.downloadQrPng = function(qrContainerId, filename = 'qrcode.png') {
     document.body.removeChild(a);
 };
 
-// نظام التبويبات لمدير المنشأة
+// التنقل في شريط السوبر أدمن الجانبي
+window.switchSuperSection = function(sectionName, ev) {
+    document.querySelectorAll('.super-section-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.super-nav-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'font-bold');
+        btn.classList.add('bg-gray-50', 'text-gray-700', 'font-semibold');
+    });
+
+    const targetSec = document.getElementById(`super-sec-${sectionName}`);
+    if (targetSec) targetSec.classList.remove('hidden');
+
+    if (ev && ev.currentTarget) {
+        ev.currentTarget.classList.remove('bg-gray-50', 'text-gray-700', 'font-semibold');
+        ev.currentTarget.classList.add('bg-indigo-600', 'text-white', 'font-bold');
+    }
+
+    if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('super-admin-sidebar');
+        if (sidebar) sidebar.classList.add('hidden');
+    }
+};
+
+// التنقل في شريط مدير المنشأة الجانبي
 window.switchAdminTab = function(tabName, ev) {
     document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.admin-tab-btn').forEach(btn => {
         btn.classList.remove('bg-indigo-600', 'theme-bg-primary', 'text-white', 'font-bold');
-        btn.classList.add('bg-gray-100', 'text-gray-700', 'font-semibold');
+        btn.classList.add('bg-gray-50', 'text-gray-700', 'font-semibold');
     });
 
     const targetTab = document.getElementById(`admin-tab-${tabName}`);
     if (targetTab) targetTab.classList.remove('hidden');
 
     if (ev && ev.currentTarget) {
-        ev.currentTarget.classList.remove('bg-gray-100', 'text-gray-700', 'font-semibold');
+        ev.currentTarget.classList.remove('bg-gray-50', 'text-gray-700', 'font-semibold');
         ev.currentTarget.classList.add('bg-indigo-600', 'theme-bg-primary', 'text-white', 'font-bold');
+    }
+
+    if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('tenant-admin-sidebar');
+        if (sidebar) sidebar.classList.add('hidden');
     }
 };
 

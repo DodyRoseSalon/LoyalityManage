@@ -1,9 +1,14 @@
 import { db } from "./firebase-config.js";
 import { doc, getDoc, updateDoc, collection, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
+let allTenantCustomersCache = [];
+let activeTenantReportTab = 'all';
+let currentTenantIdActive = '';
+
 // تحميل بيانات لوحة تحكم مدير المنشأة مع تطبيق السكيم
 window.loadTenantAdminData = async function(tenantId) {
     if (!tenantId) return;
+    currentTenantIdActive = tenantId;
     
     try {
         const tDoc = await getDoc(doc(db, "tenants", tenantId));
@@ -17,7 +22,9 @@ window.loadTenantAdminData = async function(tenantId) {
         
         // تطبيق السكيم البصري الخاص بالمنشأة فوراً
         const savedTheme = data.theme || 'indigo';
-        window.applyTenantTheme(savedTheme);
+        if (typeof window.applyTenantTheme === 'function') {
+            window.applyTenantTheme(savedTheme);
+        }
         if (document.getElementById('rule-tenant-theme')) {
             document.getElementById('rule-tenant-theme').value = savedTheme;
         }
@@ -36,7 +43,7 @@ window.loadTenantAdminData = async function(tenantId) {
         if (directLinkInput) directLinkInput.value = directLink;
 
         const qrContainer = document.getElementById('tenant-reg-qrcode');
-        if (qrContainer) {
+        if (qrContainer && typeof QRCode !== 'undefined') {
             qrContainer.innerHTML = '';
             new QRCode(qrContainer, {
                 text: directLink,
@@ -82,7 +89,9 @@ window.saveTenantLoyaltyRules = async function(e, tenantId) {
             theme: selectedTheme
         });
         
-        window.applyTenantTheme(selectedTheme);
+        if (typeof window.applyTenantTheme === 'function') {
+            window.applyTenantTheme(selectedTheme);
+        }
         alert('تم حفظ ضوابط الولاء والهوية البصرية بنجاح!');
     } catch (err) {
         console.error("Error saving rules:", err);
@@ -325,8 +334,9 @@ window.deleteTenantGalleryImage = async function(tenantId, imgId) {
     window.loadTenantGallery(tenantId);
 };
 
-let allTenantCustomersCache = [];
-
+// ==========================================
+// العملاء والتقارير الأربعة لمدير المنشأة
+// ==========================================
 window.loadTenantCustomers = async function(tenantId) {
     const listEl = document.getElementById('tenant-customers-list');
     if (!listEl) return;
@@ -337,21 +347,170 @@ window.loadTenantCustomers = async function(tenantId) {
             listEl.innerHTML = '<p class="text-gray-400 text-sm py-4">لا توجد عملاء مسجلون في هذه المنشأة حتى الآن.</p>';
             if(document.getElementById('tenant-stat-customers')) document.getElementById('tenant-stat-customers').innerText = '0';
             if(document.getElementById('tenant-stat-points')) document.getElementById('tenant-stat-points').innerText = '0';
+            window.renderTenantReportsDashboard(tenantId, activeTenantReportTab);
             return;
         }
         let totalPts = 0;
         snap.forEach(d => {
             const c = d.data();
-            totalPts += (c.points || 0);
-            allTenantCustomersCache.push({ id: d.id, ...c });
+            const pts = Number(c.points || 0);
+            totalPts += pts;
+            allTenantCustomersCache.push({ id: d.id, ...c, points: pts });
         });
         if(document.getElementById('tenant-stat-customers')) document.getElementById('tenant-stat-customers').innerText = allTenantCustomersCache.length;
         if(document.getElementById('tenant-stat-points')) document.getElementById('tenant-stat-points').innerText = totalPts;
 
         renderTenantCustomersTable(allTenantCustomersCache);
+        window.renderTenantReportsDashboard(tenantId, activeTenantReportTab);
     } catch (err) {
         listEl.innerHTML = '<p class="text-red-500 text-sm">خطأ في تحميل عملاء المنشأة.</p>';
     }
+};
+
+window.renderTenantReportsDashboard = function(tenantId = currentTenantIdActive, reportTab = activeTenantReportTab) {
+    activeTenantReportTab = reportTab;
+    const reportsBox = document.getElementById('tenant-admin-reports-box');
+    if (!reportsBox) return;
+
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+
+    const birthdayCustomers = allTenantCustomersCache.filter(c => {
+        if (!c.birthdate) return false;
+        const parts = String(c.birthdate).split('-');
+        return parts[1] === currentMonth;
+    });
+
+    const anniversaryCustomers = allTenantCustomersCache.filter(c => {
+        if (!c.anniversary) return false;
+        const parts = String(c.anniversary).split('-');
+        return parts[1] === currentMonth;
+    });
+
+    const sortedByPointsAndActivity = [...allTenantCustomersCache].sort((a, b) => {
+        const dateA = a.updatedAt || a.lastVisitAt || a.createdAt || '';
+        const dateB = b.updatedAt || b.lastVisitAt || b.createdAt || '';
+        if (dateA && dateB && dateA !== dateB) return String(dateB).localeCompare(String(dateA));
+        return Number(b.points || 0) - Number(a.points || 0);
+    });
+
+    const totalPointsAll = allTenantCustomersCache.reduce((sum, c) => sum + Number(c.points || 0), 0);
+
+    let listToShow = allTenantCustomersCache;
+    let titleText = '1. تقرير العملاء والمحافظ';
+    if (reportTab === 'birthdays') {
+        listToShow = birthdayCustomers;
+        titleText = `2. تقرير أعياد ميلاد الشهر (شهر ${currentMonth})`;
+    } else if (reportTab === 'anniversaries') {
+        listToShow = anniversaryCustomers;
+        titleText = `3. تقرير تواريخ الزواج والمناسبات بالشهر (شهر ${currentMonth})`;
+    } else if (reportTab === 'activity') {
+        listToShow = sortedByPointsAndActivity;
+        titleText = '4. تقرير حركة ونشاط النقاط للعملاء المرتبطين';
+    }
+
+    let rowsHtml = '';
+    if (!listToShow.length) {
+        rowsHtml = '<tr><td colspan="5" class="p-4 text-center text-gray-400">لا توجد سجلات مطابقة لهذا التقرير حالياً.</td></tr>';
+    } else {
+        listToShow.forEach(c => {
+            const activityDateRaw = c.updatedAt || c.lastVisitAt || c.createdAt || '';
+            const activityLabel = activityDateRaw && !isNaN(new Date(activityDateRaw).getTime())
+                ? new Date(activityDateRaw).toLocaleDateString('ar-SA')
+                : 'مسجل';
+            rowsHtml += `
+                <tr class="hover:bg-gray-50 text-xs">
+                    <td class="p-2.5 font-bold text-indigo-950">${c.name || '--'}</td>
+                    <td class="p-2.5 font-mono" dir="ltr">${c.phone || '--'}</td>
+                    <td class="p-2.5 font-extrabold text-emerald-700">${c.points || 0} نقطة</td>
+                    <td class="p-2.5 text-gray-600">${c.birthdate || '--'} / ${c.anniversary || '--'}</td>
+                    <td class="p-2.5 text-gray-500">${activityLabel}</td>
+                </tr>
+            `;
+        });
+    }
+
+    reportsBox.innerHTML = `
+        <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+                <div>
+                    <h4 class="font-extrabold text-sm text-indigo-950">${titleText}</h4>
+                    <p class="text-[11px] text-gray-500">عدد السجلات: ${listToShow.length} • إجمالي نقاط المنشأة: ${totalPointsAll}</p>
+                </div>
+                <button type="button" onclick="window.exportTenantCustomersCSV('${reportTab}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>تصدير CSV</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-right">
+                <button type="button" onclick="window.renderTenantReportsDashboard('${tenantId}', 'all')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${reportTab === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-indigo-50/70 hover:bg-indigo-100 text-indigo-950'}">
+                    <div class="font-bold">1. العملاء والمحافظ</div>
+                    <div class="text-sm font-extrabold mt-0.5">${allTenantCustomersCache.length} عميل</div>
+                </button>
+                <button type="button" onclick="window.renderTenantReportsDashboard('${tenantId}', 'birthdays')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${reportTab === 'birthdays' ? 'bg-pink-600 text-white border-pink-600' : 'bg-pink-50/70 hover:bg-pink-100 text-pink-950'}">
+                    <div class="font-bold">2. أعياد ميلاد الشهر</div>
+                    <div class="text-sm font-extrabold mt-0.5">${birthdayCustomers.length} عميل</div>
+                </button>
+                <button type="button" onclick="window.renderTenantReportsDashboard('${tenantId}', 'anniversaries')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${reportTab === 'anniversaries' ? 'bg-amber-600 text-white border-amber-600' : 'bg-amber-50/70 hover:bg-amber-100 text-amber-950'}">
+                    <div class="font-bold">3. تواريخ الزواج بالشهر</div>
+                    <div class="text-sm font-extrabold mt-0.5">${anniversaryCustomers.length} عميل</div>
+                </button>
+                <button type="button" onclick="window.renderTenantReportsDashboard('${tenantId}', 'activity')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${reportTab === 'activity' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-emerald-50/70 hover:bg-emerald-100 text-emerald-950'}">
+                    <div class="font-bold">4. حركة ونشاط النقاط</div>
+                    <div class="text-sm font-extrabold mt-0.5">${totalPointsAll} نقطة</div>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b text-[11px] text-gray-600">
+                            <th class="p-2.5">العميل</th>
+                            <th class="p-2.5">الهاتف</th>
+                            <th class="p-2.5">رصيد النقاط</th>
+                            <th class="p-2.5">الميلاد / الزواج</th>
+                            <th class="p-2.5">آخر نشاط</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">${rowsHtml}</tbody>
+                </table>
+            </div>
+        </div>
+    `;
+};
+
+window.exportTenantCustomersCSV = function(reportTab = activeTenantReportTab) {
+    if (!allTenantCustomersCache.length) return alert('لا توجد بيانات عملاء لتصديرها.');
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+    let rows = allTenantCustomersCache;
+
+    if (reportTab === 'birthdays') {
+        rows = allTenantCustomersCache.filter(c => c.birthdate && String(c.birthdate).split('-')[1] === currentMonth);
+    } else if (reportTab === 'anniversaries') {
+        rows = allTenantCustomersCache.filter(c => c.anniversary && String(c.anniversary).split('-')[1] === currentMonth);
+    }
+
+    const headers = ['الاسم', 'الهاتف', 'البريد', 'رصيد النقاط', 'تاريخ الميلاد', 'تاريخ الزواج'];
+    const lines = [headers.join(',')];
+
+    rows.forEach(c => {
+        lines.push([
+            `"${String(c.name || '').replace(/"/g, '""')}"`,
+            `"${String(c.phone || '').replace(/"/g, '""')}"`,
+            `"${String(c.email || '').replace(/"/g, '""')}"`,
+            Number(c.points || 0),
+            `"${String(c.birthdate || '').replace(/"/g, '""')}"`,
+            `"${String(c.anniversary || '').replace(/"/g, '""')}"`
+        ].join(','));
+    });
+
+    const blob = new Blob(["\uFEFF" + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tenant_${currentTenantIdActive || 'report'}_${reportTab}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 };
 
 window.renderTenantCustomersTable = function(customers) {
