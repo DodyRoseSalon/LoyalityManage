@@ -11,8 +11,68 @@ let allUsersCache = [];
 let currentSuperReportFilter = 'all';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const GRACE_DAYS = 3;
 const REMINDER_DAYS_BEFORE_EXPIRY = 3;
+
+const SUBSCRIPTION_PLANS = {
+    lifetime: {
+        key: 'lifetime',
+        label: 'اشتراك دائم',
+        durationDays: null,
+        graceDays: 0,
+        isTrial: false,
+        isLifetime: true,
+        billingCycle: 'lifetime'
+    },
+    quarterly_90: {
+        key: 'quarterly_90',
+        label: 'ثلاثة أشهر (7 أيام سماح)',
+        durationDays: 90,
+        graceDays: 7,
+        isTrial: false,
+        isLifetime: false,
+        billingCycle: 'quarterly'
+    },
+    monthly_30: {
+        key: 'monthly_30',
+        label: 'شهر (3 أيام سماح)',
+        durationDays: 30,
+        graceDays: 3,
+        isTrial: false,
+        isLifetime: false,
+        billingCycle: 'monthly'
+    },
+    trial_30: {
+        key: 'trial_30',
+        label: 'شهر تجريبي',
+        durationDays: 30,
+        graceDays: 0,
+        isTrial: true,
+        isLifetime: false,
+        billingCycle: 'trial'
+    },
+    trial_14: {
+        key: 'trial_14',
+        label: '14 يوم تجريبي',
+        durationDays: 14,
+        graceDays: 0,
+        isTrial: true,
+        isLifetime: false,
+        billingCycle: 'trial'
+    },
+    trial_7: {
+        key: 'trial_7',
+        label: '7 أيام تجريبي',
+        durationDays: 7,
+        graceDays: 0,
+        isTrial: true,
+        isLifetime: false,
+        billingCycle: 'trial'
+    }
+};
+
+function getPlanConfig(planKey) {
+    return SUBSCRIPTION_PLANS[planKey] || SUBSCRIPTION_PLANS.monthly_30;
+}
 
 // ==========================================
 // أداة توليد أرقام المعرفات تلقائياً
@@ -63,29 +123,41 @@ function ensureAutoIdGeneratorButton() {
 }
 
 // ==========================================
-// منطق الاشتراكات الشهري والتجريبي وفترة السماح
+// منطق الباقات الست وفترة السماح وإشعارات النهاية
 // ==========================================
-function isMonthlyPlan(plan, isTrial) {
-    if (isTrial) return false;
-    return String(plan || '').startsWith('monthly');
-}
-
-function getPlanDurationDays(plan) {
-    if (plan === 'trial_7') return 7;
-    if (plan === 'trial_14') return 14;
-    if (plan === 'monthly_30') return 30;
-    return 30;
-}
-
 function computeSubscriptionState(tenantData, nowMs = Date.now()) {
-    const isTrial = Boolean(tenantData.isTrial) || String(tenantData.plan || '').startsWith('trial');
-    const monthly = isMonthlyPlan(tenantData.plan, isTrial);
-    const expiresAtMs = tenantData.expiresAt ? new Date(tenantData.expiresAt).getTime() : null;
+    const planKey = tenantData.plan || tenantData.planKey || 'monthly_30';
+    const planCfg = getPlanConfig(planKey);
 
-    if (!expiresAtMs || Number.isNaN(expiresAtMs)) {
+    if (planCfg.isLifetime || tenantData.isLifetime || !tenantData.expiresAt) {
+        if (planCfg.isLifetime || tenantData.isLifetime) {
+            return {
+                planKey: planCfg.key,
+                planLabel: planCfg.label,
+                isMonthly: false,
+                isTrial: false,
+                isLifetime: true,
+                graceDays: 0,
+                expiresAtMs: null,
+                graceEndMs: null,
+                daysUntilExpiry: null,
+                isNearExpiry: false,
+                shouldDeactivate: false,
+                inGracePeriod: false,
+                needsPreExpiryReminder: false,
+                needsExpiryNotification: false,
+                statusLabel: tenantData.isActive !== false ? 'نشط (اشتراك دائم)' : 'موقوف يدوياً',
+                statusType: tenantData.isActive !== false ? 'active' : 'inactive'
+            };
+        }
+
         return {
-            isMonthly: monthly,
-            isTrial,
+            planKey: planCfg.key,
+            planLabel: planCfg.label,
+            isMonthly: planCfg.billingCycle === 'monthly' || planCfg.billingCycle === 'quarterly',
+            isTrial: planCfg.isTrial,
+            isLifetime: false,
+            graceDays: planCfg.graceDays,
             expiresAtMs: null,
             graceEndMs: null,
             daysUntilExpiry: null,
@@ -93,123 +165,203 @@ function computeSubscriptionState(tenantData, nowMs = Date.now()) {
             shouldDeactivate: false,
             inGracePeriod: false,
             needsPreExpiryReminder: false,
-            statusLabel: tenantData.isActive ? 'نشط' : 'موقوف',
-            statusType: tenantData.isActive ? 'active' : 'inactive',
-            planLabel: isTrial ? 'تجريبي / مجاني' : 'شهري'
+            needsExpiryNotification: false,
+            statusLabel: tenantData.isActive !== false ? 'نشط' : 'موقوف',
+            statusType: tenantData.isActive !== false ? 'active' : 'inactive'
         };
     }
 
+    const expiresAtMs = new Date(tenantData.expiresAt).getTime();
+    if (Number.isNaN(expiresAtMs)) {
+        return {
+            planKey: planCfg.key,
+            planLabel: planCfg.label,
+            isMonthly: false,
+            isTrial: planCfg.isTrial,
+            isLifetime: false,
+            graceDays: planCfg.graceDays,
+            expiresAtMs: null,
+            graceEndMs: null,
+            daysUntilExpiry: null,
+            isNearExpiry: false,
+            shouldDeactivate: false,
+            inGracePeriod: false,
+            needsPreExpiryReminder: false,
+            needsExpiryNotification: false,
+            statusLabel: tenantData.isActive !== false ? 'نشط' : 'موقوف',
+            statusType: tenantData.isActive !== false ? 'active' : 'inactive'
+        };
+    }
+
+    const graceDays = typeof tenantData.graceDays === 'number' ? tenantData.graceDays : planCfg.graceDays;
+    const graceEndMs = expiresAtMs + (graceDays * DAY_MS);
     const msUntilExpiry = expiresAtMs - nowMs;
     const daysUntilExpiry = msUntilExpiry / DAY_MS;
 
-    if (!monthly) {
-        const expired = nowMs >= expiresAtMs;
-        const nearTrial = !expired && daysUntilExpiry <= REMINDER_DAYS_BEFORE_EXPIRY;
+    // 1. قبل انتهاء المدة الأساسية للاشتراك أو التجربة
+    if (nowMs < expiresAtMs) {
+        const daysLeft = Math.max(1, Math.ceil(daysUntilExpiry));
+        const isNearExpiry = daysLeft <= REMINDER_DAYS_BEFORE_EXPIRY;
+        const needsPreExpiryReminder = isNearExpiry && !tenantData.preExpiryNotifiedForCycle;
+
         return {
-            isMonthly: false,
-            isTrial: true,
+            planKey: planCfg.key,
+            planLabel: planCfg.label,
+            isMonthly: planCfg.billingCycle === 'monthly' || planCfg.billingCycle === 'quarterly',
+            isTrial: planCfg.isTrial,
+            isLifetime: false,
+            graceDays,
             expiresAtMs,
-            graceEndMs: expiresAtMs,
+            graceEndMs,
             daysUntilExpiry,
-            isNearExpiry: nearTrial,
-            shouldDeactivate: expired,
+            isNearExpiry,
+            shouldDeactivate: false,
             inGracePeriod: false,
-            needsPreExpiryReminder: false,
-            statusLabel: expired ? 'منتهي / موقوف' : (tenantData.isActive ? 'تجريبي نشط' : 'موقوف'),
-            statusType: expired || !tenantData.isActive ? 'inactive' : 'active',
-            planLabel: 'تجريبي / مجاني'
+            needsPreExpiryReminder,
+            needsExpiryNotification: false,
+            statusLabel: tenantData.isActive !== false
+                ? (isNearExpiry ? `قريب الانتهاء (${daysLeft} يوم)` : (planCfg.isTrial ? `تجريبي نشط (${daysLeft} يوم)` : `نشط (${daysLeft} يوم)`))
+                : 'موقوف',
+            statusType: tenantData.isActive !== false ? 'active' : 'inactive'
         };
     }
 
-    const graceEndMs = expiresAtMs + (GRACE_DAYS * DAY_MS);
-    const isNearExpiry = daysUntilExpiry <= REMINDER_DAYS_BEFORE_EXPIRY && daysUntilExpiry > 0;
-    const needsPreExpiryReminder = isNearExpiry && !tenantData.preExpiryNotifiedForCycle;
-    const inGracePeriod = nowMs >= expiresAtMs && nowMs < graceEndMs;
-    const graceExpired = nowMs >= graceEndMs;
-
-    let statusLabel = 'شهري نشط';
-    let statusType = 'active';
-
-    if (graceExpired) {
-        statusLabel = 'موقوف بعد السماح';
-        statusType = 'inactive';
-    } else if (inGracePeriod) {
+    // 2. بعد انتهاء المدة الأساسية وضمن فترة السماح (للباقات التي لها أيام سماح فقط)
+    if (graceDays > 0 && nowMs < graceEndMs) {
         const remainingGraceDays = Math.max(1, Math.ceil((graceEndMs - nowMs) / DAY_MS));
-        statusLabel = `فترة سماح (${remainingGraceDays} يوم)`;
-        statusType = 'grace';
-    } else if (!tenantData.isActive) {
-        statusLabel = 'موقوف';
-        statusType = 'inactive';
-    } else if (isNearExpiry) {
-        statusLabel = 'قريب الانتهاء (تنبيه)';
-        statusType = 'active';
+        return {
+            planKey: planCfg.key,
+            planLabel: planCfg.label,
+            isMonthly: true,
+            isTrial: false,
+            isLifetime: false,
+            graceDays,
+            expiresAtMs,
+            graceEndMs,
+            daysUntilExpiry,
+            isNearExpiry: true,
+            shouldDeactivate: false,
+            inGracePeriod: true,
+            needsPreExpiryReminder: false,
+            needsExpiryNotification: !tenantData.expiryNotifiedForCycle,
+            statusLabel: `انتهى الاشتراك — فترة سماح (${remainingGraceDays} يوم)`,
+            statusType: 'grace'
+        };
     }
 
+    // 3. الوصول لنهاية الاشتراك أو نهاية فترة السماح (أو نهاية الباقة التجريبية)
     return {
-        isMonthly: true,
-        isTrial: false,
+        planKey: planCfg.key,
+        planLabel: planCfg.label,
+        isMonthly: planCfg.billingCycle === 'monthly' || planCfg.billingCycle === 'quarterly',
+        isTrial: planCfg.isTrial,
+        isLifetime: false,
+        graceDays,
         expiresAtMs,
         graceEndMs,
         daysUntilExpiry,
-        isNearExpiry,
-        shouldDeactivate: graceExpired,
-        inGracePeriod,
-        needsPreExpiryReminder,
-        statusLabel,
-        statusType,
-        planLabel: 'شهري'
+        isNearExpiry: false,
+        shouldDeactivate: true,
+        inGracePeriod: false,
+        needsPreExpiryReminder: false,
+        needsExpiryNotification: !tenantData.expiryNotifiedForCycle,
+        statusLabel: 'منتهي / موقوف',
+        statusType: 'inactive'
     };
 }
 
-async function triggerPreExpiryReminderNotification(tenantId, tenantData, subState) {
+async function recordSubscriptionNotification(tenantId, tenantData, subState, mode = 'pre_expiry') {
     const targetEmail = tenantData.managerEmail || tenantData.contactEmail || '';
-    const expDateStr = new Date(subState.expiresAtMs).toISOString().slice(0, 10);
+    const businessName = tenantData.businessName || tenantData.name || tenantId;
+    const expDateStr = subState.expiresAtMs ? new Date(subState.expiresAtMs).toLocaleDateString('ar-SA') : '--';
+    const graceEndStr = (subState.graceDays > 0 && subState.graceEndMs)
+        ? new Date(subState.graceEndMs).toLocaleDateString('ar-SA')
+        : null;
+
+    let type = 'pre_expiry_3_days';
+    let message = `تنبيه: اشتراك منشأة (${businessName}) ضمن باقة (${subState.planLabel}) ينتهي بتاريخ ${expDateStr}.`;
+
+    if (mode === 'grace_started') {
+        type = 'subscription_ended_grace_period';
+        message = `إشعار نهاية الاشتراك: وصلت منشأة (${businessName}) إلى نهاية مدة باقة (${subState.planLabel}) بتاريخ ${expDateStr}، وهي الآن ضمن فترة السماح (${subState.graceDays} أيام) حتى تاريخ ${graceEndStr} قبل الإيقاف التلقائي.`;
+    } else if (mode === 'expired_deactivated') {
+        type = 'subscription_ended_deactivated';
+        message = subState.graceDays > 0
+            ? `إشعار انتهاء الاشتراك والإيقاف: وصلت منشأة (${businessName}) ضمن باقة (${subState.planLabel}) إلى نهاية فترة السماح بتاريخ ${graceEndStr} وتم إيقاف المنشأة تلقائياً لحين التجديد.`
+            : `إشعار نهاية الاشتراك والإيقاف: وصلت منشأة (${businessName}) إلى نهاية مدة باقة (${subState.planLabel}) بتاريخ ${expDateStr} وتم إيقاف المنشأة تلقائياً لحين التجديد.`;
+    }
 
     const notifRef = doc(collection(db, "subscription_notifications"));
     await setDoc(notifRef, {
         tenantId,
-        businessName: tenantData.businessName || tenantData.name || tenantId,
+        businessName,
+        planKey: subState.planKey,
+        planLabel: subState.planLabel,
         recipientEmail: targetEmail,
-        type: 'pre_expiry_3_days',
-        expiresAt: new Date(subState.expiresAtMs).toISOString(),
-        graceEndAt: new Date(subState.graceEndMs).toISOString(),
-        message: `تنبيه: اشتراك منشأة (${tenantData.businessName || tenantId}) ينتهي بتاريخ ${expDateStr}، ولديكم 3 أيام سماح بعد الانتهاء (إجمالي 6 أيام للسداد والتنشيط).`,
+        type,
+        expiresAt: subState.expiresAtMs ? new Date(subState.expiresAtMs).toISOString() : null,
+        graceEndAt: subState.graceEndMs ? new Date(subState.graceEndMs).toISOString() : null,
+        message,
         createdAt: new Date().toISOString(),
         status: targetEmail ? 'queued_for_email' : 'missing_manager_email'
     });
 
-    await updateDoc(doc(db, "tenants", tenantId), {
-        preExpiryNotifiedForCycle: true,
-        lastReminderSentAt: new Date().toISOString()
-    });
+    const tenantUpdates = {
+        lastNotificationMessage: message,
+        lastNotificationAt: new Date().toISOString()
+    };
+
+    if (mode === 'pre_expiry') {
+        tenantUpdates.preExpiryNotifiedForCycle = true;
+    } else if (mode === 'grace_started' || mode === 'expired_deactivated') {
+        tenantUpdates.expiryNotifiedForCycle = true;
+    }
+
+    await updateDoc(doc(db, "tenants", tenantId), tenantUpdates);
+    Object.assign(tenantData, tenantUpdates);
 }
 
 window.runSubscriptionLifecycleCheck = async function(showSummaryAlert = false) {
     const nowMs = Date.now();
     let deactivatedCount = 0;
-    let remindersCount = 0;
+    let notificationsCount = 0;
+    const endedNotices = [];
 
     for (const tenant of allTenantsData) {
         const state = computeSubscriptionState(tenant, nowMs);
 
         if (state.needsPreExpiryReminder) {
-            await triggerPreExpiryReminderNotification(tenant.id, tenant, state);
-            remindersCount++;
+            await recordSubscriptionNotification(tenant.id, tenant, state, 'pre_expiry');
+            notificationsCount++;
         }
 
-        if (state.shouldDeactivate && tenant.isActive !== false) {
-            await updateDoc(doc(db, "tenants", tenant.id), {
-                isActive: false,
-                deactivatedAt: new Date().toISOString(),
-                deactivationReason: state.isMonthly ? 'monthly_grace_period_ended' : 'trial_expired'
-            });
-            tenant.isActive = false;
-            deactivatedCount++;
+        if (state.shouldDeactivate) {
+            if (state.needsExpiryNotification) {
+                await recordSubscriptionNotification(tenant.id, tenant, state, 'expired_deactivated');
+                notificationsCount++;
+            }
+            if (tenant.isActive !== false) {
+                await updateDoc(doc(db, "tenants", tenant.id), {
+                    isActive: false,
+                    deactivatedAt: new Date().toISOString(),
+                    deactivationReason: state.planKey === 'quarterly_90'
+                        ? 'quarterly_grace_period_ended'
+                        : (state.planKey === 'monthly_30' ? 'monthly_grace_period_ended' : 'trial_period_ended')
+                });
+                tenant.isActive = false;
+                deactivatedCount++;
+            }
+            endedNotices.push(`• ${tenant.businessName || tenant.name || tenant.id} (${state.planLabel}): تم الوصول لنهاية الاشتراك وإيقاف الحساب.`);
+        } else if (state.inGracePeriod && state.needsExpiryNotification) {
+            await recordSubscriptionNotification(tenant.id, tenant, state, 'grace_started');
+            notificationsCount++;
+            endedNotices.push(`• ${tenant.businessName || tenant.name || tenant.id} (${state.planLabel}): وصل إلى نهاية الاشتراك وهو الآن ضمن فترة السماح (${state.graceDays} أيام).`);
         }
     }
 
     if (showSummaryAlert) {
-        alert(`تم فحص الاشتراكات: تم إيقاف (${deactivatedCount}) منشأة منتهية، وتسجيل (${remindersCount}) إشعار تجديد قبل الانتهاء بـ 3 أيام.`);
+        const noticesBlock = endedNotices.length ? `\n\nإشعارات نهاية الاشتراك:\n${endedNotices.join('\n')}` : '';
+        alert(`تم فحص الاشتراكات: تم إيقاف (${deactivatedCount}) منشأة منتهية، وتسجيل (${notificationsCount}) إشعار.${noticesBlock}`);
         if (typeof window.loadTenants === 'function') {
             await window.loadTenants();
         }
@@ -229,8 +381,12 @@ window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReport
 
     const activeCount = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'active').length;
     const graceCount = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'grace').length;
-    const nearExpiryCount = enriched.filter(x => x.sub.isNearExpiry).length;
+    const nearExpiryCount = enriched.filter(x => x.sub.isNearExpiry && !x.sub.inGracePeriod).length;
     const inactiveCount = enriched.filter(x => !x.tenant.isActive || x.sub.statusType === 'inactive').length;
+
+    const endNotifications = enriched
+        .filter(x => x.sub.inGracePeriod || x.sub.shouldDeactivate || x.tenant.lastNotificationMessage)
+        .slice(0, 6);
 
     let filteredList = enriched;
     if (filterMode === 'active') {
@@ -238,7 +394,7 @@ window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReport
     } else if (filterMode === 'grace') {
         filteredList = enriched.filter(x => x.tenant.isActive && x.sub.statusType === 'grace');
     } else if (filterMode === 'near_expiry') {
-        filteredList = enriched.filter(x => x.sub.isNearExpiry);
+        filteredList = enriched.filter(x => x.sub.isNearExpiry && !x.sub.inGracePeriod);
     } else if (filterMode === 'inactive') {
         filteredList = enriched.filter(x => !x.tenant.isActive || x.sub.statusType === 'inactive');
     }
@@ -257,8 +413,14 @@ window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReport
     } else {
         filteredList.forEach(({ tenant, sub }) => {
             const name = tenant.businessName || tenant.name || '--';
-            const expStr = tenant.expiresAt ? new Date(tenant.expiresAt).toLocaleDateString('ar-SA') : '--';
-            const graceStr = (sub.isMonthly && sub.graceEndMs) ? new Date(sub.graceEndMs).toLocaleDateString('ar-SA') : 'لا يوجد (إيقاف مباشر)';
+            const expStr = sub.isLifetime
+                ? 'بدون انتهاء (دائم)'
+                : (tenant.expiresAt ? new Date(tenant.expiresAt).toLocaleDateString('ar-SA') : '--');
+            const graceStr = sub.isLifetime
+                ? 'لا ينطبق'
+                : ((sub.graceDays > 0 && sub.graceEndMs)
+                    ? `${new Date(sub.graceEndMs).toLocaleDateString('ar-SA')} (${sub.graceDays} أيام)`
+                    : 'لا يوجد (إيقاف مباشر)');
             rowsHtml += `
                 <tr class="hover:bg-gray-50 text-xs">
                     <td class="p-2.5 font-bold text-gray-800">${name} <span class="font-mono text-indigo-600">(${tenant.id})</span></td>
@@ -270,6 +432,24 @@ window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReport
             `;
         });
     }
+
+    const noticesHtml = endNotifications.length > 0
+        ? `<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-1.5">
+            <div class="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-bell"></i>
+                <span>إشعارات نهاية الاشتراك وفترة السماح</span>
+            </div>
+            <ul class="text-[11px] text-amber-900 space-y-1 pr-3 list-disc">
+                ${endNotifications.map(({ tenant, sub }) => {
+                    const msg = tenant.lastNotificationMessage ||
+                        (sub.shouldDeactivate
+                            ? `منشأة (${tenant.businessName || tenant.name || tenant.id}) وصلت لنهاية باقة (${sub.planLabel}) وتم إيقافها.`
+                            : `منشأة (${tenant.businessName || tenant.name || tenant.id}) وصلت لنهاية باقة (${sub.planLabel}) وهي ضمن فترة السماح.`);
+                    return `<li>${msg}</li>`;
+                }).join('')}
+            </ul>
+        </div>`
+        : '';
 
     reportBox.innerHTML = `
         <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs space-y-4">
@@ -283,6 +463,8 @@ window.renderSuperAdminReportsSummary = function(filterMode = currentSuperReport
                     <span>تصدير التقرير CSV</span>
                 </button>
             </div>
+
+            ${noticesHtml}
 
             <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-right">
                 <button type="button" onclick="window.renderSuperAdminReportsSummary('all')" class="p-2.5 rounded-xl border text-xs transition cursor-pointer ${filterMode === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 hover:bg-gray-100 text-gray-800'}">
@@ -341,7 +523,7 @@ window.exportSuperAdminTenantsCSV = function() {
             `"${String(t.currency || '').replace(/"/g, '""')}"`,
             `"${String(sub.planLabel || '').replace(/"/g, '""')}"`,
             `"${String(sub.statusLabel || '').replace(/"/g, '""')}"`,
-            `"${t.expiresAt ? new Date(t.expiresAt).toISOString().slice(0, 10) : ''}"`
+            `"${sub.isLifetime ? 'دائم' : (t.expiresAt ? new Date(t.expiresAt).toISOString().slice(0, 10) : '')}"`
         ];
         lines.push(row.join(','));
     });
@@ -574,9 +756,11 @@ function renderTenantsTable(tenants) {
 
     tenants.forEach(data => {
         const sub = computeSubscriptionState(data);
-        const planBadge = sub.isTrial
-            ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي / مجاني</span>'
-            : '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">شهري</span>';
+        const planBadge = sub.isLifetime
+            ? '<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-semibold">اشتراك دائم</span>'
+            : (sub.isTrial
+                ? '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-semibold">تجريبي / مجاني</span>'
+                : '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">مدفوع</span>');
 
         let statusBadge = '<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">موقوف</span>';
         if (data.isActive && sub.statusType === 'grace') {
@@ -585,12 +769,14 @@ function renderTenantsTable(tenants) {
             statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-bold">${sub.statusLabel}</span>`;
         }
 
-        const expFormatted = data.expiresAt ? new Date(data.expiresAt).toLocaleDateString('ar-SA') : '--';
+        const expFormatted = sub.isLifetime
+            ? 'دائم (لا ينتهي)'
+            : (data.expiresAt ? new Date(data.expiresAt).toLocaleDateString('ar-SA') : '--');
         const bName = data.businessName || data.name || '--';
         html += `<tr class="hover:bg-gray-50">
             <td class="p-3 font-semibold">${bName}</td>
             <td class="p-3 text-xs"><span class="font-mono text-indigo-600">${data.id}</span><br><span class="text-gray-500">${data.country || 'المملكة العربية السعودية'}</span></td>
-            <td class="p-3 text-xs">${planBadge} (${data.currency || 'ريال'})</td>
+            <td class="p-3 text-xs">${planBadge} <span class="font-semibold">${sub.planLabel}</span> (${data.currency || 'ريال'})</td>
             <td class="p-3 text-xs">${statusBadge}<br><span class="text-[11px] text-gray-500">ينتهي: ${expFormatted}</span></td>
             <td class="p-3 flex gap-1.5 flex-wrap">
                 <button onclick="toggleTenantStatus('${data.id}', ${Boolean(data.isActive)})" class="px-2 py-1 rounded text-xs text-white ${data.isActive ? 'bg-amber-500' : 'bg-emerald-600'} cursor-pointer">${data.isActive ? 'إيقاف' : 'تنشيط'}</button>
@@ -625,13 +811,14 @@ window.createTenant = async function(event) {
     const managerEmail = managerEmailInput ? managerEmailInput.value.trim().toLowerCase() : '';
     const country = countryInput ? countryInput.value : "المملكة العربية السعودية";
     const currency = currencyInput ? currencyInput.value : "ريال سعودي";
-    const plan = planInput ? planInput.value : "monthly_30";
+    const planKey = planInput ? planInput.value : "monthly_30";
     const theme = themeInput ? themeInput.value : "indigo";
 
-    const isTrial = plan.startsWith('trial');
-    const durationDays = getPlanDurationDays(plan);
+    const planCfg = getPlanConfig(planKey);
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + (durationDays * DAY_MS)).toISOString();
+    const expiresAt = planCfg.isLifetime || planCfg.durationDays === null
+        ? null
+        : new Date(now.getTime() + (planCfg.durationDays * DAY_MS)).toISOString();
 
     try {
         const tenantRef = doc(db, "tenants", tenantId);
@@ -649,18 +836,21 @@ window.createTenant = async function(event) {
             managerEmail,
             country,
             currency,
-            plan,
-            billingCycle: isTrial ? 'trial' : 'monthly',
-            graceDays: isTrial ? 0 : GRACE_DAYS,
+            plan: planCfg.key,
+            planLabel: planCfg.label,
+            billingCycle: planCfg.billingCycle,
+            graceDays: planCfg.graceDays,
             theme,
             isActive: true,
-            isTrial,
+            isTrial: planCfg.isTrial,
+            isLifetime: planCfg.isLifetime,
             expiresAt,
             preExpiryNotifiedForCycle: false,
+            expiryNotifiedForCycle: false,
             createdAt: now.toISOString()
         });
 
-        alert(`تم إنشاء المنشأة بنجاح بالمعرف الرقمي (${tenantId}) وتحديد هويتها البصرية!`);
+        alert(`تم إنشاء المنشأة بنجاح بالمعرف الرقمي (${tenantId}) وتحديد الباقة (${planCfg.label}) وهويتها البصرية!`);
         tenantNameInput.value = '';
         if (managerEmailInput) managerEmailInput.value = '';
         if (typeof window.loadTenants === 'function') {
@@ -678,6 +868,7 @@ window.toggleTenantStatus = async function(tenantId, currentStatus) {
     const updates = { isActive: nextActive };
     if (nextActive) {
         updates.preExpiryNotifiedForCycle = false;
+        updates.expiryNotifiedForCycle = false;
         updates.reactivatedAt = new Date().toISOString();
     }
     await updateDoc(doc(db, "tenants", tenantId), updates);
@@ -695,7 +886,9 @@ window.extendTenantDays = async function(tenantId, days) {
     await updateDoc(doc(db, "tenants", tenantId), {
         expiresAt: currentExp.toISOString(),
         isActive: true,
+        isLifetime: false,
         preExpiryNotifiedForCycle: false,
+        expiryNotifiedForCycle: false,
         renewedAt: new Date().toISOString()
     });
     alert(`تم تمديد وتنشيط اشتراك المنشأة بـ ${days} يوماً بنجاح!`);
